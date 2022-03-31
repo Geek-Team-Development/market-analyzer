@@ -11,10 +11,14 @@
         <relativePath/>
     </parent>
 
-    <groupId>ru.m-analyzer</groupId>
+    <groupId>ru.manalyzer</groupId>
     <artifactId>market-analyzer</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
+
+    <modules>
+        <module>analyzer-dto</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
