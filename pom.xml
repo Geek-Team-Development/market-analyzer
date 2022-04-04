@@ -18,6 +18,7 @@
 
     <modules>
         <module>analyzer-dto</module>
+        <module>alalyzer-parser</module>
     </modules>
 
     <properties>
