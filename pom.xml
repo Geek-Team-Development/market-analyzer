@@ -19,6 +19,7 @@
     <modules>
         <module>analyzer-dto</module>
         <module>alalyzer-parser</module>
+        <module>parser-shop-oldi</module>
     </modules>
 
     <properties>
