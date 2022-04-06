@@ -1,0 +1,178 @@
+{
+  "headers" : {
+    "Server" : [
+      "nginx"
+    ],
+    "Date" : [
+      "Fri, 01 Apr 2022 15:28:12 GMT"
+    ],
+    "Content-Type" : [
+      "application/json; charset=utf-8"
+    ],
+    "Transfer-Encoding" : [
+      "chunked"
+    ],
+    "Connection" : [
+      "keep-alive"
+    ],
+    "Set-Cookie" : [
+      "__lhash_=b608d944555b3daae0e3edbfbaa62edb; Max-Age=604800; Path=/",
+      "MVID_ENVCLOUD=reserve; path=/; Max-Age=600"
+    ],
+    "x-powered-by" : [
+      "Express"
+    ],
+    "etag" : [
+      "W/\"10537-W7dDz5+pCO7DKnZS42xUL0JyO8Q\""
+    ],
+    "rev" : [
+      ".5"
+    ],
+    "cache-control" : [
+      "no-store, no-cache"
+    ],
+    "lbu-ha" : [
+      "reserve"
+    ],
+    "lbu" : [
+      "reserve-bff"
+    ],
+    "MVID-Uber-Trace-Id" : [
+      "1f126100815314a:3d1f1da902b225c2:1f126100815314a:1"
+    ],
+    "vary" : [
+      "Origin"
+    ],
+    "access-control-allow-credentials" : [
+      "true"
+    ]
+  },
+  "body" : {
+    "body" : {
+      "products" : [
+        {
+          "productId" : "20066174",
+          "image" : "Pdb/small_pic/480/20066174b.jpg",
+          "name" : "Встраиваемый холодильник комби Haier BCFT629TWRU"
+        },
+        {
+          "productId" : "50041286",
+          "image" : "Pdb/small_pic/480/50041286b.jpg",
+          "name" : "Поглотитель запаха в холодильнике Electrolux E6RDO101"
+        },
+        {
+          "productId" : "20076370",
+          "image" : "Pdb/small_pic/480/20076370b.jpg",
+          "name" : "Встраиваемый холодильник комби Bosch Serie|2 KIV86NS20R"
+        },
+        {
+          "productId" : "20055393",
+          "image" : "Pdb/small_pic/480/20055393b.jpg",
+          "name" : "Холодильник Hotpoint-Ariston HF 5200 M"
+        },
+        {
+          "productId" : "20035896",
+          "image" : "Pdb/small_pic/480/20035896b.jpg",
+          "name" : "Холодильник многодверный Haier A2F635CWMV"
+        },
+        {
+          "productId" : "20062422",
+          "image" : "Pdb/small_pic/480/20062422b.jpg",
+          "name" : "Холодильник многодверный Haier HTF-456DM6RU"
+        },
+        {
+          "productId" : "20066238",
+          "image" : "Pdb/small_pic/480/20066238b.jpg",
+          "name" : "Холодильник LG DoorCooling+ GA-B509CLWL"
+        },
+        {
+          "productId" : "20072123",
+          "image" : "Pdb/small_pic/480/20072123b.jpg",
+          "name" : "Холодильник Haier CEF537AGG"
+        },
+        {
+          "productId" : "20039121",
+          "image" : "Pdb/small_pic/480/20039121b.jpg",
+          "name" : "Холодильник Indesit DS 4180 SB"
+        },
+        {
+          "productId" : "20032604",
+          "image" : "Pdb/small_pic/480/20032604b.jpg",
+          "name" : "Встраиваемый холодильник комби Electrolux ENN93153AW"
+        },
+        {
+          "productId" : "20073033",
+          "image" : "Pdb/small_pic/480/20073033b.jpg",
+          "name" : "Холодильник (Side-by-Side) Novex NSSN017832S"
+        },
+        {
+          "productId" : "20062974",
+          "image" : "Pdb/small_pic/480/20062974b.jpg",
+          "name" : "Холодильник Hotpoint-Ariston HMD 520 W"
+        },
+        {
+          "productId" : "20062531",
+          "image" : "Pdb/small_pic/480/20062531b.jpg",
+          "name" : "Холодильник Haier C4F744CWG"
+        },
+        {
+          "productId" : "20039345",
+          "image" : "Pdb/small_pic/480/20039345b.jpg",
+          "name" : "Встраиваемый холодильник комби Hotpoint-Ariston BCB 7525 E C AA O3(RU)"
+        },
+        {
+          "productId" : "20060470",
+          "image" : "Pdb/small_pic/480/20060470b.jpg",
+          "name" : "Встраиваемый холодильник комби Whirlpool SP40 801 EU"
+        },
+        {
+          "productId" : "20037126",
+          "image" : "Pdb/small_pic/480/20037126b.jpg",
+          "name" : "Холодильник Samsung RT35K5440S8"
+        },
+        {
+          "productId" : "20051828",
+          "image" : "Pdb/small_pic/480/20051828b.jpg",
+          "name" : "Холодильник многодверный Haier A2F637CGG"
+        },
+        {
+          "productId" : "20062868",
+          "image" : "Pdb/small_pic/480/20062868b.jpg",
+          "name" : "Холодильник (Side-by-Side) Samsung RS64R5331B4"
+        },
+        {
+          "productId" : "20039763",
+          "image" : "Pdb/small_pic/480/20039763b.jpg",
+          "name" : "Холодильник Beko RCSK 310M20 W"
+        },
+        {
+          "productId" : "20068161",
+          "image" : "Pdb/small_pic/480/20068161b.jpg",
+          "name" : "Холодильник Whirlpool W7 931T W"
+        },
+        {
+          "productId" : "20070644",
+          "image" : "Pdb/small_pic/480/20070644b.jpg",
+          "name" : "Холодильник Indesit ITS 4180 S"
+        },
+        {
+          "productId" : "20066810",
+          "image" : "Pdb/small_pic/480/20066810b.jpg",
+          "name" : "Холодильник Samsung RB41R7747B1"
+        },
+        {
+          "productId" : "20025680",
+          "image" : "Pdb/small_pic/480/20025680b.jpg",
+          "name" : "Холодильник Indesit MT 08 T"
+        },
+        {
+          "productId" : "20037268",
+          "image" : "Pdb/small_pic/480/20037268b.jpg",
+          "name" : "Холодильник многодверный Haier HB25FSSAAARU"
+        }
+      ]
+    }
+  },
+  "statusCode" : "OK",
+  "statusCodeValue" : 200
+}
