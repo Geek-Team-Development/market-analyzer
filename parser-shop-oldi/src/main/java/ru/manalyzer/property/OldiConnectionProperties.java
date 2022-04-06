@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Parameters for connecting to the online store.
+ */
 @Component
 @PropertySource("classpath:oldi-connection.properties")
 @ConfigurationProperties(prefix = "shop")

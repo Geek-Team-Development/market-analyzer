@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.manalyzer.property.OldiConnectionProperties;
 
+/**
+ * Performs conversions between dto objects of the online store and ProductDto
+ */
 @Component
 @Getter
 @Setter
@@ -25,6 +28,11 @@ public class ConverterOldiDtoToDto implements ConverterDto {
         this.shopUri = connectionProperties.getShopUri();
     }
 
+    /**
+     * Converts the dto object of the online store to ProductDto.
+     * @param oldiProductDto - dto object of the online store.
+     * @return - ProductDto object.
+     */
     @Override
     public ProductDto convertToDto(OldiProductDto oldiProductDto) {
         return new ProductDto(

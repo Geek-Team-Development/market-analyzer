@@ -15,6 +15,9 @@ import ru.manalyzer.dto.ProductDto;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Responsible for loading and converting product information from Oldi store
+ */
 @Service
 @Log4j2
 public class OldiParser implements Parser {
@@ -29,11 +32,17 @@ public class OldiParser implements Parser {
         this.converterOldiDtoToDto = converterDto;
     }
 
+    /**
+     * Loads a list of products and converts to ProductDto format
+     * @param searchName - parameters for connecting to the online store
+     * @return Flux<ProductDto> or empty Flux<ProductDto> if an error occurred
+     */
     @Override
     public Flux<ProductDto> parse(String searchName) {
+        // Set search query parameter
         connectionProperties.getQueryParams().put(connectionProperties.getSearchParamName(), searchName);
-        WebClient client = WebClient.create(connectionProperties.getSearchUri());
 
+        WebClient client = WebClient.create(connectionProperties.getSearchUri());
         return client
                 .get()
                 .uri(uriBuilder -> {
