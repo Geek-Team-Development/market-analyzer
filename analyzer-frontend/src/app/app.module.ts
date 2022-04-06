@@ -6,6 +6,8 @@ import { AppComponent } from './app.component';
 import { MainPageComponent } from './components/pages/main-page/main-page.component';
 import { FooterComponent } from './components/pages/footer/footer.component';
 import { NavBarComponent } from './components/pages/nav-bar/nav-bar.component';
+import {HttpClientModule} from "@angular/common/http";
+import {FormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -16,7 +18,9 @@ import { NavBarComponent } from './components/pages/nav-bar/nav-bar.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    HttpClientModule,
+    AppRoutingModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

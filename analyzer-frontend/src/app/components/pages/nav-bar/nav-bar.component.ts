@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {ProductFilter} from "../../../model/ProductFilter";
 
 @Component({
   selector: 'app-nav-bar',
@@ -7,9 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NavBarComponent implements OnInit {
 
-  constructor() { }
+  @Output() filterApplied = new EventEmitter<ProductFilter>();
+
+  productFilter: ProductFilter = new ProductFilter("");
+
+  constructor() {
+  }
 
   ngOnInit(): void {
+  }
+
+  applyFilter() {
+    this.filterApplied.emit(this.productFilter);
   }
 
 }
