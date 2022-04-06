@@ -1,0 +1,20 @@
+<div class="row row-cols-1 row-cols-md-3 g-4">
+
+  <div *ngFor="let product of products" class="col">
+    <div class="card">
+      <img alt="Card image cap" class="card-img-top" height="200" src="{{product.imageLink}}"
+           width="100">
+      <div class="card-body">
+        <h5 class="card-title">{{product.name}}</h5>
+        <p class="card-text">{{product.shopName}}</p>
+        <p class="card-text">Price: {{product.price}}</p>
+        <a class="btn btn-primary" routerLink="{{product.productLink}}">View</a>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="products.length == 0" class="col">
+    No data
+  </div>
+
+</div>
