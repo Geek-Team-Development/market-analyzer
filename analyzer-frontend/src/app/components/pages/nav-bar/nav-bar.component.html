@@ -1,8 +1,8 @@
 <form (ngSubmit)="applyFilter()">
-  <label class="form-label" for="namePattern">Поиск по названию</label>
+  <label class="form-label" for="searchName">Поиск по названию</label>
   <div class="input-group mb-3">
-    <input [(ngModel)]="productFilter.namePattern" aria-label="Name" class="form-control" id="namePattern"
-           name="namePattern" placeholder="Название продукта" type="text">
+    <input [(ngModel)]="productFilter.searchName" aria-label="Name" class="form-control" id="searchName"
+           name="searchName" placeholder="Название продукта" type="text">
   </div>
   <button class="btn btn-primary" type="submit">Apply</button>
 </form>

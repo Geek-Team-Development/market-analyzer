@@ -1,4 +1,4 @@
 export class ProductFilter {
-  constructor(public namePattern: string) {
+  constructor(public searchName: string) {
   }
 }

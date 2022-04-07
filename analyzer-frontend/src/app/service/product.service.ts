@@ -12,13 +12,11 @@ export class ProductService {
   constructor(private http: HttpClient) {
   }
 
-  public findAll(productFilter?: ProductFilter, page?: number): Observable<Page> {
+  public findAll(productFilter?: ProductFilter): Observable<Page> {
     let params = new HttpParams();
-    if (productFilter?.namePattern != null) {
-      params = params.set('namePattern', productFilter?.namePattern);
+    if (productFilter?.searchName != null) {
+      params = params.set('searchName', productFilter?.searchName);
     }
-    params = params.set("page", page != null ? page : 1);
-    params = params.set("size", 6);
     return this.http.get<Page>('/product', {params: params});
   }
 }
