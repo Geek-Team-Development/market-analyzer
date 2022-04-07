@@ -10,13 +10,15 @@ import org.mockserver.model.Header;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 import reactor.netty.http.client.HttpClient;
+import ru.manalyzer.parser.mvideo.config.MVideoProperties;
 import ru.manalyzer.parser.mvideo.utils.TestUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,22 +28,22 @@ import static org.mockserver.model.HttpResponse.response;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MVideoCookieServiceTest {
 
-    private Properties properties;
     private WebClient webClient;
     private ClientAndServer mockServer;
 
-    private static final String propertyFilePath = "/mvideo-cookie-service-test/test.properties";
-    private String hostname;
-    private Integer port;
+    private static MVideoProperties.Cookies properties;
+    private static final String propertyFile = "/mvideo-cookie-service-test/test.yaml";
+    private static final String cookieResponseFile = "/mvideo-cookie-service-test/cookie-response.json";
+    private static final String expectedCookiesFileName = "/mvideo-cookie-service-test/expected-cookies.json";
 
     @BeforeAll
     public void beforeAll() throws IOException {
-        properties = new Properties();
-        try (InputStream inputStream = getClass().getResourceAsStream(propertyFilePath)) {
-            properties.load(inputStream);
+        Yaml yaml = new Yaml(new Constructor(MVideoProperties.Cookies.class));
+        try(InputStream inputStream = getClass().getResourceAsStream(propertyFile)) {
+            properties = yaml.load(inputStream);
         }
-        hostname = properties.getProperty("mvideo.main.url");
-        port = Integer.parseInt(properties.getProperty("mvideo.server.port"));
+        String hostname = "http://localhost";
+        Integer port = 8080;
 
         mockServer = ClientAndServer.startClientAndServer(port);
         HttpClient httpClient = HttpClient.create()
@@ -59,7 +61,6 @@ public class MVideoCookieServiceTest {
 
     @Test
     public void getRequiredCookiesTest() {
-        String cookieResponseFile = properties.getProperty("mvideo.response.file");
         ResponseEntity<String> responseEntity =
                 TestUtils.readFromFile(cookieResponseFile, new TypeReference<ResponseEntity<String>>() { });
         List<Header> headers = responseEntity
@@ -75,10 +76,8 @@ public class MVideoCookieServiceTest {
                         .withBody(responseEntity.getBody())
                         .withHeaders(headers));
 
-        String expectedCookiesFileName = properties.getProperty("mvideo.expected-cookies.file");
         String expectedCookies = TestUtils.readFromFile(expectedCookiesFileName, String.class);
-        MVideoCookieService cookieService = new MVideoCookieService(webClient);
-        TestUtils.setPrivateFields(cookieService, properties);
+        MVideoCookieService cookieService = new MVideoCookieService(webClient, properties);
         String resultCookies = cookieService.getRequiredCookies();
         assertEquals(expectedCookies, resultCookies);
     }

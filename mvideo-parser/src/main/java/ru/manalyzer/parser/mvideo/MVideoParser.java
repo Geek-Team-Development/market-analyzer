@@ -3,21 +3,21 @@ package ru.manalyzer.parser.mvideo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.manalyzer.Parser;
 import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.parser.mvideo.config.MVideoProperties;
 import ru.manalyzer.parser.mvideo.dto.*;
 import ru.manalyzer.parser.mvideo.service.MVideoHeadersService;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Парсер информации о продуктах с сервера MVideo
@@ -25,22 +25,19 @@ import java.util.List;
 @Service
 public class MVideoParser implements Parser {
 
-    @Value("${mvideo.search-url}")
-    private String searchURL;
-    @Value("${mvideo.price-url}")
-    private String priceURL;
-    @Value("${mvideo.product-details.url}")
-    private String productDetailsURL;
-
     private final MVideoHeadersService mVideoHeadersService;
     private final WebClient webClient;
+    private final MVideoProperties.Parser properties;
 
     private static final Logger logger = LoggerFactory.getLogger(MVideoParser.class);
 
     @Autowired
-    public MVideoParser(WebClient webClient, MVideoHeadersService mVideoHeadersService) {
+    public MVideoParser(WebClient webClient,
+                        MVideoHeadersService mVideoHeadersService,
+                        MVideoProperties.Parser properties) {
         this.webClient = webClient;
         this.mVideoHeadersService = mVideoHeadersService;
+        this.properties = properties;
     }
 
     public Flux<ProductDto> parse(String searchName) {
@@ -59,11 +56,11 @@ public class MVideoParser implements Parser {
                 ProductDetail detail = tuple.getT2();
                 String id = price.getProductId();
                 product.setId(id);
-                product.setShopName("MVideo");
+                product.setShopName(properties.getShopName());
                 product.setPrice(price.getPrice().getBasePrice());
                 product.setName(detail.getName());
-                product.setImageLink("https://img.mvideo.ru/" + detail.getImage());
-                product.setProductLink("https://www.mvideo.ru/products/" + detail.getNameTranslit() + "-" + id);
+                product.setImageLink(properties.getImageLinkPrefix() + detail.getImage());
+                product.setProductLink(properties.getProductLinkPrefix() + detail.getNameTranslit() + "-" + id);
                 return product;
             });
         });
@@ -73,14 +70,15 @@ public class MVideoParser implements Parser {
         HttpHeaders productIdsRequestHeaders = mVideoHeadersService.getIdsHeaders();
         return webClient
                 .get()
-                .uri(uriBuilder -> UriComponentsBuilder.fromUri(uriBuilder.build())
-                        .path(searchURL)
-                        .queryParam("query", searchName)
-                        .queryParam("offset", "0")
-                        .queryParam("limit", "24")
-                        .encode()
-                        .build()
-                        .toUri())
+                .uri(uriBuilder -> {
+                    String searchParamName = properties.getIdsRequest().getSearchParamName();
+                    uriBuilder
+                            .path(properties.getSearchUrl())
+                            .queryParam(searchParamName, searchName);
+                    Map<String, String> defaultParams = properties.getIdsRequest().getDefaultParams();
+                    defaultParams.forEach(uriBuilder::queryParam);
+                    return uriBuilder.build();
+                })
                 .headers(httpHeaders -> httpHeaders.addAll(productIdsRequestHeaders))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<MVideoResponse<ProductIds>>() {
@@ -95,7 +93,7 @@ public class MVideoParser implements Parser {
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(priceURL)
+                        .path(properties.getPriceUrl())
                         .queryParam("productIds", productIdsStr)
                         .build())
                 .headers(httpHeaders -> httpHeaders.addAll(productIdsRequestHeaders))
@@ -111,7 +109,7 @@ public class MVideoParser implements Parser {
         HttpHeaders productDetailsRequestHeaders = mVideoHeadersService.getDetailsHeaders(searchName);
         return webClient
                 .post()
-                .uri(productDetailsURL)
+                .uri(properties.getProductDetailsUrl())
                 .headers(httpHeaders -> httpHeaders.addAll(productDetailsRequestHeaders))
                 .bodyValue(postObject)
                 .retrieve()

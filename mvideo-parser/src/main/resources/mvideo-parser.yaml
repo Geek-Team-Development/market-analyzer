@@ -1,0 +1,28 @@
+mvideo:
+  cookies:
+    required-names:
+      - MVID_CITY_ID
+      - MVID_REGION_ID
+      - MVID_REGION_SHOP
+      - bIPs
+      - JSESSIONID
+      - MVID_TIMEZONE_OFFSET
+      - MVID_GUEST_ID
+  connection:
+    base-url: https://www.mvideo.ru
+  headers:
+    host: www.mvideo.ru
+    user-agent: Mozilla
+    product-details-referer: https://www.mvideo.ru/product-list-page
+  parser:
+    shop-name: MVideo
+    search-url: /bff/products/search
+    price-url: /bff/products/prices
+    product-details-url: /bff/product-details/list
+    image-link-prefix: https://img.mvideo.ru/
+    product-link-prefix: https://www.mvideo.ru/products/
+    ids-request:
+      search-param-name: query
+      default-params:
+        offset: 0
+        limit: 24

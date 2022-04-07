@@ -12,13 +12,21 @@ import org.mockserver.model.Header;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.parser.mvideo.config.MVideoProperties;
 import ru.manalyzer.parser.mvideo.dto.*;
 import ru.manalyzer.parser.mvideo.service.MVideoHeadersService;
 import ru.manalyzer.parser.mvideo.utils.TestUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -33,20 +41,26 @@ import static org.mockserver.model.HttpResponse.response;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MVideoParserTest {
 
-    private static final String PROPERTY_FILE = "/mvideo-parser-test/test.properties";
+    private static final String propertyFile = "/mvideo-parser-test/test.yaml";
+    private static MVideoProperties.Parser properties;
+    private static String productIdsResponseFile = "/mvideo-parser-test/product-ids-response.json";
+    private static String productPricesResponseFile = "/mvideo-parser-test/product-prices-response.json";
+    private static String productDetailsResponseFile = "/mvideo-parser-test/product-details-response.json";
+    private static String expectedCommonHeadersFile = "/mvideo-parser-test/common-headers.json";
+    private static String expectedProductDetailsHeadersFile = "/mvideo-parser-test/product-details-headers.json";
 
-    private Properties properties;
     private WebClient webClient;
     private ClientAndServer mockServer;
 
-    private String hostname;
-    private Integer port;
-
     @BeforeAll
-    public void beforeAll() {
-        properties = TestUtils.loadProperties(PROPERTY_FILE);
-        hostname = properties.getProperty("mvideo.main.url");
-        port = Integer.parseInt(properties.getProperty("mvideo.server.port"));
+    public void beforeAll() throws IOException {
+        Yaml yaml = new Yaml(new Constructor(MVideoProperties.Parser.class));
+        try(InputStream inputStream = getClass().getResourceAsStream(propertyFile)) {
+            properties = yaml.load(inputStream);
+        }
+        String hostname = "http://localhost";
+        Integer port = 8080;
+
         mockServer = ClientAndServer.startClientAndServer(configuration()
                 .disableLogging(false), port);
         webClient = WebClient.builder()
@@ -63,28 +77,25 @@ public class MVideoParserTest {
     public void getProductsTest() {
 
         ResponseEntity<MVideoResponse<ProductIds>> responseProductIds = TestUtils.readFromFile(
-                properties.getProperty("mvideo.product-ids-response.file"),
-                new TypeReference<ResponseEntity<MVideoResponse<ProductIds>>>() { });
+                productIdsResponseFile, new TypeReference<ResponseEntity<MVideoResponse<ProductIds>>>() { });
 
         ResponseEntity<MVideoResponse<ProductPrices>> responseProductPrices = TestUtils.readFromFile(
-                properties.getProperty("mvideo.product-prices-response.file"),
-                new TypeReference<ResponseEntity<MVideoResponse<ProductPrices>>>() { });
+                productPricesResponseFile, new TypeReference<ResponseEntity<MVideoResponse<ProductPrices>>>() { });
 
         ResponseEntity<MVideoResponse<ProductDetails>> responseProductDetails = TestUtils.readFromFile(
-                properties.getProperty("mvideo.product-details-response.file"),
-                new TypeReference<ResponseEntity<MVideoResponse<ProductDetails>>>() { });
+                productDetailsResponseFile, new TypeReference<ResponseEntity<MVideoResponse<ProductDetails>>>() { });
 
-        HttpHeaders productIdsHeaders = TestUtils.readFromFile(properties.getProperty("mvideo.common-headers.file"),  HttpHeaders.class);
-        HttpHeaders productDetailsHeaders = TestUtils.readFromFile(properties.getProperty("mvideo.product-details-headers.file"),  HttpHeaders.class);
+        String searchName = "холодильники и ноутбуки";
+
+        HttpHeaders productIdsHeaders = TestUtils.readFromFile(expectedCommonHeadersFile,  HttpHeaders.class);
+        HttpHeaders productDetailsHeaders = TestUtils.readFromFile(expectedProductDetailsHeadersFile,  HttpHeaders.class);
         List<String> productIds = responseProductIds.getBody().getBody().getProducts();
-        mockIdsRequest(responseProductIds);
+        mockIdsRequest(responseProductIds, searchName);
         mockPriceRequest(responseProductPrices, productIds);
         mockProductDetailsRequest(responseProductDetails, productIds);
 
-        String searchName = "холодильники и ноутбуки";
         MVideoHeadersService mVideoHeadersService = getMockedMVideoHeadersService(productIdsHeaders, productDetailsHeaders, searchName);
-        MVideoParser mVideoParser = new MVideoParser(webClient, mVideoHeadersService);
-        TestUtils.setPrivateFields(mVideoParser, properties);
+        MVideoParser mVideoParser = new MVideoParser(webClient, mVideoHeadersService, properties);
         long start = System.currentTimeMillis();
         List<ProductDto> result = mVideoParser.parse(searchName)
                 .collectList()
@@ -112,16 +123,25 @@ public class MVideoParserTest {
         });
     }
 
-    private void mockIdsRequest(ResponseEntity<MVideoResponse<ProductIds>> responseProductIds) {
+    private void mockIdsRequest(ResponseEntity<MVideoResponse<ProductIds>> responseProductIds,
+                                String searchName) {
         List<Header> headersProductIds = responseProductIds
                 .getHeaders()
                 .entrySet()
                 .stream()
                 .map(entry -> new Header(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
+
+        Map<String, List<String>> defaultParams = properties.getIdsRequest().getDefaultParams()
+                        .entrySet().stream()
+                        .map((entry) -> Map.entry(entry.getKey(), List.of(entry.getValue())))
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         mockServer
                 .when(request()
-                        .withMethod("GET").withPath(properties.getProperty("mvideo.search-url")))
+                        .withMethod("GET")
+                        .withPath(properties.getSearchUrl())
+                        .withQueryStringParameter(properties.getIdsRequest().getSearchParamName(), searchName)
+                        .withQueryStringParameters(defaultParams))
                 .respond(response()
                         .withBody(TestUtils.writeAsString(responseProductIds.getBody()))
                         .withHeaders(headersProductIds));
@@ -137,7 +157,7 @@ public class MVideoParserTest {
                 .collect(Collectors.toList());
         mockServer
                 .when(request()
-                        .withMethod("GET").withPath(properties.getProperty("mvideo.price-url"))
+                        .withMethod("GET").withPath(properties.getPriceUrl())
                         .withQueryStringParameter("productIds", String.join(",", productIds)))
                 .respond(response()
                         .withBody(TestUtils.writeAsString(responseProductPrices.getBody()))
@@ -158,7 +178,7 @@ public class MVideoParserTest {
             ProductListPostObject postObject = new ProductListPostObject(productIds);
             mockServer
                     .when(request()
-                            .withMethod("POST").withPath(properties.getProperty("mvideo.product-details.url"))
+                            .withMethod("POST").withPath(properties.getProductDetailsUrl())
                             .withBody(mapper.writeValueAsString(postObject), StandardCharsets.UTF_8))
                     .respond(response()
                             .withBody(TestUtils.writeAsString(responseProductDetails.getBody()))
@@ -184,9 +204,9 @@ public class MVideoParserTest {
             product.setPrice(productPrices.get(productId).getPrice().getBasePrice());
             ProductDetail productDetail = productDetailMap.get(productId);
             product.setName(productDetail.getName());
-            product.setImageLink("https://img.mvideo.ru/" + productDetail.getImage());
-            product.setProductLink("https://www.mvideo.ru/products/" + productDetail.getNameTranslit() + "-" + productId);
-            product.setShopName("MVideo");
+            product.setImageLink(properties.getImageLinkPrefix() + productDetail.getImage());
+            product.setProductLink(properties.getProductLinkPrefix() + productDetail.getNameTranslit() + "-" + productId);
+            product.setShopName(properties.getShopName());
             productMap.put(productId, product);
         });
         return new ArrayList<>(productMap.values());
