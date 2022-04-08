@@ -1,7 +1,6 @@
 package ru.manalyzer.parser.mvideo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -10,31 +9,30 @@ import org.junit.jupiter.api.TestInstance;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.parser.mvideo.config.MVideoProperties;
 import ru.manalyzer.parser.mvideo.dto.*;
 import ru.manalyzer.parser.mvideo.service.MVideoHeadersService;
-import ru.manalyzer.parser.mvideo.utils.TestUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockserver.configuration.Configuration.configuration;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -43,14 +41,10 @@ public class MVideoParserTest {
 
     private static final String propertyFile = "/mvideo-parser-test/test.yaml";
     private static MVideoProperties.Parser properties;
-    private static String productIdsResponseFile = "/mvideo-parser-test/product-ids-response.json";
-    private static String productPricesResponseFile = "/mvideo-parser-test/product-prices-response.json";
-    private static String productDetailsResponseFile = "/mvideo-parser-test/product-details-response.json";
-    private static String expectedCommonHeadersFile = "/mvideo-parser-test/common-headers.json";
-    private static String expectedProductDetailsHeadersFile = "/mvideo-parser-test/product-details-headers.json";
 
     private WebClient webClient;
     private ClientAndServer mockServer;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeAll
     public void beforeAll() throws IOException {
@@ -61,8 +55,7 @@ public class MVideoParserTest {
         String hostname = "http://localhost";
         Integer port = 8080;
 
-        mockServer = ClientAndServer.startClientAndServer(configuration()
-                .disableLogging(false), port);
+        mockServer = ClientAndServer.startClientAndServer(port);
         webClient = WebClient.builder()
                 .baseUrl(hostname + ":" + port)
                 .build();
@@ -75,44 +68,35 @@ public class MVideoParserTest {
 
     @Test
     public void getProductsTest() {
-
-        ResponseEntity<MVideoResponse<ProductIds>> responseProductIds = TestUtils.readFromFile(
-                productIdsResponseFile, new TypeReference<ResponseEntity<MVideoResponse<ProductIds>>>() { });
-
-        ResponseEntity<MVideoResponse<ProductPrices>> responseProductPrices = TestUtils.readFromFile(
-                productPricesResponseFile, new TypeReference<ResponseEntity<MVideoResponse<ProductPrices>>>() { });
-
-        ResponseEntity<MVideoResponse<ProductDetails>> responseProductDetails = TestUtils.readFromFile(
-                productDetailsResponseFile, new TypeReference<ResponseEntity<MVideoResponse<ProductDetails>>>() { });
+        List<String> productIds = getProductIds();
+        List<ProductDto> expectedProducts = getExpectedProducts(productIds);
 
         String searchName = "холодильники и ноутбуки";
 
-        HttpHeaders productIdsHeaders = TestUtils.readFromFile(expectedCommonHeadersFile,  HttpHeaders.class);
-        HttpHeaders productDetailsHeaders = TestUtils.readFromFile(expectedProductDetailsHeadersFile,  HttpHeaders.class);
-        List<String> productIds = responseProductIds.getBody().getBody().getProducts();
-        mockIdsRequest(responseProductIds, searchName);
-        mockPriceRequest(responseProductPrices, productIds);
-        mockProductDetailsRequest(responseProductDetails, productIds);
+        HttpHeaders productIdsReqHeaders = getProductIdsReqHeaders();
+        HttpHeaders productDetailsReqHeaders = getProductDetailsReqHeaders(productIdsReqHeaders, searchName);
+        mockIdsRequest(productIds, searchName, productIdsReqHeaders);
+        mockPriceRequest(expectedProducts, productIdsReqHeaders);
+        mockProductDetailsRequest(expectedProducts, productDetailsReqHeaders);
 
-        MVideoHeadersService mVideoHeadersService = getMockedMVideoHeadersService(productIdsHeaders, productDetailsHeaders, searchName);
+        MVideoHeadersService mVideoHeadersService =
+                getMockedMVideoHeadersService(productIdsReqHeaders, productDetailsReqHeaders, searchName);
+
         MVideoParser mVideoParser = new MVideoParser(webClient, mVideoHeadersService, properties);
         long start = System.currentTimeMillis();
         List<ProductDto> result = mVideoParser.parse(searchName)
                 .collectList()
                 .block();
         System.out.println("Время " + (System.currentTimeMillis() - start));
+        assertNotNull(result);
         Map<String, ProductDto> resultProducts = result
                 .stream()
                 .collect(Collectors.toMap(ProductDto::getId, Function.identity()));
-        Map<String, ProductDto> expectedProducts =
-                getExpectedProducts(responseProductIds,
-                        responseProductPrices,
-                        responseProductDetails)
-                        .stream()
-                        .collect(Collectors.toMap(ProductDto::getId, Function.identity()));
+        Map<String, ProductDto> expectedProductsMap = expectedProducts.stream()
+                .collect(Collectors.toMap(ProductDto::getId, Function.identity()));
 
         assertEquals(expectedProducts.size(), resultProducts.size());
-        expectedProducts.values().forEach(productDto -> {
+        expectedProductsMap.values().forEach(productDto -> {
             ProductDto resultProduct = resultProducts.get(productDto.getId());
             assertNotNull(resultProduct);
             assertEquals(productDto.getName(), resultProduct.getName());
@@ -123,105 +107,171 @@ public class MVideoParserTest {
         });
     }
 
-    private void mockIdsRequest(ResponseEntity<MVideoResponse<ProductIds>> responseProductIds,
-                                String searchName) {
-        List<Header> headersProductIds = responseProductIds
-                .getHeaders()
+    private void mockIdsRequest(List<String> productIdsList,
+                                String searchName,
+                                HttpHeaders productIdsReqHeaders) {
+        Map<String, List<String>> defaultParams = properties.getIdsRequest().getDefaultParams()
+                .entrySet().stream()
+                .map((entry) -> Map.entry(entry.getKey(), List.of(entry.getValue())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        MVideoResponse<ProductIds> body = new MVideoResponse<>();
+        ProductIds productIds = new ProductIds();
+        productIds.setProducts(productIdsList);
+        body.setBody(productIds);
+
+        List<Header> reqHeaders = productIdsReqHeaders
                 .entrySet()
                 .stream()
                 .map(entry -> new Header(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
-
-        Map<String, List<String>> defaultParams = properties.getIdsRequest().getDefaultParams()
-                        .entrySet().stream()
-                        .map((entry) -> Map.entry(entry.getKey(), List.of(entry.getValue())))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         mockServer
                 .when(request()
                         .withMethod("GET")
                         .withPath(properties.getSearchUrl())
                         .withQueryStringParameter(properties.getIdsRequest().getSearchParamName(), searchName)
-                        .withQueryStringParameters(defaultParams))
+                        .withQueryStringParameters(defaultParams)
+                        .withHeaders(reqHeaders))
                 .respond(response()
-                        .withBody(TestUtils.writeAsString(responseProductIds.getBody()))
-                        .withHeaders(headersProductIds));
+                        .withBody(writeValueAsString(body))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
     }
 
-    private void mockPriceRequest(ResponseEntity<MVideoResponse<ProductPrices>> responseProductPrices,
-                                  List<String> productIds) {
-        List<Header> headersProductPrices = responseProductPrices
-                .getHeaders()
+    private void mockPriceRequest(List<ProductDto> expectedProducts, HttpHeaders priceReqHeaders) {
+        List<String> productIds = expectedProducts.stream().map(ProductDto::getId).collect(Collectors.toList());
+        MVideoResponse<ProductPrices> body = new MVideoResponse<>();
+        ProductPrices productPrices = new ProductPrices();
+        List<MaterialPrice> materialPrices = expectedProducts.stream()
+                .map(product -> {
+                    MaterialPrice materialPrice = new MaterialPrice();
+                    Price price = new Price();
+                    price.setBasePrice(product.getPrice());
+                    materialPrice.setPrice(price);
+                    materialPrice.setProductId(product.getId());
+                    return materialPrice;
+                })
+                .collect(Collectors.toList());
+        productPrices.setMaterialPrices(materialPrices);
+        body.setBody(productPrices);
+
+        List<Header> reqHeaders = priceReqHeaders
                 .entrySet()
                 .stream()
                 .map(entry -> new Header(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
+
         mockServer
                 .when(request()
                         .withMethod("GET").withPath(properties.getPriceUrl())
-                        .withQueryStringParameter("productIds", String.join(",", productIds)))
+                        .withQueryStringParameter("productIds", String.join(",", productIds))
+                        .withHeaders(reqHeaders))
                 .respond(response()
-                        .withBody(TestUtils.writeAsString(responseProductPrices.getBody()))
-                        .withHeaders(headersProductPrices));
+                        .withBody(writeValueAsString(body))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
     }
 
-    private void mockProductDetailsRequest(ResponseEntity<MVideoResponse<ProductDetails>> responseProductDetails,
-                                           List<String> productIds) {
-        List<Header> headersProductDetails = responseProductDetails
-                .getHeaders()
+    private void mockProductDetailsRequest(List<ProductDto> expectedProducts, HttpHeaders detailsReqHeaders) {
+        List<String> productIds = expectedProducts.stream().map(ProductDto::getId).collect(Collectors.toList());
+        MVideoResponse<ProductDetails> body = new MVideoResponse<>();
+        ProductDetails productDetails = new ProductDetails();
+        List<ProductDetail> productDetailList = expectedProducts.stream()
+                .map(productDto -> {
+                    ProductDetail detail = new ProductDetail();
+                    detail.setName(productDto.getName());
+                    detail.setProductId(productDto.getId());
+                    String image = productDto.getImageLink()
+                            .substring(properties.getImageLinkPrefix().length());
+                    detail.setImage(image);
+                    String nameTranslit = productDto.getProductLink()
+                            .substring(properties.getProductLinkPrefix().length());
+                    nameTranslit = nameTranslit.substring(0, nameTranslit.length() - ("-" + productDto.getId()).length());
+                    detail.setNameTranslit(nameTranslit);
+                    return detail;
+                })
+                .collect(Collectors.toList());
+        productDetails.setProducts(productDetailList);
+        body.setBody(productDetails);
+
+        List<Header> reqHeaders = detailsReqHeaders
                 .entrySet()
                 .stream()
                 .map(entry -> new Header(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            ProductListPostObject postObject = new ProductListPostObject(productIds);
-            mockServer
-                    .when(request()
-                            .withMethod("POST").withPath(properties.getProductDetailsUrl())
-                            .withBody(mapper.writeValueAsString(postObject), StandardCharsets.UTF_8))
-                    .respond(response()
-                            .withBody(TestUtils.writeAsString(responseProductDetails.getBody()))
-                            .withHeaders(headersProductDetails));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        ProductListPostObject postObject = new ProductListPostObject(productIds);
+        mockServer
+                .when(request()
+                        .withMethod("POST").withPath(properties.getProductDetailsUrl())
+                        .withBody(writeValueAsString(postObject))
+                        .withHeaders(reqHeaders))
+                .respond(response()
+                        .withBody(writeValueAsString(body))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
     }
 
-    private List<ProductDto> getExpectedProducts(ResponseEntity<MVideoResponse<ProductIds>> responseProductIds,
-                                                 ResponseEntity<MVideoResponse<ProductPrices>> responseProductPrices,
-                                                 ResponseEntity<MVideoResponse<ProductDetails>> responseProductDetails) {
-        List<String> productIds = responseProductIds.getBody().getBody().getProducts();
-        Map<String, MaterialPrice> productPrices = responseProductPrices.getBody().getBody().getMaterialPrices()
-                .stream().collect(Collectors.toMap(MaterialPrice::getProductId, Function.identity()));
-        Map<String, ProductDetail> productDetailMap = responseProductDetails.getBody().getBody()
-                .getProducts().stream()
-                .collect(Collectors.toMap(ProductDetail::getProductId, Function.identity()));
-        Map<String, ProductDto> productMap = new HashMap<>();
-        productIds.forEach(productId -> {
-            ProductDto product = new ProductDto();
-            product.setId(productId);
-            product.setPrice(productPrices.get(productId).getPrice().getBasePrice());
-            ProductDetail productDetail = productDetailMap.get(productId);
-            product.setName(productDetail.getName());
-            product.setImageLink(properties.getImageLinkPrefix() + productDetail.getImage());
-            product.setProductLink(properties.getProductLinkPrefix() + productDetail.getNameTranslit() + "-" + productId);
-            product.setShopName(properties.getShopName());
-            productMap.put(productId, product);
-        });
-        return new ArrayList<>(productMap.values());
-    }
-
-    private MVideoHeadersService getMockedMVideoHeadersService(HttpHeaders productIdsHeaders,
-                                                               HttpHeaders productDetailsHeaders,
+    private MVideoHeadersService getMockedMVideoHeadersService(HttpHeaders productsIdsHeaders,
+                                                               HttpHeaders productPriceHeaders,
                                                                String searchName) {
         MVideoHeadersService mVideoHeadersService = mock(MVideoHeadersService.class);
-        doReturn(productIdsHeaders)
+        doReturn(productsIdsHeaders)
                 .when(mVideoHeadersService)
                 .getIdsHeaders();
-        doReturn(productDetailsHeaders)
+        doReturn(productsIdsHeaders)
+                .when(mVideoHeadersService)
+                .getPriceHeaders();
+        doReturn(productPriceHeaders)
                 .when(mVideoHeadersService)
                 .getDetailsHeaders(searchName);
         return mVideoHeadersService;
+    }
+
+    private List<String> getProductIds() {
+        Random random = new Random();
+        return IntStream.rangeClosed(0, 10)
+                .mapToObj(value -> Integer.toString(random.nextInt(Integer.MAX_VALUE)))
+                .collect(Collectors.toList());
+    }
+
+    private List<ProductDto> getExpectedProducts(List<String> productIds) {
+        Random random = new Random();
+        return productIds.stream()
+                .map(productId -> {
+                    ProductDto productDto = new ProductDto();
+                    productDto.setId(productId);
+                    productDto.setName(UUID.randomUUID().toString());
+                    productDto.setPrice(Integer.toString(random.nextInt(Integer.MAX_VALUE)));
+                    productDto.setShopName(properties.getShopName());
+                    productDto.setProductLink(properties.getProductLinkPrefix() + UUID.randomUUID() + "-" + productId);
+                    productDto.setImageLink(properties.getImageLinkPrefix() + UUID.randomUUID());
+                    return productDto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private HttpHeaders getProductIdsReqHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.HOST, "www.mvideo.ru");
+        headers.add(HttpHeaders.USER_AGENT, "Mozilla");
+        headers.add(HttpHeaders.COOKIE, "JSESSIONID=" + UUID.randomUUID());
+        return headers;
+    }
+
+    private HttpHeaders getProductDetailsReqHeaders(HttpHeaders commonHeaders, String searchName) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.addAll(commonHeaders);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String referer = UriComponentsBuilder
+                .fromPath("https://www.mvideo.ru/product-list-page")
+                .queryParam("q", searchName)
+                .encode().build().toString();
+        headers.add(HttpHeaders.REFERER, referer);
+        return headers;
+    }
+
+    private String writeValueAsString(Object object) {
+        try {
+            return mapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("");
+        }
     }
 }
