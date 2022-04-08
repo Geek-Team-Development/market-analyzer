@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import ru.manalyzer.Parser;
+import ru.manalyzer.controller.param.ProductRequestParam;
 import ru.manalyzer.dto.ProductDto;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -20,13 +20,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Flux<ProductDto> findProducts(String searchName) {
-        return Flux.combineLatest(subscribeParsersToSearchProducts(searchName), (arr) -> (ProductDto) arr[0]);
+    public Flux<ProductDto> findProducts(ProductRequestParam requestParam) {
+        return Flux.create(fluxSink -> {
+            parsers.forEach(parser -> parser.parse(requestParam.getSearchName()).subscribe(fluxSink::next));
+
+            fluxSink.complete();
+        });
     }
 
-    private List<Flux<ProductDto>> subscribeParsersToSearchProducts(String searchName) {
-        return parsers.stream()
-                .map(parser -> parser.parse(searchName))
-                .collect(Collectors.toList());
-    }
 }
