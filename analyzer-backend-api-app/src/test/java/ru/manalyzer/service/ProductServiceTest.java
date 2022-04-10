@@ -33,6 +33,7 @@ public class ProductServiceTest {
     @Test
     public void findProductsTest() {
         String searchName = "macbook";
+        ProductRequestParam requestParam = new ProductRequestParam(searchName);
 
         Flux<ProductDto> oldiFlux = Flux.just(
                 new ProductDto("1",
@@ -68,10 +69,10 @@ public class ProductServiceTest {
                 )
         );
 
-        when(oldiParser.parse(searchName)).thenReturn(oldiFlux);
-        when(mvideoParser.parse(searchName)).thenReturn(mvideoFlux);
+        when(oldiParser.parse(requestParam.getSearchName())).thenReturn(oldiFlux);
+        when(mvideoParser.parse(requestParam.getSearchName())).thenReturn(mvideoFlux);
 
-        Flux<ProductDto> productDtoFlux = productService.findProducts(new ProductRequestParam(searchName));
+        Flux<ProductDto> productDtoFlux = productService.findProducts(requestParam);
 
         StepVerifier.create(productDtoFlux)
                 .expectSubscription()

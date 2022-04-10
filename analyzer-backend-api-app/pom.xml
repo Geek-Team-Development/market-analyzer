@@ -12,18 +12,20 @@
     <artifactId>analyzer-backend-api-app</artifactId>
 
     <dependencies>
+        <!--        Spring boot dependencies-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!--        Tools dependencies-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
 
-        <!--        Test dependency-->
+        <!--        Test dependencies-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -50,7 +52,7 @@
             <version>3.2.3.RELEASE</version>
         </dependency>
 
-        <!--        Module dependency-->
+        <!--        Module dependencies-->
         <dependency>
             <groupId>ru.manalyzer</groupId>
             <artifactId>alalyzer-parser</artifactId>
@@ -61,5 +63,20 @@
             <artifactId>analyzer-dto</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>ru.manalyzer</groupId>
+            <artifactId>parser-shop-oldi</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
