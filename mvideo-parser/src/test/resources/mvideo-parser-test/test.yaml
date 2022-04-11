@@ -1,0 +1,11 @@
+shopName: MVideo
+searchUrl: /bff/products/search
+priceUrl: /bff/products/prices
+productDetailsUrl: /bff/product-details/list
+imageLinkPrefix: https://img.mvideo.ru/
+productLinkPrefix: https://www.mvideo.ru/products/
+idsRequest:
+  searchParamName: query
+  defaultParams:
+    offset: 0
+    limit: 24

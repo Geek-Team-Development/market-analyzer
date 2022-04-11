@@ -1,0 +1,25 @@
+<div class="col input-group bg-light shadow border border-1 border-primary rounded-3 mt-3 mb-0 p-2">
+  <input type="search" [(ngModel)]="searchName" id="searchForm" class="form-control rounded" placeholder="Поиск"
+         aria-label="search" aria-describedby="search-addon"/>
+  <button type="button" class="btn btn-primary" (click)="clickSubmit()">Поиск</button>
+</div>
+
+<div *ngIf="productsArray.length > 0" class="col bg-light shadow border border-1 border-primary rounded-3 my-3 min-vh-80 p-3">
+  <a *ngFor="let prod of productsArray; let idx = index;" class="d-flex border rounded-3 border-primary shadow mb-3 p-2 bg-light product-card text-black"
+     style="min-width: 330px; font-size: 1.1rem; text-decoration: none"
+     [attr.href]="prod.productLink">
+    <div class="align-self-center me-3">
+      <img style="height: 150px; width: 150px; object-fit: contain;"
+           [attr.src]="prod.imageLink">
+    </div>
+    <div class="d-flex flex-column w-100">
+      <div class="d-flex flex-nowrap">
+        <h5 class="card-title text-wrap text-break pe-2">{{prod.name}}</h5>
+        <p class="ms-auto text-success">{{prod.price}}&nbsp;&#8381;</p>
+      </div>
+      <p class="card-text text-truncate flex-fill text-wrap text-break word-break"
+         style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; white-space: normal">
+        {{prod.shopName}}</p>
+    </div>
+  </a>
+</div>

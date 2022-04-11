@@ -1,0 +1,13 @@
+cookies:
+  requiredNames:
+    - MVID_CITY_ID
+    - MVID_REGION_ID
+    - MVID_REGION_SHOP
+    - bIPs
+    - JSESSIONID
+    - MVID_TIMEZONE_OFFSET
+    - MVID_GUEST_ID
+headers:
+  host: www.mvideo.ru
+  userAgent: Mozilla
+  productDetailsReferer: https://www.mvideo.ru/product-list-page
