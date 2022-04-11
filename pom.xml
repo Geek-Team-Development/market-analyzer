@@ -21,6 +21,7 @@
         <module>alalyzer-parser</module>
         <module>mvideo-parser</module>
         <module>parser-shop-oldi</module>
+        <module>analyzer-backend-api-app</module>
     </modules>
 
     <properties>

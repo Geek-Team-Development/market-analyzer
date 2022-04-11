@@ -1,14 +1,12 @@
 version: '3'
 services:
+  analyzer-backend-api-app:
+    image: manalyzer/analyzer-backend-api-app:latest
+    ports:
+      - 8080:8080
   frontend:
     image: geekteam/frontend
     ports:
       - 80:80
     depends_on:
       - analyzer-backend-api-app
-
-  analyzer-backend-api-app:
-    image: geekteam/analyzer-backend-api-app
-    ports:
-      - 8080:8080
-    command: sh -c "/apps/entrypoint.sh"
