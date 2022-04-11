@@ -23,19 +23,17 @@ public class ProductServiceTest {
 
     private static Parser mvideoParser;
 
+    private static Flux<ProductDto> oldiFlux;
+
+    private static Flux<ProductDto> mvideoFlux;
+
     @BeforeAll
     public static void initClass() {
         oldiParser = mock(Parser.class);
         mvideoParser = mock(Parser.class);
         productService = new ProductServiceImpl(List.of(mvideoParser, oldiParser));
-    }
 
-    @Test
-    public void findProductsTest() {
-        String searchName = "macbook";
-        ProductRequestParam requestParam = new ProductRequestParam(searchName);
-
-        Flux<ProductDto> oldiFlux = Flux.just(
+        oldiFlux = Flux.just(
                 new ProductDto("1",
                         "Macbook Pro",
                         "200000",
@@ -52,7 +50,7 @@ public class ProductServiceTest {
                 )
         );
 
-        Flux<ProductDto> mvideoFlux = Flux.just(
+        mvideoFlux = Flux.just(
                 new ProductDto("1",
                         "Macbook Pro",
                         "190000",
@@ -68,6 +66,12 @@ public class ProductServiceTest {
                         "M.Video"
                 )
         );
+    }
+
+    @Test
+    public void findProductsTest() {
+        String searchName = "macbook";
+        ProductRequestParam requestParam = new ProductRequestParam(searchName);
 
         when(oldiParser.parse(requestParam.getSearchName())).thenReturn(oldiFlux);
         when(mvideoParser.parse(requestParam.getSearchName())).thenReturn(mvideoFlux);
@@ -79,6 +83,30 @@ public class ProductServiceTest {
                 .assertNext(dto -> MatcherAssert.assertThat(dto.getShopName(), Matchers.in(List.of("Oldi", "M.Video"))))
                 .assertNext(dto -> MatcherAssert.assertThat(dto.getShopName(), Matchers.in(List.of("Oldi", "M.Video"))))
                 .assertNext(dto -> MatcherAssert.assertThat(dto.getShopName(), Matchers.in(List.of("Oldi", "M.Video"))))
+                .assertNext(dto -> MatcherAssert.assertThat(dto.getShopName(), Matchers.in(List.of("Oldi", "M.Video"))))
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    public void findProductsOnBackpressureTest() {
+        String searchName = "macbook";
+        ProductRequestParam requestParam = new ProductRequestParam(searchName);
+
+        when(oldiParser.parse(requestParam.getSearchName())).thenReturn(oldiFlux);
+        when(mvideoParser.parse(requestParam.getSearchName())).thenReturn(mvideoFlux);
+
+        Flux<ProductDto> productDtoFlux = productService.findProducts(requestParam);
+
+        StepVerifier.create(productDtoFlux.onBackpressureBuffer(), 0)
+                .expectSubscription()
+                .thenRequest(1)
+                .assertNext(dto -> MatcherAssert.assertThat(dto.getShopName(), Matchers.in(List.of("Oldi", "M.Video"))))
+                .thenRequest(1)
+                .assertNext(dto -> MatcherAssert.assertThat(dto.getShopName(), Matchers.in(List.of("Oldi", "M.Video"))))
+                .thenRequest(1)
+                .assertNext(dto -> MatcherAssert.assertThat(dto.getShopName(), Matchers.in(List.of("Oldi", "M.Video"))))
+                .thenRequest(1)
                 .assertNext(dto -> MatcherAssert.assertThat(dto.getShopName(), Matchers.in(List.of("Oldi", "M.Video"))))
                 .expectComplete()
                 .verify();

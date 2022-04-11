@@ -15,17 +15,14 @@ public class ProductServiceImpl implements ProductService {
 
     private final List<Parser> parsers;
 
-    private final AtomicInteger counter;
-
     @Autowired
     public ProductServiceImpl(List<Parser> parsers) {
         this.parsers = parsers;
-        this.counter = new AtomicInteger();
     }
 
     @Override
     public Flux<ProductDto> findProducts(ProductRequestParam requestParam) {
-        counter.set(parsers.size());
+        AtomicInteger counter = new AtomicInteger(parsers.size());
         return Flux.create(fluxSink -> parsers.forEach(parser -> parser.parse(requestParam.getSearchName())
                 .doOnComplete(() -> {
                     if (counter.decrementAndGet() == 0) {
