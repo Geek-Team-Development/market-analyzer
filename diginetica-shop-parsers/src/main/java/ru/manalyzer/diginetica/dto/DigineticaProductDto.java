@@ -1,4 +1,4 @@
-package ru.manalyzer.dto;
+package ru.manalyzer.diginetica.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OldiProductDto {
+public class DigineticaProductDto {
 
     private String id;
 

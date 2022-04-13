@@ -1,39 +1,37 @@
-package ru.manalyzer;
+package ru.manalyzer.diginetica;
 
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.util.retry.Retry;
-import ru.manalyzer.dto.ConverterDto;
-import ru.manalyzer.dto.OldiResponseDto;
-import ru.manalyzer.property.OldiConnectionProperties;
+import ru.manalyzer.Parser;
+import ru.manalyzer.diginetica.dto.ConverterDto;
+import ru.manalyzer.diginetica.dto.DigineticaResponseDto;
+import ru.manalyzer.diginetica.property.DigineticaConnectionProperties;
 import ru.manalyzer.dto.ProductDto;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Responsible for loading and converting product information from Oldi store
+ * Responsible for loading and converting product information from Diginetica store
  */
-@Service
 @Log4j2
-public class OldiParser implements Parser {
+public class DigineticaParser implements Parser {
 
-    private final OldiConnectionProperties connectionProperties;
+    private final DigineticaConnectionProperties connectionProperties;
 
-    private final ConverterDto converterOldiDtoToDto;
+    private final ConverterDto converterDigineticaDtoToDto;
 
-    @Autowired
-    public OldiParser(OldiConnectionProperties connectionProperties, ConverterDto converterDto) {
+    public DigineticaParser(DigineticaConnectionProperties connectionProperties, ConverterDto converterDto) {
         this.connectionProperties = connectionProperties;
-        this.converterOldiDtoToDto = converterDto;
+        this.converterDigineticaDtoToDto = converterDto;
     }
 
     /**
      * Loads a list of products and converts to ProductDto format
+     *
      * @param searchName - parameters for connecting to the online store
      * @return Flux<ProductDto> or empty Flux<ProductDto> if an error occurred
      */
@@ -52,19 +50,19 @@ public class OldiParser implements Parser {
                 })
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .bodyToMono(OldiResponseDto.class)
+                .bodyToMono(DigineticaResponseDto.class)
                 .retryWhen(
                         Retry.backoff(3, Duration.ofMillis(500))
                                 .filter(throwable -> throwable instanceof TimeoutException)
                 )
                 .doOnError(this::exceptionHandle)
-                .onErrorReturn(new OldiResponseDto())
-                .flatMapIterable(OldiResponseDto::getProducts)
+                .onErrorReturn(new DigineticaResponseDto())
+                .flatMapIterable(DigineticaResponseDto::getProducts)
                 .filter(oldiProductDto -> oldiProductDto.getName().toLowerCase().contains(searchName.toLowerCase()))
-                .map(converterOldiDtoToDto::convertToDto);
+                .map(converterDigineticaDtoToDto::convertToDto);
     }
 
     private void exceptionHandle(Throwable throwable) {
-        log.error("Oldi parser error");
+        log.error(connectionProperties.getShopName() + " parser error");
     }
 }

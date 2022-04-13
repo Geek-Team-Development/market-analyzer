@@ -10,8 +10,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
+import ru.manalyzer.diginetica.dto.ConverterDigineticaDtoToDto;
+import ru.manalyzer.diginetica.dto.DigineticaProductDto;
+import ru.manalyzer.diginetica.dto.DigineticaResponseDto;
 import ru.manalyzer.dto.*;
-import ru.manalyzer.property.OldiConnectionProperties;
+import ru.manalyzer.diginetica.property.DigineticaConnectionProperties;
+import ru.manalyzer.parsers.oldi.ConverterOldiDtoToDto;
+import ru.manalyzer.parsers.oldi.OldiConnectionProperties;
+import ru.manalyzer.parsers.oldi.OldiParser;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,7 +44,7 @@ public class OldiParserTest {
 
     @BeforeEach
     public void init() {
-        OldiConnectionProperties connectionProperties = new OldiConnectionProperties(
+        DigineticaConnectionProperties connectionProperties = new OldiConnectionProperties(
                 "Oldi",
                 "https://www.oldi.ru",
                 String.format("http://localhost:%s", mockWebServer.getPort()),
@@ -46,16 +52,15 @@ public class OldiParserTest {
                 "st",
                 new HashMap<>()
         );
-        ConverterDto converterDto =
-                new ConverterOldiDtoToDto(connectionProperties.getShopName(), connectionProperties.getShopUri());
-
+        ConverterDigineticaDtoToDto converterDto =
+                new ConverterOldiDtoToDto(connectionProperties);
         mapper = new ObjectMapper();
         oldiParser = new OldiParser(connectionProperties, converterDto);
     }
 
     @Test
     public void findProductsTest() throws JsonProcessingException {
-        OldiProductDto oldiProductDto = new OldiProductDto(
+        DigineticaProductDto digineticaProductDto = new DigineticaProductDto(
                 "1",
                 "MacBook Pro",
                 "200000",
@@ -64,7 +69,7 @@ public class OldiParserTest {
                 "https://img.oldi.ru/"
         );
 
-        OldiResponseDto responseDto = new OldiResponseDto(1, List.of(oldiProductDto));
+        DigineticaResponseDto responseDto = new DigineticaResponseDto(1, List.of(digineticaProductDto));
 
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
@@ -93,7 +98,7 @@ public class OldiParserTest {
     public void errorFindProductsTest() throws JsonProcessingException {
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(400)
-                .setBody(mapper.writeValueAsString(new OldiResponseDto()))
+                .setBody(mapper.writeValueAsString(new DigineticaResponseDto()))
                 .addHeader("Content-Type", "application/json"));
 
         Flux<ProductDto> products = oldiParser.parse("macbook");
@@ -106,7 +111,7 @@ public class OldiParserTest {
 
     @Test
     public void findProductsOnBackpressureTest() throws JsonProcessingException {
-        OldiProductDto oldiProductDto1 = new OldiProductDto(
+        DigineticaProductDto digineticaProductDto1 = new DigineticaProductDto(
                 "1",
                 "MacBook Pro",
                 "200000",
@@ -115,8 +120,8 @@ public class OldiParserTest {
                 "https://img.oldi.ru/"
         );
 
-        OldiProductDto oldiProductDto2 = new OldiProductDto(
-                "1",
+        DigineticaProductDto digineticaProductDto2 = new DigineticaProductDto(
+                "2",
                 "MacBook Air",
                 "150000",
                 1.0,
@@ -125,8 +130,8 @@ public class OldiParserTest {
         );
 
 
-        OldiResponseDto responseDto =
-                new OldiResponseDto(1, List.of(oldiProductDto1, oldiProductDto2));
+        DigineticaResponseDto responseDto =
+                new DigineticaResponseDto(2, List.of(digineticaProductDto1, digineticaProductDto2));
 
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
