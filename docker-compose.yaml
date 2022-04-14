@@ -1,7 +1,7 @@
 version: '3'
 services:
   analyzer-backend-api-app:
-    image: manalyzer/analyzer-backend-api-app:latest
+    image: geekteam/analyzer-backend-api-app:latest
     ports:
       - 8080:8080
   frontend:
