@@ -1,0 +1,198 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                   http://www.liquibase.org/xml/ns/pro
+                   http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="10" author="root">
+        <ext:createCollection collectionName="users">
+            <ext:options>
+                {
+                    validator: {
+                        $jsonSchema: {
+                            bsonType: "object",
+                            required: ["email", "password", "firstname", "roles"],
+                            properties: {
+                                _id: {
+                                    bsonType: "objectId",
+                                },
+                                email: {
+                                    bsonType: "string",
+                                }
+                                firstname: {
+                                    bsonType: "string",
+                                }
+                                lastname: {
+                                    bsonType: "string",
+                                }
+                                password: {
+                                    bsonType: "string",
+                                }
+                                city: {
+                                    bsonType: "string",
+                                }
+                                roles: {
+                                bsonType: ["string"],
+                                }
+                                _class: {
+                                    bsonType: "string",
+                                }
+                            }
+                        }
+                    },
+                    validationAction: "warn",
+                    validationLevel: "strict"
+                }
+            </ext:options>
+        </ext:createCollection>
+    </changeSet>
+
+    <changeSet id="11" author="root">
+        <ext:createCollection collectionName="requests">
+            <ext:options>
+                {
+                validator: {
+                $jsonSchema: {
+                bsonType: "object",
+                required: ["userId", "searchString", "searchDate"],
+                properties: {
+                _id: {
+                bsonType: "objectId",
+                },
+                userId: {
+                bsonType: "objectId",
+                }
+                searchString: {
+                bsonType: "string",
+                }
+                searchDate: {
+                bsonType: "date",
+                }
+                _class: {
+                bsonType: "string",
+                }
+                }
+                }
+                },
+                validationAction: "warn",
+                validationLevel: "strict"
+                }
+            </ext:options>
+        </ext:createCollection>
+    </changeSet>
+
+    <changeSet id="12" author="root">
+        <ext:createCollection collectionName="products">
+            <ext:options>
+                {
+                validator: {
+                $jsonSchema: {
+                bsonType: "object",
+                required: ["productShopId", "shopName", "name", "cost", "imageLink", "productLink"],
+                properties: {
+                _id: {
+                bsonType: "objectId",
+                },
+                productShopId: {
+                bsonType: "string",
+                }
+                shopName: {
+                bsonType: "string",
+                }
+                name: {
+                bsonType: "string",
+                }
+                cost: {
+                bsonType: "decimal",
+                }
+                imageLink: {
+                bsonType: "string",
+                }
+                productLink: {
+                bsonType: "string",
+                }
+                _class: {
+                bsonType: "string",
+                }
+                }
+                }
+                },
+                validationAction: "warn",
+                validationLevel: "strict"
+                }
+            </ext:options>
+        </ext:createCollection>
+    </changeSet>
+
+    <changeSet id="13" author="root">
+        <ext:createCollection collectionName="favorites">
+            <ext:options>
+                {
+                validator: {
+                $jsonSchema: {
+                bsonType: "object",
+                required: ["userId"],
+                properties: {
+                _id: {
+                bsonType: "objectId",
+                },
+                userId: {
+                bsonType: "objectId",
+                }
+                products: {
+                bsonType: ["objectId"],
+                }
+                _class: {
+                bsonType: "string",
+                }
+                }
+                }
+                },
+                validationAction: "warn",
+                validationLevel: "strict"
+                }
+            </ext:options>
+        </ext:createCollection>
+    </changeSet>
+
+    <changeSet id="14" author="root">
+        <ext:createCollection collectionName="productPrices">
+            <ext:options>
+                {
+                validator: {
+                $jsonSchema: {
+                bsonType: "object",
+                required: ["userId", "searchString", "searchDate"],
+                properties: {
+                _id: {
+                bsonType: "objectId",
+                },
+                productId: {
+                bsonType: "objectId",
+                }
+                price: {
+                bsonType: "decimal",
+                }
+                date: {
+                bsonType: "date",
+                }
+                _class: {
+                bsonType: "string",
+                }
+                }
+                }
+                },
+                validationAction: "warn",
+                validationLevel: "strict"
+                }
+            </ext:options>
+        </ext:createCollection>
+    </changeSet>
+
+</databaseChangeLog>

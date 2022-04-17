@@ -73,6 +73,7 @@
             <artifactId>mvideo-parser</artifactId>
             <version>1.0</version>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -89,8 +90,8 @@
                 <configuration>
                     <dockerDirectory>${project.basedir}</dockerDirectory>
                     <imageName>geekteam/${project.artifactId}</imageName>
-                    <serverId>docker-hub</serverId>
-                    <pushImage>true</pushImage>
+<!--                    <serverId>docker-hub</serverId>-->
+<!--                    <pushImage>true</pushImage>-->
                     <buildArgs>
                         <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>
