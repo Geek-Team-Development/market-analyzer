@@ -1,0 +1,42 @@
+<div class="tw-min-h-full tw-flex tw-items-center tw-justify-center tw-py-12 tw-px-4 tw-sm:px-6 tw-lg:px-8">
+  <div class="tw-max-w-md w-full tw-space-y-8 border rounded-3 border-primary shadow py-3 px-4 bg-light">
+
+    <div>
+      <h2 class="tw-mt-6 tw-text-center tw-text-3xl tw-font-extrabold
+       tw-text-gray-900">Create your new account</h2>
+    </div>
+
+    <form (submit)="signUp()">
+      <div class="mb-3">
+        <input type="email" [(ngModel)]="userDto.email" placeholder="Email address"
+               class="form-control" id="email" name="email">
+        <p *ngIf="signUpError.emailError !== ''" class="tw-text-red-500">{{signUpError.emailError}}</p>
+      </div>
+      <div class="mb-3">
+        <input type="password" [(ngModel)]="userDto.password" placeholder="Password"
+               class="form-control" id="password" name="password">
+        <p *ngIf="signUpError.passwordError !== ''" class="tw-text-red-500">{{signUpError.passwordError}}</p>
+      </div>
+      <div class="mb-3">
+        <input type="password" [(ngModel)]="repeatPassword" placeholder="Repeat password"
+               class="form-control" id="matchingPassword" name="matchingPassword">
+        <p *ngIf="signUpError.repeatPasswordError !== ''" class="tw-text-red-500">{{signUpError.repeatPasswordError}}</p>
+      </div>
+      <div class="mb-3">
+        <input type="text" [(ngModel)]="userDto.firstName" placeholder="First name"
+               class="form-control" id="firstName" name="firstName">
+        <p *ngIf="signUpError.firstNameError !== ''" class="tw-text-red-500">{{signUpError.firstNameError}}</p>
+      </div>
+      <div class="mb-3">
+        <input type="text" [(ngModel)]="userDto.lastName" placeholder="Last name"
+               class="form-control" id="lastName" name="lastName">
+        <p *ngIf="signUpError.lastNameError !== ''" class="tw-text-red-500">{{signUpError.lastNameError}}</p>
+      </div>
+      <div class="mb-3">
+        <input type="text" [(ngModel)]="userDto.city" placeholder="City"
+               class="form-control" id="city" name="city">
+      </div>
+      <button type="submit" class="btn btn-primary tw-w-full me-3">Sign Up</button>
+    </form>
+  </div>
+</div>

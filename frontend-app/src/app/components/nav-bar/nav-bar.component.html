@@ -1,0 +1,20 @@
+<nav class="navbar navbar-expand-lg navbar-light mt-3">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav w-100 mb-2 mb-lg-0 d-flex justify-content-between">
+        <li class="nav-item">
+          <a class="nav-link active tw-text-base hover:tw-bg-slate-300 tw-text-center" [routerLink]="[main]">Home</a>
+        </li>
+        <div class="tw-flex tw-flex-row-reverse">
+          <a *ngIf="authService.isAuthenticated()" type="button" class="btn btn-outline-primary tw-ml-1">Logout</a>
+          <a type="button" class="btn btn-outline-success tw-ml-1" [routerLink]="signup">Sign Up</a>
+          <a *ngIf="!authService.isAuthenticated()" type="button" class="btn btn-outline-dark" [routerLink]="signin">Sign In</a>
+        </div>
+      </ul>
+    </div>
+  </div>
+</nav>
