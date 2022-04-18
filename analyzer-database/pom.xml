@@ -10,10 +10,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <properties>
-        <liquibase.version>4.9.0</liquibase.version>
-    </properties>
-
     <dependencies>
         <!--        Spring boot dependencies-->
         <dependency>

@@ -32,7 +32,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void findUserByIdTest() {
+    public void findUserByEmailTest() {
         userRepository.save(expectedUser);
 
         User user = userRepository.findByEmail(expectedUser.getEmail()).orElseThrow(IllegalArgumentException::new);

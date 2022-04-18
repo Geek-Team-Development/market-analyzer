@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,10 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "productPrices")
-public class ProductPrice {
-
-    @Id
-    private String id;
+public class ProductPrice extends AbstractPersistentObject {
 
     @Field
     @Indexed(name = "productId", direction = IndexDirection.ASCENDING)

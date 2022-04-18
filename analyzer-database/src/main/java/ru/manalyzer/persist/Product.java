@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -18,10 +17,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Document(collection = "products")
 @CompoundIndex(def = "{'productShopId':1, 'shopName':id}", name = "uci_productShopId_shopName")
-public class Product {
-
-    @Id
-    private String id;
+public class Product extends AbstractPersistentObject {
 
     @Field
     private String productShopId;

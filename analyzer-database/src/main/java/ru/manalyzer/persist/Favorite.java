@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
@@ -19,10 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "favorites")
-public class Favorite {
-
-    @Id
-    private String id;
+public class Favorite extends AbstractPersistentObject {
 
     @Field(targetType = FieldType.OBJECT_ID)
     @Indexed(name = "ui_userId")
