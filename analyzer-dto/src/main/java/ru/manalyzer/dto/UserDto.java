@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.manalyzer.persist.Role;
 
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -17,11 +19,13 @@ public class UserDto extends AbstractPersistentDto {
 
     private String password;
 
-    private String firstname;
+    private String firstName;
 
-    private String lastname;
+    private String lastName;
 
     private String city;
+
+    private List<Role> roles;
 
     @Override
     public boolean equals(Object o) {
@@ -29,12 +33,12 @@ public class UserDto extends AbstractPersistentDto {
         if (o == null || getClass() != o.getClass()) return false;
         UserDto userDto = (UserDto) o;
         return Objects.equals(this.getId(), userDto.getId()) && Objects.equals(email, userDto.email) &&
-                Objects.equals(password, userDto.password) && Objects.equals(firstname, userDto.firstname) &&
-                Objects.equals(lastname, userDto.lastname) && Objects.equals(city, userDto.city);
+                Objects.equals(password, userDto.password) && Objects.equals(firstName, userDto.firstName) &&
+                Objects.equals(lastName, userDto.lastName) && Objects.equals(city, userDto.city);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getId(), email, password, firstname, lastname, city);
+        return Objects.hash(this.getId(), email, password, firstName, lastName, city);
     }
 }

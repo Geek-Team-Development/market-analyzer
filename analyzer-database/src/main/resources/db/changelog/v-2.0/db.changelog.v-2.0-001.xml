@@ -15,8 +15,8 @@
             <ext:document>
                 {
                 email: "admin@mail.ru",
-                firstname: "Admin",
-                lastname: ""
+                firstName: "Admin",
+                lastName: ""
                 password: "$2a$12$eulRnwp94lJ1pCIOe3nIS.mVtg4d9tdX03snWvn2GdgidIh/bYjCO",
                 city: ""
                 roles: ["ADMIN"]

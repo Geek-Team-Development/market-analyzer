@@ -31,8 +31,8 @@ public class RequestRepositoryTest {
     public static void init() {
         testUser = new User();
         testUser.setEmail("test@mail.ru");
-        testUser.setFirstname("Test");
-        testUser.setLastname("");
+        testUser.setFirstName("Test");
+        testUser.setLastName("");
         testUser.setPassword("$2a$12$eulRnwp94lJ1pCIOe3nIS.mVtg4d9tdX03snWvn2GdgidIh/bYjCO");
         testUser.setCity("");
         testUser.getRoles().add(Role.USER);

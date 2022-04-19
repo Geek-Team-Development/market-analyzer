@@ -24,8 +24,8 @@ public class UserRepositoryTest {
     public static void init() {
         expectedUser = new User();
         expectedUser.setEmail("test@mail.ru");
-        expectedUser.setFirstname("Test");
-        expectedUser.setLastname("");
+        expectedUser.setFirstName("Test");
+        expectedUser.setLastName("");
         expectedUser.setPassword("$2a$12$eulRnwp94lJ1pCIOe3nIS.mVtg4d9tdX03snWvn2GdgidIh/bYjCO");
         expectedUser.setCity("");
         expectedUser.getRoles().add(Role.ADMIN);
@@ -38,8 +38,8 @@ public class UserRepositoryTest {
         User user = userRepository.findByEmail(expectedUser.getEmail()).orElseThrow(IllegalArgumentException::new);
 
         Assertions.assertEquals(expectedUser.getEmail(), user.getEmail());
-        Assertions.assertEquals(expectedUser.getFirstname(), user.getFirstname());
-        Assertions.assertEquals(expectedUser.getLastname(), user.getLastname());
+        Assertions.assertEquals(expectedUser.getFirstName(), user.getFirstName());
+        Assertions.assertEquals(expectedUser.getLastName(), user.getLastName());
         Assertions.assertEquals(expectedUser.getPassword(), user.getPassword());
         Assertions.assertEquals(expectedUser.getCity(), user.getCity());
         Assertions.assertArrayEquals(expectedUser.getRoles().toArray(), user.getRoles().toArray());
@@ -58,8 +58,8 @@ public class UserRepositoryTest {
 
         User duplicateUser = new User();
         duplicateUser.setEmail("test@mail.ru");
-        duplicateUser.setFirstname("Duplicate");
-        duplicateUser.setLastname("");
+        duplicateUser.setFirstName("Duplicate");
+        duplicateUser.setLastName("");
         duplicateUser.setPassword("$2a$12$eulRnwp94lJ1pCIOe3nIS.mVtg4d9tdX03snWvn2GdgidIh/bYjCO");
         duplicateUser.setCity("");
         duplicateUser.getRoles().add(Role.USER);

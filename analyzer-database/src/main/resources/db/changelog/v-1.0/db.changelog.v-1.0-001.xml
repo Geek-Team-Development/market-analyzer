@@ -17,7 +17,7 @@
                     validator: {
                         $jsonSchema: {
                             bsonType: "object",
-                            required: ["email", "password", "firstname", "roles"],
+                            required: ["email", "password", "firstName", "roles"],
                             properties: {
                                 _id: {
                                     bsonType: "objectId",
@@ -25,10 +25,10 @@
                                 email: {
                                     bsonType: "string",
                                 }
-                                firstname: {
+                                firstName: {
                                     bsonType: "string",
                                 }
-                                lastname: {
+                                lastName: {
                                     bsonType: "string",
                                 }
                                 password: {

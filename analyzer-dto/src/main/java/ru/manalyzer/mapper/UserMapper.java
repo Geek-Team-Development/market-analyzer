@@ -29,7 +29,6 @@ public class UserMapper<E extends User, D extends UserDto>
                 .addMappings(m -> m.skip(UserDto::setPassword))
                 .setPostConverter(toDtoConverter());
         this.getModelMapper().createTypeMap(this.getDtoClass(), this.getEntityClass())
-                .addMappings(m -> m.skip(User::setPassword))
                 .setPostConverter(toEntityConverter());
     }
 }

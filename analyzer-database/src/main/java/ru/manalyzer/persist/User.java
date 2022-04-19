@@ -26,10 +26,10 @@ public class User extends AbstractPersistentObject {
     private String email;
 
     @Field
-    private String firstname;
+    private String firstName;
 
     @Field
-    private String lastname;
+    private String lastName;
 
     @Field
     private String password;

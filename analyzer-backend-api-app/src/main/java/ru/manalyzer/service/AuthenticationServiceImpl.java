@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.manalyzer.dto.UserDto;
 import ru.manalyzer.mapper.Mapper;
@@ -14,6 +15,7 @@ import ru.manalyzer.persist.Role;
 import ru.manalyzer.repository.UserRepository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,10 +25,17 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
     private final Mapper<ru.manalyzer.persist.User, UserDto> userMapper;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
-    public AuthenticationServiceImpl(UserRepository userRepository, Mapper<ru.manalyzer.persist.User, UserDto> userMapper) {
+    public AuthenticationServiceImpl(UserRepository userRepository,
+                                     Mapper<ru.manalyzer.persist.User,
+                                             UserDto> userMapper,
+                                     PasswordEncoder passwordEncoder) {
+
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -53,5 +62,13 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
         return userRepository.findByEmail(email)
                 .map(userMapper::toDto)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public UserDto saveNewUser(UserDto userDto) {
+        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        userDto.setRoles(List.of(Role.USER));
+        ru.manalyzer.persist.User savedUser = userRepository.save(userMapper.toEntity(userDto));
+        return userMapper.toDto(savedUser);
     }
 }
