@@ -44,7 +44,7 @@ public class OldiParserTest {
 
     @BeforeEach
     public void init() {
-        DigineticaConnectionProperties connectionProperties = new OldiConnectionProperties(
+        DigineticaConnectionProperties connectionProperties = new DigineticaConnectionProperties(
                 "Oldi",
                 "https://www.oldi.ru",
                 String.format("http://localhost:%s", mockWebServer.getPort()),
@@ -53,7 +53,7 @@ public class OldiParserTest {
                 new HashMap<>()
         );
         ConverterDigineticaDtoToDto converterDto =
-                new ConverterOldiDtoToDto(connectionProperties);
+                new ConverterDigineticaDtoToDto(connectionProperties);
         mapper = new ObjectMapper();
         oldiParser = new OldiParser(connectionProperties, converterDto);
     }

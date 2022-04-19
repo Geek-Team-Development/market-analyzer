@@ -44,7 +44,7 @@ public class CitilinkParserTest {
 
     @BeforeEach
     public void init() {
-        DigineticaConnectionProperties connectionProperties = new CitilinkConnectionProperties(
+        DigineticaConnectionProperties connectionProperties = new DigineticaConnectionProperties(
                 "Citilink",
                 "https://www.citilink.ru",
                 String.format("http://localhost:%s", mockWebServer.getPort()),
@@ -53,7 +53,7 @@ public class CitilinkParserTest {
                 new HashMap<>()
         );
         ConverterDigineticaDtoToDto converterDto =
-                new ConverterCitilinkDtoToDto(connectionProperties);
+                new ConverterDigineticaDtoToDto(connectionProperties);
         mapper = new ObjectMapper();
         citilinkParser = new CitilinkParser(connectionProperties, converterDto);
     }
