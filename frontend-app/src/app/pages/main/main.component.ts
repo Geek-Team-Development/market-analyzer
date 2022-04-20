@@ -1,8 +1,11 @@
 import {Component, NgZone, OnInit} from '@angular/core';
 import {ProductDto} from "../../dto/product-dto";
 import {Observable} from "rxjs";
-
-export const MAIN_URL = 'main';
+import {SearchProducts} from "../../config/backend-urls";
+import {HttpParams} from "@angular/common/http";
+import {EventSourceService} from "../../services/event-source.service";
+import {ProductService} from "../../services/product.service";
+import {Logos} from "../../config/front-config";
 
 @Component({
   selector: 'app-main',
@@ -13,47 +16,35 @@ export class MainComponent implements OnInit {
 
   searchName: string = '';
   productsArray: ProductDto[] = [];
+  isWaiting: boolean = false;
 
-  constructor(private zone: NgZone) {
+  constructor(private productService: ProductService,
+              private logos: Logos) {
   }
 
   ngOnInit(): void {
 
   }
 
-  clickSubmit() {
-    this.productsArray = [];
-    this.getProducts()
-      .subscribe(value => {
-        this.productsArray.push(value);
-      });
+  search() {
+    if(this.searchName !== '') {
+      this.productsArray = [];
+      this.isWaiting = true;
+      this.productService.getProducts(this.searchName)
+        .subscribe({
+          next: value => {
+            this.productsArray.push(value);
+          }, error: e => {
+            console.log(e);
+            this.isWaiting = false;
+          }, complete: () => {
+            this.isWaiting = false;
+          }
+        });
+    }
   }
 
-  getProducts(): Observable<any> {
-    return new Observable<any>((
-      observer => {
-        console.log('searchName = ' + this.searchName);
-        let source = new EventSource('/api/v1/product?searchName=' + this.searchName);
-        source.onmessage = event => {
-          const json = JSON.parse(event.data);
-          let productDto = new ProductDto(
-            json['id'],
-            json['name'],
-            json['price'],
-            json['shopName'],
-            json['productLink'],
-            json['imageLink']);
-          this.zone.run(() => {
-            observer.next(productDto);
-          })
-        };
-        source.onerror = error => {
-          this.zone.run(() => {
-            observer.error(error)
-          })
-        };
-        return () => source.close();
-      }
-    ))
+  getLogo(shopName: string) {
+    return this.logos.logos.get(shopName);
   }
 }

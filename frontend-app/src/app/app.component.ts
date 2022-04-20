@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {APP_NAME} from "./config/front-config";
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'frontend-app';
+  title = APP_NAME;
 }

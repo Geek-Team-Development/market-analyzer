@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import {Component} from "@angular/core";
+import {APP_NAME} from "./config/front-config";
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -9,7 +11,8 @@ describe('AppComponent', () => {
         RouterTestingModule
       ],
       declarations: [
-        AppComponent
+        AppComponent,
+        MockAppNavBarComponent
       ],
     }).compileComponents();
   });
@@ -20,16 +23,24 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'frontend-app'`, () => {
+  it('should have header, app-router-outlet', function () {
     const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('frontend-app');
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('app-nav-bar')).toBeTruthy();
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 
-  it('should render title', () => {
+  const appName = APP_NAME;
+
+  it(`should have as title '${appName}'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('frontend-app app is running!');
+    const app = fixture.componentInstance;
+    expect(app.title).toEqual(appName);
   });
 });
+
+@Component({
+  selector: 'app-nav-bar',
+  template: ''
+})
+class MockAppNavBarComponent {}
