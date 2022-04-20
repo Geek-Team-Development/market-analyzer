@@ -18,8 +18,8 @@
 
     <modules>
         <module>analyzer-dto</module>
-        <module>alalyzer-parser</module>
-        <module>parser-shop-oldi</module>
+        <module>analyzer-parser</module>
+        <module>diginetica-shop-parsers</module>
     </modules>
 
     <properties>

@@ -1,4 +1,4 @@
-package ru.manalyzer.dto;
+package ru.manalyzer.diginetica.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,13 +10,13 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class OldiResponseDto {
+public class DigineticaResponseDto {
 
     private Integer totalHits;
 
-    private List<OldiProductDto> products;
+    private List<DigineticaProductDto> products;
 
-    public OldiResponseDto() {
+    public DigineticaResponseDto() {
         this.totalHits = 0;
         products = Collections.emptyList();
     }
