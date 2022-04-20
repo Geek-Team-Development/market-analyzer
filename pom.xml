@@ -18,9 +18,9 @@
 
     <modules>
         <module>analyzer-dto</module>
-        <module>alalyzer-parser</module>
+        <module>analyzer-parser</module>
+        <module>diginetica-shop-parsers</module>
         <module>mvideo-parser</module>
-        <module>parser-shop-oldi</module>
         <module>analyzer-backend-api-app</module>
         <module>analyzer-database</module>
     </modules>

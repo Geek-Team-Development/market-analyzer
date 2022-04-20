@@ -9,7 +9,7 @@
         <version>1.0</version>
     </parent>
 
-    <artifactId>parser-shop-oldi</artifactId>
+    <artifactId>diginetica-shop-parsers</artifactId>
 
     <dependencies>
         <dependency>
