@@ -1,0 +1,107 @@
+<nav class="tw-bg-gray-800 tw-mb-4 tw-sticky tw-top-0 tw-z-10">
+  <div class="tw-max-w-7xl tw-mx-auto tw-px-2 sm:tw-px-6 lg:tw-px-8">
+    <div class="tw-relative tw-flex tw-items-center tw-justify-between tw-h-16">
+      <div class="tw-absolute tw-inset-y-0 tw-left-0 tw-flex tw-items-center sm:tw-hidden">
+        <button type="button" (click)="clickLeftMenu()"
+                class="tw-inline-flex tw-items-center tw-justify-center tw-p-2 tw-rounded-md tw-text-gray-400 hover:tw-text-white hover:tw-bg-gray-700 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-inset focus:tw-ring-white"
+                aria-controls="mobile-menu" aria-expanded="false">
+          <span class="tw-sr-only">Open main menu</span>
+          <svg class="tw-block tw-h-6 tw-w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg class="tw-hidden tw-h-6 tw-w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center sm:tw-items-stretch sm:tw-justify-start">
+        <div class="tw-flex-shrink-0 tw-flex tw-items-center">
+          <div class="tw-text-white tw-text-4xl" style="font-family: 'Ms Madi', cursive;">Space Price</div>
+        </div>
+        <div class="tw-hidden tw-relative tw-flex tw-flex-row tw-grow sm:tw-block sm:tw-ml-6">
+          <div class="tw-absolute tw-inset-y-0 tw-items-center tw-left-0 tw-flex tw-space-x-4">
+            <a [routerLink]="main" class="tw-block tw-px-3 tw-py-2 tw-rounded-md
+            tw-text-sm tw-font-medium tw-no-underline"
+               [class]="currentUrl === main ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
+                ' hover:tw-text-white'" aria-current="page">Home</a>
+          </div>
+          <div class="tw-absolute tw-inset-y-0 tw-right-0 tw-flex
+                tw-items-center tw-pr-2 sm:tw-ml-6 sm:tw-pr-0">
+            <a *ngIf="!authService.isAuthenticated()" [routerLink]="signin"
+               class="tw-block tw-px-3 tw-py-2 tw-text-sm tw-text-white
+               hover:tw-bg-gray-700 tw-rounded-md tw-no-underline"
+               [class]="currentUrl === signin ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
+                               ' hover:tw-text-white'">Sign In</a>
+            <a [routerLink]="signup"
+               class="tw-block tw-px-3 tw-py-2 tw-ml-2 tw-text-sm tw-text-white hover:tw-bg-gray-700 tw-rounded-md tw-no-underline"
+               [class]="currentUrl === signup ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
+                ' hover:tw-text-white'">Sign Up</a>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="authService.isAuthenticated()" class="tw-absolute tw-inset-y-0 tw-right-0 tw-flex
+      tw-items-center tw-pr-2 sm:tw-static sm:tw-inset-auto sm:tw-ml-6 sm:tw-pr-0">
+        <button type="button"
+                class="tw-bg-gray-800 tw-p-1 tw-rounded-full tw-text-gray-400 hover:tw-text-white focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-offset-2 focus:tw-ring-offset-gray-800 focus:tw-ring-white">
+          <span class="tw-sr-only">View notifications</span>
+          <svg class="tw-h-6 tw-w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+        </button>
+        <div class="tw-ml-3 tw-relative">
+          <div>
+            <button type="button" [matMenuTriggerFor]="menu"
+                    class="tw-bg-gray-800 tw-flex tw-text-sm tw-rounded-full focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-offset-2 focus:tw-ring-offset-gray-800 focus:tw-ring-white"
+                    id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+              <span class="tw-sr-only">Open user menu</span>
+              <img class="tw-h-8 tw-w-8 tw-rounded-full"
+                   src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                   alt="">
+            </button>
+            <mat-menu #menu="matMenu"
+                      class="tw-z-10 tw-right-0 tw-mt-2 tw-w-48 tw-rounded-md tw-p-0
+                    tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none
+                     tw-border tw-border-yellow-300 tw-bg-gray-800"
+                      role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+              <a [routerLink]="signin"
+                 class="btn tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700" role="menuitem"
+                 tabindex="-1"
+                 id="user-menu-item-2">Profile</a>
+              <a [routerLink]="signup"
+                 class="btn tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700" role="menuitem"
+                 tabindex="-1"
+                 id="user-menu-item-2">Favorites</a>
+              <a *ngIf="authService.isAuthenticated()" (click)="logout()"
+                 class="btn tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700" role="menuitem"
+                 tabindex="-1"
+                 id="user-menu-item-2">Logout</a>
+            </mat-menu>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sm:tw-hidden" [class]="leftMenuIsActive ? 'tw-block' : 'tw-hidden'" id="mobile-menu">
+    <div class="tw-px-2 tw-pt-2 tw-pb-3 tw-space-y-1">
+      <a [routerLink]="main"
+         class="tw-block tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium tw-no-underline"
+         [class]="currentUrl === main ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 ' +
+          'hover:tw-bg-gray-700 hover:tw-text-white'"
+         aria-current="page">Home</a>
+      <a *ngIf="!authService.isAuthenticated()" [routerLink]="signin"
+         class="tw-block tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium tw-no-underline"
+         [class]="currentUrl === signin ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 ' +
+          'hover:tw-bg-gray-700 hover:tw-text-white'">Sign In</a>
+      <a [routerLink]="signup"
+         class="tw-block tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium tw-no-underline"
+         [class]="currentUrl === signup ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 ' +
+          'hover:tw-bg-gray-700 hover:tw-text-white'">Sign Up</a>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,34 @@
+import {Injectable, NgZone} from '@angular/core';
+import {EventSourceService} from "./event-source.service";
+import {ProductDto} from "../dto/product-dto";
+import {Observable} from "rxjs";
+import {Util} from "../utils/util";
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProductService {
+
+  constructor(private eventSourceService: EventSourceService,
+              private ngZone: NgZone) { }
+
+  getProducts(searchName: string) : Observable<ProductDto> {
+    return new Observable<ProductDto>((
+      observer => {
+        let source = this.eventSourceService.getEventSource(searchName);
+        source.onmessage = event => {
+          let productDto = Util.parseProduct(event.data);
+          this.ngZone.run(() => {
+            observer.next(productDto);
+          })
+        };
+        source.onerror = error => {
+          this.ngZone.run(() => {
+            observer.error(error)
+          })
+        };
+        return () => source.close();
+      }
+    ));
+  }
+}
