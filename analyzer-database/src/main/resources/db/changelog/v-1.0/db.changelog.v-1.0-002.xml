@@ -1,0 +1,79 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                   http://www.liquibase.org/xml/ns/pro
+                   http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="20" author="root">
+        <ext:createIndex collectionName="users">
+            <ext:keys>
+                { email: 1}
+            </ext:keys>
+            <ext:options>
+                {unique: true, name: "ui_email"}
+            </ext:options>
+        </ext:createIndex>
+    </changeSet>
+
+    <changeSet id="21" author="root">
+        <ext:createIndex collectionName="requests">
+            <ext:keys>
+                { userId: 1}
+            </ext:keys>
+            <ext:options>
+                { name: "i_userId" }
+            </ext:options>
+        </ext:createIndex>
+    </changeSet>
+
+    <changeSet id="22" author="root">
+        <ext:createIndex collectionName="requests">
+            <ext:keys>
+                { searchString: 1}
+            </ext:keys>
+            <ext:options>
+                { name: "i_searchString" }
+            </ext:options>
+        </ext:createIndex>
+    </changeSet>
+
+    <changeSet id="23" author="root">
+        <ext:createIndex collectionName="products">
+            <ext:keys>
+                { productShopId: 1, shopName: 1}
+            </ext:keys>
+            <ext:options>
+                {unique: true, name: "uci_productShopId_shopName"}
+            </ext:options>
+        </ext:createIndex>
+    </changeSet>
+
+    <changeSet id="24" author="root">
+        <ext:createIndex collectionName="favorites">
+            <ext:keys>
+                { userId: 1 }
+            </ext:keys>
+            <ext:options>
+                {unique: true, name: "ui_userId"}
+            </ext:options>
+        </ext:createIndex>
+    </changeSet>
+
+    <changeSet id="25" author="root">
+        <ext:createIndex collectionName="productPrices">
+            <ext:keys>
+                { productId: 1 }
+            </ext:keys>
+            <ext:options>
+                {name: "i_productId"}
+            </ext:options>
+        </ext:createIndex>
+    </changeSet>
+
+</databaseChangeLog>
