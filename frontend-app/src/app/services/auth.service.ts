@@ -30,11 +30,14 @@ export class AuthService {
             let responseCredentials = response as Credentials;
             let credentials = new Credentials();
             credentials.email = responseCredentials.email;
+            if(localStorage.getItem(this.currentUserKey)) {
+              this.logout();
+            }
             return new AuthResult(credentials, this.redirectUrl);
           }
           throw new Error(response.toString());
         })
-      )
+      );
   }
 
   signIn(credentials: Credentials) : Observable<AuthResult> {

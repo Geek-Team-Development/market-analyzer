@@ -84,7 +84,7 @@ public class MVideoParser implements Parser {
                 .bodyToMono(new ParameterizedTypeReference<MVideoResponse<ProductIds>>() {
                 })
                 .map(productIds -> productIds.getBody().getProducts())
-                .onErrorReturn(NullPointerException.class, List.of());
+                .onErrorReturn(List.of());
     }
 
     private Flux<MaterialPrice> getProductPrice(List<String> productIds) {

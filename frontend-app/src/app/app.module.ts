@@ -10,8 +10,9 @@ import { NavBarComponent } from './components/nav-bar/nav-bar.component';
 import { SignUpComponent } from './pages/sign-up/sign-up.component';
 import {HttpClientModule} from "@angular/common/http";
 import { SignInComponent } from './pages/sign-in/sign-in.component';
-import { HeaderComponent } from './components/header/header.component';
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {MatButtonModule} from "@angular/material/button";
+import {MatMenuModule} from "@angular/material/menu";
 
 @NgModule({
   declarations: [
@@ -19,17 +20,18 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
     MainComponent,
     NavBarComponent,
     SignUpComponent,
-    SignInComponent,
-    HeaderComponent
+    SignInComponent
   ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        FormsModule,
-        BrowserAnimationsModule,
-        HttpClientModule,
-        MatProgressSpinnerModule
-    ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    MatMenuModule
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })

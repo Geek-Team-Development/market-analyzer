@@ -1,23 +1,27 @@
 <div class="tw-min-h-full tw-flex tw-items-center tw-justify-center tw-py-12 tw-px-4 tw-sm:px-6 tw-lg:px-8">
-  <div class="tw-max-w-md w-full tw-space-y-8 border rounded-3 border-primary shadow py-3 px-4 bg-light">
+  <div class="tw-max-w-md w-full tw-space-y-8 tw-border tw-border-yellow-300
+   tw-rounded-xl py-3 px-4 tw-bg-[#2a2a2a] tw-shadow-[0_0_60px_-15px_rgba(255,255,255,0.3)]">
 
     <div>
       <h2 class="tw-mt-6 tw-text-center tw-text-3xl tw-font-extrabold
-       tw-text-gray-900">Sign in to your account</h2>
+       tw-text-white">Sign in to your account</h2>
     </div>
 
     <form (submit)="signIn()">
       <div class="mb-3">
-        <input type="email" [(ngModel)]="credentials.email" placeholder="Email address"
-               class="form-control" id="email" name="email">
+        <input type="text" [(ngModel)]="credentials.email" placeholder="Email address"
+               class="tw-border tw-border-white tw-bg-[#2a2a2a] tw-w-full
+                tw-caret-white tw-text-white tw-rounded-md focus:tw-bg-[#2a2a2a]" id="email" name="email">
         <p *ngIf="signInError.emailError !== ''" class="tw-text-red-500">{{signInError.emailError}}</p>
       </div>
       <div class="mb-3">
         <input type="password" [(ngModel)]="credentials.password" placeholder="Password"
-               class="form-control" id="password" name="password">
+               class="tw-border tw-border-white tw-bg-[#2a2a2a] tw-w-full
+                tw-caret-white tw-text-white tw-rounded-md" id="password" name="password">
         <p *ngIf="signInError.passwordError !== ''" class="tw-text-red-500">{{signInError.passwordError}}</p>
       </div>
-      <button type="submit" class="btn btn-outline-dark tw-w-full me-3">Sign In</button>
+      <button type="submit" class="tw-block tw-w-full tw-p-3 tw-text-white tw-text-xl tw-rounded-2xl
+        tw-bg-green-600 hover:tw-bg-green-700 active:tw-scale-95 tw-rounded-md">Sign In</button>
     </form>
   </div>
 </div>

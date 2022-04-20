@@ -1,32 +1,38 @@
-<div class="col input-group bg-light shadow mt-3 mb-0 p-0">
-  <input type="search" [(ngModel)]="searchName" id="searchForm"
-         class="form-control tw-border tw-border-blue-500" placeholder="Поиск"
-         aria-label="search" aria-describedby="search-addon"/>
-  <button type="button" class="btn btn-primary tw-w-16" (click)="search()">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
+<div class="tw-flex tw-flex-col">
+  <div class="col input-group shadow p-0">
+    <input type="search" [(ngModel)]="searchName" (keyup.enter)="search()" id="searchForm"
+           class="tw-w-auto tw-grow tw-border tw-border-[#00ff00] tw-rounded-l-md tw-bg-[#2a2a2a]
+          tw-caret-white tw-text-white tw-shadow-[0_0_60px_-15px_rgba(255,255,255,0.3)]" placeholder="Поиск"
+           aria-label="search" aria-describedby="search-addon"/>
+    <button type="button" class="tw-block tw-bg-[#00ff00] hover:tw-bg-[#00dd00] tw-w-16 tw-rounded-r-md"
+            (click)="search()">
+      <i class="fa-solid fa-magnifying-glass tw-scale-[1.4] active:tw-scale-[1.2]"></i>
+    </button>
+  </div>
+  <mat-spinner *ngIf="isWaiting" class="tw-mx-auto tw-mt-3" [diameter]="64"></mat-spinner>
 </div>
-<div *ngIf="isWaiting" class="tw-mt-3">
-  <mat-spinner class="tw-mx-auto" [diameter]="70"></mat-spinner>
-</div>
-<div *ngIf="productsArray.length > 0" class="tw-bg-gray-100 mt-3 shadow">
-  <div class="tw-max-w-2xl tw-mx-auto tw-py-2 tw-px-4 sm:tw-py-24 sm:tw-px-6 lg:tw-max-w-7xl lg:tw-px-8">
+<div *ngIf="productsArray.length > 0" class="mt-3">
+  <div class="tw-max-w-2xl tw-mx-auto tw-py-2 tw-px-4 sm:tw-py-8 sm:tw-px-6 lg:tw-max-w-7xl lg:tw-px-8 tw-rounded-lg">
     <div class="tw-grid tw-grid-cols-1 tw-gap-y-10 tw-gap-x-6 sm:tw-grid-cols-2 lg:tw-grid-cols-4 xl:tw-gap-x-8">
-      <a *ngFor="let product of productsArray;" class="tw-flex tw-flex-col tw-justify-between tw-bg-white tw-shadow-2xl tw-relative tw-no-underline tw-min-h-full tw-p-2 hover:tw-scale-105 tw-duration-300" [attr.href]="product.productLink">
+      <a *ngFor="let product of productsArray;" class="tw-flex tw-flex-col tw-justify-between
+      tw-bg-[#2a2a2a] tw-relative tw-no-underline tw-rounded-xl
+      tw-min-h-full tw-p-2 hover:tw-scale-105 tw-duration-300 tw-border tw-border-yellow-500
+      tw-shadow-[0_0_60px_-15px_rgba(255,255,255,0.3)]" [attr.href]="product.productLink">
         <div>
-          <div class="tw-w-full tw-bg-gray-200 tw-aspect-w-1 tw-aspect-h-1 tw-rounded-md tw-overflow-hidden group-hover:tw-opacity-75">
+          <div
+            class="tw-w-full tw-aspect-w-1 tw-aspect-h-1 tw-rounded-md tw-overflow-hidden group-hover:tw-opacity-75">
             <img [attr.src]="product.imageLink" class="tw-w-full tw-h-full lg:tw-w-full lg:tw-h-full tw-object-contain">
           </div>
           <div class="tw-mt-4 tw-flex tw-justify-between tw-justify-items-stretch">
             <div class="tw-flex tw-flex-col">
               <h3 class="tw-text-sm tw-text-gray-700">
-                <a class="tw-no-underline">
+                <a class="tw-no-underline tw-text-white tw-text-xl">
                   <span aria-hidden="true" class="tw-absolute tw-inset-0"></span>
                   {{product.name}}
                 </a>
               </h3>
             </div>
-            <p class="tw-text-sm tw-font-medium tw-text-gray-900">{{product.price}}&nbsp;&#8381;</p>
+            <p class="tw-font-medium tw-text-yellow-500 tw-text-xl">{{product.price}}&nbsp;&#8381;</p>
           </div>
         </div>
         <div>

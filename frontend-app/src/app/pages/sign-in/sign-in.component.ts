@@ -30,6 +30,7 @@ export class SignInComponent implements OnInit {
       .subscribe({
         next: (signInResult) => {
           let navigateUrl = signInResult.redirectUrl ? signInResult.redirectUrl : '/' + FrontUrls.MAIN;
+          console.log(navigateUrl);
           this.router.navigateByUrl(navigateUrl);
         },
         error: (errorResult) => {

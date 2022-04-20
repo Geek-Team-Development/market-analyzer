@@ -4,6 +4,7 @@ import {AuthService} from "../../services/auth.service";
 import {Router} from "@angular/router";
 import {SIGN_IN} from "../../config/backend-urls";
 import {Util} from "../../utils/util";
+import {FrontUrls} from "../../config/front-config";
 
 @Component({
   selector: 'app-sign-up',
@@ -30,7 +31,7 @@ export class SignUpComponent implements OnInit {
     this.authService.signUp(this.userDto)
       .subscribe({
         next: (signUpResult) => {
-          let navigateUrl = signUpResult.redirectUrl ? signUpResult.redirectUrl : '/' + SIGN_IN;
+          let navigateUrl = signUpResult.redirectUrl ? signUpResult.redirectUrl : '/' + FrontUrls.SIGN_IN;
           this.router.navigateByUrl(navigateUrl);
         },
         error: (errorResult) => {

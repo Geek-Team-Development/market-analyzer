@@ -27,19 +27,21 @@ export class MainComponent implements OnInit {
   }
 
   search() {
-    this.productsArray = [];
-    this.isWaiting = true;
-    this.productService.getProducts(this.searchName)
-      .subscribe({
-        next: value => {
-          this.productsArray.push(value);
-        }, error: e => {
-          console.log(e);
-          this.isWaiting = false;
-        }, complete: () => {
-          this.isWaiting = false;
-        }
-      });
+    if(this.searchName !== '') {
+      this.productsArray = [];
+      this.isWaiting = true;
+      this.productService.getProducts(this.searchName)
+        .subscribe({
+          next: value => {
+            this.productsArray.push(value);
+          }, error: e => {
+            console.log(e);
+            this.isWaiting = false;
+          }, complete: () => {
+            this.isWaiting = false;
+          }
+        });
+    }
   }
 
   getLogo(shopName: string) {

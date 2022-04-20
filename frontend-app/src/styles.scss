@@ -34,9 +34,30 @@ $frontend-app-theme: mat.define-light-theme((
 // that you are using.
 @include mat.all-component-themes($frontend-app-theme);
 
-body {
-  background-image: url(/assets/images/bg_page.png);
+html { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+input::placeholder {
+  -webkit-text-fill-color: #aaaaaa !important;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  box-shadow: 0 0 0 30px #2d2d2d inset !important;
+  -webkit-text-fill-color: white !important;
+}
+
+body::-webkit-scrollbar{
+  width: 12px;
+}
+
+body::-webkit-scrollbar-track {
+  background-color: #2a2a2a;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #3a3a3a;
+  border-radius: 20px;
+  border: 1px solid yellow;
+}

@@ -12,7 +12,7 @@ describe('AppComponent', () => {
       ],
       declarations: [
         AppComponent,
-        MockAppHeaderComponent
+        MockAppNavBarComponent
       ],
     }).compileComponents();
   });
@@ -26,7 +26,7 @@ describe('AppComponent', () => {
   it('should have header, app-router-outlet', function () {
     const fixture = TestBed.createComponent(AppComponent);
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('app-header')).toBeTruthy();
+    expect(compiled.querySelector('app-nav-bar')).toBeTruthy();
     expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 
@@ -40,7 +40,7 @@ describe('AppComponent', () => {
 });
 
 @Component({
-  selector: 'app-header',
+  selector: 'app-nav-bar',
   template: ''
 })
-class MockAppHeaderComponent {}
+class MockAppNavBarComponent {}
