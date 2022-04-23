@@ -23,9 +23,13 @@ public class AuthenticationController {
         return authenticationService.findUserByEmail(((User) authentication.getPrincipal()).getUsername());
     }
 
-
     @PostMapping(path = "/signup", produces = "application/json", consumes = "application/json")
     public UserDto addNewUser(@RequestBody UserDto userDto) {
         return authenticationService.saveNewUser(userDto);
+    }
+
+    @ExceptionHandler
+    public String exception(Throwable throwable) {
+        return throwable.getMessage();
     }
 }

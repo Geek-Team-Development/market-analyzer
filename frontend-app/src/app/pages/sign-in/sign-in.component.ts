@@ -31,7 +31,9 @@ export class SignInComponent implements OnInit {
         next: (signInResult) => {
           let navigateUrl = signInResult.redirectUrl ? signInResult.redirectUrl : '/' + FrontUrls.MAIN;
           console.log(navigateUrl);
-          this.router.navigateByUrl(navigateUrl);
+          this.router.navigateByUrl(navigateUrl).then(() => {
+            this.authService.redirectUrl = undefined;
+          });
         },
         error: (errorResult) => {
           console.log(errorResult);
@@ -47,7 +49,8 @@ export class SignInComponent implements OnInit {
       result = false;
     }
     if (this.credentials.password === '') {
-      this.signInError.passwordError = Util.mustBeDefinedErrorMessage('Password');
+      this.signInError.passwordError = Util.mustBeDefinedErrorMessage('Пароль');
+      result = false;
     }
     return result;
   }

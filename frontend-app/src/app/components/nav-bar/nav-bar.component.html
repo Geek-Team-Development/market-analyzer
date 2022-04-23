@@ -25,7 +25,7 @@
             <a [routerLink]="main" class="tw-block tw-px-3 tw-py-2 tw-rounded-md
             tw-text-sm tw-font-medium tw-no-underline"
                [class]="currentUrl === main ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
-                ' hover:tw-text-white'" aria-current="page">Home</a>
+                ' hover:tw-text-white'" aria-current="page">Главная</a>
           </div>
           <div class="tw-absolute tw-inset-y-0 tw-right-0 tw-flex
                 tw-items-center tw-pr-2 sm:tw-ml-6 sm:tw-pr-0">
@@ -33,11 +33,11 @@
                class="tw-block tw-px-3 tw-py-2 tw-text-sm tw-text-white
                hover:tw-bg-gray-700 tw-rounded-md tw-no-underline"
                [class]="currentUrl === signin ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
-                               ' hover:tw-text-white'">Sign In</a>
+                               ' hover:tw-text-white'">Вход</a>
             <a [routerLink]="signup"
                class="tw-block tw-px-3 tw-py-2 tw-ml-2 tw-text-sm tw-text-white hover:tw-bg-gray-700 tw-rounded-md tw-no-underline"
                [class]="currentUrl === signup ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
-                ' hover:tw-text-white'">Sign Up</a>
+                ' hover:tw-text-white'">Регистрация</a>
           </div>
         </div>
       </div>
@@ -66,20 +66,25 @@
             <mat-menu #menu="matMenu"
                       class="tw-z-10 tw-right-0 tw-mt-2 tw-w-48 tw-rounded-md tw-p-0
                     tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none
-                     tw-border tw-border-yellow-300 tw-bg-gray-800"
+                     tw-border tw-border-yellow-300 tw-bg-gray-800 tw-text-left"
                       role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+              <div class="tw-px-4 tw-py-2 tw-text-sm tw-text-white">Вы вошли под именем {{getUsername()}}</div>
+              <mat-divider class="tw-bg-yellow-300 tw-mx-2"></mat-divider>
               <a [routerLink]="signin"
-                 class="btn tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700" role="menuitem"
+                 class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700
+                 tw-no-underline" role="menuitem"
                  tabindex="-1"
-                 id="user-menu-item-2">Profile</a>
+                 id="user-menu-item-2">Профиль</a>
               <a [routerLink]="signup"
-                 class="btn tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700" role="menuitem"
+                 class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700
+                  tw-no-underline" role="menuitem"
                  tabindex="-1"
-                 id="user-menu-item-2">Favorites</a>
+                 id="user-menu-item-2">Избранное</a>
               <a *ngIf="authService.isAuthenticated()" (click)="logout()"
-                 class="btn tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700" role="menuitem"
+                 class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700
+                  tw-no-underline tw-cursor-pointer" role="menuitem"
                  tabindex="-1"
-                 id="user-menu-item-2">Logout</a>
+                 id="user-menu-item-2">Выход</a>
             </mat-menu>
           </div>
         </div>
@@ -93,15 +98,15 @@
          class="tw-block tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium tw-no-underline"
          [class]="currentUrl === main ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 ' +
           'hover:tw-bg-gray-700 hover:tw-text-white'"
-         aria-current="page">Home</a>
+         aria-current="page">Главная</a>
       <a *ngIf="!authService.isAuthenticated()" [routerLink]="signin"
          class="tw-block tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium tw-no-underline"
          [class]="currentUrl === signin ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 ' +
-          'hover:tw-bg-gray-700 hover:tw-text-white'">Sign In</a>
+          'hover:tw-bg-gray-700 hover:tw-text-white'">Вход</a>
       <a [routerLink]="signup"
          class="tw-block tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium tw-no-underline"
          [class]="currentUrl === signup ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 ' +
-          'hover:tw-bg-gray-700 hover:tw-text-white'">Sign Up</a>
+          'hover:tw-bg-gray-700 hover:tw-text-white'">Регистрация</a>
     </div>
   </div>
 </nav>

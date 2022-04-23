@@ -23,6 +23,7 @@ export class AuthService {
   }
 
   signUp(registerData: UserDto) : Observable<AuthResult> {
+    this.logout();
     return this.http.post(SIGN_UP, registerData)
       .pipe(
         map(response => {
@@ -30,9 +31,6 @@ export class AuthService {
             let responseCredentials = response as Credentials;
             let credentials = new Credentials();
             credentials.email = responseCredentials.email;
-            if(localStorage.getItem(this.currentUserKey)) {
-              this.logout();
-            }
             return new AuthResult(credentials, this.redirectUrl);
           }
           throw new Error(response.toString());
@@ -40,13 +38,13 @@ export class AuthService {
       );
   }
 
-  signIn(credentials: Credentials) : Observable<AuthResult> {
+  signIn(credentials: Credentials | null) {
     const headers = new HttpHeaders(credentials ? {
       authorization: 'Basic ' + btoa(credentials.email + ':' + credentials.password) } : {});
     return this.http.get(SIGN_IN, { headers: headers })
       .pipe(
         map(response => {
-          if('email' in response) {
+          if ('email' in response) {
             this.currentUser = response as Credentials;
             localStorage.setItem(this.currentUserKey, JSON.stringify(response));
             return new AuthResult(this.currentUser, this.redirectUrl);
@@ -66,5 +64,9 @@ export class AuthService {
 
   public isAuthenticated(): boolean {
     return !!this.currentUser;
+  }
+
+  public getUsername() {
+    return this.currentUser?.email;
   }
 }
