@@ -64,7 +64,7 @@
         <!--        Module dependencies-->
         <dependency>
             <groupId>ru.manalyzer</groupId>
-            <artifactId>alalyzer-parser</artifactId>
+            <artifactId>analyzer-parser</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>
@@ -74,7 +74,7 @@
         </dependency>
         <dependency>
             <groupId>ru.manalyzer</groupId>
-            <artifactId>parser-shop-oldi</artifactId>
+            <artifactId>diginetica-shop-parsers</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>

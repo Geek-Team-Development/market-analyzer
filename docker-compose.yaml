@@ -4,9 +4,24 @@ services:
     image: geekteam/analyzer-backend-api-app:latest
     ports:
       - 8080:8080
+
   frontend:
     image: geekteam/frontend
     ports:
       - 80:80
     depends_on:
       - analyzer-backend-api-app
+
+  db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb-data:/var/lib/mongodb
+
+volumes:
+  mongodb-data:
