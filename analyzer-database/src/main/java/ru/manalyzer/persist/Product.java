@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "products")
-@CompoundIndex(def = "{'productShopId':1, 'shopName':id}", name = "uci_productShopId_shopName")
+@CompoundIndex(def = "{'productShopId':1, 'shopName':id}", name = "uci_productShopId_shopName", unique = true)
 public class Product extends AbstractPersistentObject {
 
     @Field
