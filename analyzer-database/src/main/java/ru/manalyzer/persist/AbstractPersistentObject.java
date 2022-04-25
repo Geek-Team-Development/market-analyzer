@@ -1,11 +1,13 @@
 package ru.manalyzer.persist;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 public abstract class AbstractPersistentObject {
 
     @Id

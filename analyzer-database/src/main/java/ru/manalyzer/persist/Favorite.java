@@ -10,8 +10,8 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -27,5 +27,5 @@ public class Favorite extends AbstractPersistentObject {
 
     @Field(targetType = FieldType.OBJECT_ID)
     @DocumentReference
-    private List<Product> products = new ArrayList<>();
+    private Set<Product> products = new HashSet<>();
 }

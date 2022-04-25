@@ -4,9 +4,12 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.dto.UserDto;
 import ru.manalyzer.mapper.Mapper;
+import ru.manalyzer.mapper.ProductMapper;
 import ru.manalyzer.mapper.UserMapper;
+import ru.manalyzer.persist.Product;
 import ru.manalyzer.persist.User;
 
 @Configuration
@@ -24,7 +27,14 @@ public class MapperConfig {
     }
 
     @Bean
+    public Mapper<Product, ProductDto> productMapper() {
+        return new ProductMapper<>(modelMapper(), Product.class, ProductDto.class);
+    }
+
+    @Bean
     public Mapper<User, UserDto> userMapper() {
         return new UserMapper<>(modelMapper(), User.class, UserDto.class);
     }
+
+
 }
