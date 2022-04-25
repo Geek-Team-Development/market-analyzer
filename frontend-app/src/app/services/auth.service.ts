@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {UserDto} from "../dto/user-dto";
 import {map, Observable} from "rxjs";
 import {AuthResult} from "../model/auth-result";
@@ -44,12 +44,14 @@ export class AuthService {
     return this.http.get(SIGN_IN, { headers: headers })
       .pipe(
         map(response => {
-          if ('email' in response) {
+          if(response) {
             this.currentUser = response as Credentials;
             localStorage.setItem(this.currentUserKey, JSON.stringify(response));
             return new AuthResult(this.currentUser, this.redirectUrl);
           }
-          throw new Error(response.toString());
+          let err = new Error(response);
+          console.log(err);
+          throw err;
         })
       );
   }

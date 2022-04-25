@@ -11,35 +11,10 @@
   </div>
   <mat-spinner *ngIf="isWaiting" class="tw-mx-auto tw-mt-3" [diameter]="64"></mat-spinner>
 </div>
-<div *ngIf="productsArray.length > 0" class="mt-3">
+<div *ngIf="products.length > 0" class="mt-3">
   <div class="tw-max-w-2xl tw-mx-auto tw-py-2 tw-px-4 sm:tw-py-8 sm:tw-px-6 lg:tw-max-w-7xl lg:tw-px-8 tw-rounded-lg">
     <div class="tw-grid tw-grid-cols-1 tw-gap-y-10 tw-gap-x-6 sm:tw-grid-cols-2 lg:tw-grid-cols-4 xl:tw-gap-x-8">
-      <a *ngFor="let product of productsArray;" class="tw-flex tw-flex-col tw-justify-between
-      tw-bg-[#2a2a2a] tw-relative tw-no-underline tw-rounded-xl
-      tw-min-h-full tw-p-2 hover:tw-scale-105 tw-duration-300 tw-border tw-border-yellow-500
-      tw-shadow-[0_0_60px_-15px_rgba(255,255,255,0.3)]" [attr.href]="product.productLink">
-        <div>
-          <div
-            class="tw-w-full tw-aspect-w-1 tw-aspect-h-1 tw-rounded-md tw-overflow-hidden group-hover:tw-opacity-75">
-            <img [attr.src]="product.imageLink" class="tw-w-full tw-h-full lg:tw-w-full lg:tw-h-full tw-object-contain">
-          </div>
-          <div class="tw-mt-4 tw-flex tw-justify-between tw-justify-items-stretch">
-            <div class="tw-flex tw-flex-col">
-              <h3 class="tw-text-sm tw-text-gray-700">
-                <a class="tw-no-underline tw-text-white tw-text-xl">
-                  <span aria-hidden="true" class="tw-absolute tw-inset-0"></span>
-                  {{product.name}}
-                </a>
-              </h3>
-            </div>
-            <p class="tw-font-medium tw-text-yellow-500 tw-text-xl">{{product.price}}&nbsp;&#8381;</p>
-          </div>
-        </div>
-        <div>
-          <img [attr.src]="getLogo(product.shopName)" class="tw-h-8 tw-object-contain tw-object-left">
-        </div>
-      </a>
-
+      <app-product-card *ngFor="let product of products;" [product]="product"></app-product-card>
     </div>
   </div>
 </div>

@@ -15,6 +15,8 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatMenuModule} from "@angular/material/menu";
 import {UnauthorizedInterceptor} from "./utils/unauthorized-interceptor";
 import {MatDividerModule} from "@angular/material/divider";
+import { FavoritesComponent } from './pages/favorites/favorites.component';
+import { ProductCardComponent } from './components/product-card/product-card.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +24,9 @@ import {MatDividerModule} from "@angular/material/divider";
     MainComponent,
     NavBarComponent,
     SignUpComponent,
-    SignInComponent
+    SignInComponent,
+    FavoritesComponent,
+    ProductCardComponent
   ],
   imports: [
     BrowserModule,

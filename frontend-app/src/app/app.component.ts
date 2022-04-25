@@ -11,6 +11,11 @@ export class AppComponent {
   title = APP_NAME;
 
   constructor(private authService: AuthService) {
-    authService.signIn(null).subscribe();
+    authService.signIn(null)
+      .subscribe({
+        error: () => {
+          authService.logout();
+        }
+      });
   }
 }
