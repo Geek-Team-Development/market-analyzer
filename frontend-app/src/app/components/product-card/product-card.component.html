@@ -1,0 +1,41 @@
+<a [attr.href]="product.productLink" class="tw-flex tw-flex-col tw-justify-between
+      tw-bg-[#2a2a2a] tw-relative tw-no-underline tw-rounded-xl
+      tw-min-h-full tw-p-2 hover:tw-scale-105 tw-duration-300 tw-border tw-border-yellow-500
+      tw-shadow-[0_0_60px_-15px_rgba(255,255,255,0.3)] tw-cursor-pointer">
+  <div>
+    <div
+      class="tw-w-full tw-aspect-w-1 tw-aspect-h-1 tw-rounded-md tw-overflow-hidden group-hover:tw-opacity-75">
+      <img [attr.src]="product.imageLink" class="tw-w-full tw-h-full lg:tw-w-full lg:tw-h-full tw-object-contain">
+    </div>
+    <div class="tw-mt-4 tw-flex tw-justify-between tw-justify-items-stretch">
+      <div class="tw-flex tw-flex-col">
+        <h3 class="tw-text-sm tw-text-gray-700">
+          <a class="tw-no-underline tw-text-white tw-text-xl">
+            <span aria-hidden="true" class="tw-absolute tw-inset-0"></span>
+            {{product.name}}
+          </a>
+        </h3>
+      </div>
+      <p class="tw-font-medium tw-text-yellow-500 tw-text-xl">{{product.price}}&nbsp;&#8381;</p>
+    </div>
+  </div>
+  <div class="tw-flex">
+    <div class="tw-relative tw-inset-y-0 tw-items-center tw-left-0 tw-flex tw-space-x-4 tw-grow">
+      <img [attr.src]="getLogo(product.shopName)" class="tw-h-8 tw-object-contain tw-object-left">
+    </div>
+    <div class="tw-relative tw-inset-y-0 tw-right-0 tw-flex tw-items-center">
+      <div *ngIf="!isAddedToFavorites" class="tw-block tw-px-3 tw-py-2 tw-text-sm tw-text-[#00dd00] tw-bg-[#3a3a3a]
+            tw-border tw-border-[#00dd00] hover:tw-text-[#00ff00] hover:tw-bg-[#4a4a4a] hover:tw-border-[#00ff00]
+            active:tw-tw-text-[#00dd00] active:tw-bg-[#3a3a3a] active:tw-border-[#00dd00]
+             tw-rounded-md tw-cursor-pointer" (click)="addToFavorites($event)">
+        <i class="fas fa-heart"></i>
+      </div>
+      <div *ngIf="isAddedToFavorites" class="tw-block tw-px-3 tw-py-2 tw-text-sm tw-text-[#bbbbbb] tw-bg-[#3a3a3a]
+            tw-border tw-border-[#aa0000] hover:tw-text-[#ffffff] hover:tw-bg-[#4a4a4a] hover:tw-border-[#ff0000]
+            active:tw-tw-text-[#bbbbbb] active:tw-bg-[#3a3a3a] active:tw-border-[#aa0000]
+             tw-rounded-md tw-cursor-pointer" (click)="removeFromFavorites(product, $event)">
+        <i class="fas fa-heart-broken"></i>
+      </div>
+    </div>
+  </div>
+</a>

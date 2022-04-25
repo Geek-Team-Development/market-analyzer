@@ -13,3 +13,4 @@ export class SearchProducts {
 export const SIGN_UP = '/api/v1/signup';
 export const SIGN_IN = '/api/v1/signin';
 export const LOGOUT = '/api/v1/logout';
+export const FAVORITES = '/api/v1/favorites';

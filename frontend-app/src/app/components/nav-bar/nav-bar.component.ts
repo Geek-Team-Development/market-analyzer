@@ -13,6 +13,7 @@ export class NavBarComponent implements OnInit {
   main = '/' + FrontUrls.MAIN;
   signup = '/' + FrontUrls.SIGN_UP;
   signin = '/' + FrontUrls.SIGN_IN;
+  favorites = '/' + FrontUrls.FAVORITES;
 
   currentUrl: string = this.main;
 
@@ -30,8 +31,7 @@ export class NavBarComponent implements OnInit {
     })
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
   logout() {
     this.authService.logout();

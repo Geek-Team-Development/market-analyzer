@@ -1,47 +1,32 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-
 import {MainComponent} from './main.component';
 import {ProductService} from "../../services/product.service";
 import {Observable} from "rxjs";
 import {ProductDto} from "../../dto/product-dto";
 import {FormsModule} from "@angular/forms";
-
-let products = new Map<string, ProductDto>();
-
-function setExpectedProducts() {
-  products.set('1', new ProductDto('1',
-    'Телевизор Samsung',
-    '10000',
-    'Oldi',
-    'https://www.products.tv_samsung',
-    'https://www.images.tv_samsung'));
-  products.set('2', new ProductDto('2',
-    'Телевизор Haier',
-    '15000',
-    'MVideo',
-    'https://www.products.tv_haier',
-    'https://www.images.tv_haier'));
-  products.set('3', new ProductDto('3',
-    'Телевизор HP',
-    '20000',
-    'Citilink',
-    'https://www.products.tv_hp',
-    'https://www.images.tv_hp'));
-}
+import {HttpClientTestingModule} from "@angular/common/http/testing";
+import SpyObj = jasmine.SpyObj;
+import {ProductCardComponent} from "../../components/product-card/product-card.component";
+import {By} from "@angular/platform-browser";
 
 describe('MainComponent', () => {
   let component: MainComponent;
   let fixture: ComponentFixture<MainComponent>;
-
-  let productService: ProductService;
+  let productServiceSpy = jasmine.createSpyObj<ProductService>('ProductService', ['getProducts']);
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FormsModule],
-      declarations: [ MainComponent ],
-      providers: [MainComponent, { provide: ProductService, useClass: MockProductService }]
+      imports: [
+        FormsModule,
+        HttpClientTestingModule
+      ],
+      declarations: [ MainComponent, ProductCardComponent ],
+      providers: [
+        MainComponent,
+        { provide: ProductService, useValue: productServiceSpy }
+      ]
     }).compileComponents();
-    productService = TestBed.inject(ProductService);
+    productServiceSpy = TestBed.inject(ProductService) as SpyObj<ProductService>;
   });
 
   beforeEach(() => {
@@ -55,31 +40,85 @@ describe('MainComponent', () => {
   });
 
   it('should return correct products', function () {
-    component.searchName = 'Телевизоры';
-    setExpectedProducts();
-    component.search();
-    expect(component.productsArray.length).toBe(products.size);
-    let result = new Map(component.productsArray.map(productDto => [productDto.id, productDto]));
-    products.forEach(expectedProduct => {
-      let resultProduct = result.get(expectedProduct.id);
-      if(resultProduct) {
-        expect(expectedProduct.equals(resultProduct)).toBeTrue();
-      } else {
-        throw new Error("result is undefined");
-      }
-    })
-  });
-});
-
-class MockProductService {
-
-  getProducts(searchName: string): Observable<ProductDto> {
-    return new Observable<ProductDto>((
+    let expectedProducts = ExpectedProducts.getProducts();
+    let getProductSpy = productServiceSpy.getProducts;
+    getProductSpy.and.returnValue(new Observable<ProductDto>((
       observer => {
-        products.forEach(productDto => {
+        expectedProducts.forEach(productDto => {
           observer.next(productDto);
         })
       }
-    ))
+    )));
+    let searchName = 'Телевизоры';
+    const compiled = fixture.nativeElement as HTMLElement;
+    let htmlInputElement = compiled.querySelector('input')!;
+    htmlInputElement.value = searchName;
+    htmlInputElement.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    component.search();
+
+    expect(getProductSpy)
+      .withContext('#getProduct called with param ' + `${searchName}`)
+      .toHaveBeenCalledWith(searchName);
+
+    expect(component.products.length)
+      .withContext('products in component have size ' + `${expectedProducts.length}`)
+      .toBe(expectedProducts.length);
+
+    for(let i = 0; i < expectedProducts.length; i++) {
+      expect(component.products[i])
+        .withContext(`${component.products[i]}` + ' equal ' + `${expectedProducts[i]}`)
+        .toEqual(expectedProducts[i]);
+    }
+  });
+
+  it('should assign correct products in product cards', () => {
+    let expectedProducts = ExpectedProducts.getProducts();
+    component.products = expectedProducts;
+    fixture.detectChanges();
+    let productCards = fixture.debugElement.queryAll(By.css('app-product-card'));
+    expect(productCards.length)
+      .withContext(`Product cards length must be ${expectedProducts.length}`)
+      .toBe(component.products.length);
+
+    for(let i = 0; i < expectedProducts.length; i++) {
+      let productCard = productCards[i].componentInstance;
+      expect(productCard.product)
+        .withContext(`${productCard.product} must be ${expectedProducts[i]}`)
+        .toEqual(expectedProducts[i]);
+    }
+  });
+});
+
+class ExpectedProducts {
+  static getProducts(): ProductDto[] {
+    let products = [];
+    let productDto = new ProductDto();
+    productDto.id = '1';
+    productDto.name = 'Телевизор Samsung';
+    productDto.price = '10000';
+    productDto.shopName = 'Oldi';
+    productDto.productLink = 'https://www.products.tv_samsung';
+    productDto.imageLink = 'https://www.images.tv_samsung';
+    products.push(productDto);
+
+    productDto = new ProductDto();
+    productDto.id = '2';
+    productDto.name = 'Телевизор Haier';
+    productDto.price = '15000';
+    productDto.shopName = 'MVideo';
+    productDto.productLink = 'https://www.products.tv_haier';
+    productDto.imageLink = 'https://www.images.tv_haier';
+    products.push(productDto);
+
+    productDto = new ProductDto();
+    productDto.id = '3';
+    productDto.name = 'Телевизор HP';
+    productDto.price = '20000';
+    productDto.shopName = 'Citilink';
+    productDto.productLink = 'https://www.products.tv_hp';
+    productDto.imageLink = 'https://www.images.tv_hp';
+    products.push(productDto);
+    return products;
   }
 }

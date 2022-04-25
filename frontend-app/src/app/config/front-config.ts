@@ -6,6 +6,7 @@ export class FrontUrls {
   static readonly MAIN = 'main';
   static readonly SIGN_UP = 'signup';
   static readonly SIGN_IN = 'signin';
+  static readonly FAVORITES = 'favorites';
 }
 
 @Injectable({

@@ -1,11 +1,6 @@
-import {Component, NgZone, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ProductDto} from "../../dto/product-dto";
-import {Observable} from "rxjs";
-import {SearchProducts} from "../../config/backend-urls";
-import {HttpParams} from "@angular/common/http";
-import {EventSourceService} from "../../services/event-source.service";
 import {ProductService} from "../../services/product.service";
-import {Logos} from "../../config/front-config";
 
 @Component({
   selector: 'app-main',
@@ -15,25 +10,22 @@ import {Logos} from "../../config/front-config";
 export class MainComponent implements OnInit {
 
   searchName: string = '';
-  productsArray: ProductDto[] = [];
+  products: ProductDto[] = [];
   isWaiting: boolean = false;
 
-  constructor(private productService: ProductService,
-              private logos: Logos) {
+  constructor(private productService: ProductService) {
   }
 
-  ngOnInit(): void {
-
-  }
+  ngOnInit(): void { }
 
   search() {
-    if(this.searchName !== '') {
-      this.productsArray = [];
+    if (this.searchName !== '') {
+      this.products = [];
       this.isWaiting = true;
       this.productService.getProducts(this.searchName)
         .subscribe({
           next: value => {
-            this.productsArray.push(value);
+            this.products.push(value);
           }, error: e => {
             console.log(e);
             this.isWaiting = false;
@@ -42,9 +34,5 @@ export class MainComponent implements OnInit {
           }
         });
     }
-  }
-
-  getLogo(shopName: string) {
-    return this.logos.logos.get(shopName);
   }
 }

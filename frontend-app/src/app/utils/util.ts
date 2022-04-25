@@ -7,11 +7,13 @@ export class Util {
 
   public static parseProduct(data: string): ProductDto {
     const json = JSON.parse(data);
-    return new ProductDto(json['id'],
-      json['name'],
-      json['price'],
-      json['shopName'],
-      json['productLink'],
-      json['imageLink']);
+    let productDto = new ProductDto();
+    productDto.id = json['id'];
+    productDto.name = json['name'];
+    productDto.price = json['price'];
+    productDto.shopName = json['shopName'];
+    productDto.productLink = json['productLink'];
+    productDto.imageLink = json['imageLink'];
+    return productDto;
   }
 }

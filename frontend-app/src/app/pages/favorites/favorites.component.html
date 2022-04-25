@@ -1,0 +1,13 @@
+<div (click)="clear()" class="tw-block tw-border tw-border-red-900
+tw-bg-[#5a5a5a] tw-text-white tw-w-fit tw-p-2 tw-rounded-md tw-cursor-pointer
+hover:tw-bg-[#2a2a2a] hover:tw-border-red-500 active:tw-scale-90 tw-select-none">
+  Очистить
+</div>
+<div *ngIf="products.length > 0" class="mt-3">
+  <div class="tw-max-w-2xl tw-mx-auto tw-py-2 tw-px-4 sm:tw-py-8 sm:tw-px-6 lg:tw-max-w-7xl lg:tw-px-8 tw-rounded-lg">
+    <div class="tw-grid tw-grid-cols-1 tw-gap-y-10 tw-gap-x-6 sm:tw-grid-cols-2 lg:tw-grid-cols-4 xl:tw-gap-x-8">
+      <app-product-card *ngFor="let product of products;" [product]="product"
+                        [isAddedToFavorites]="true" (productDeleted)="productDeleted($event)"></app-product-card>
+    </div>
+  </div>
+</div>
