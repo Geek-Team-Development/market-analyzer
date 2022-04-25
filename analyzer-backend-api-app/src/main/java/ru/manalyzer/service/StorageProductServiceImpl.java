@@ -26,4 +26,5 @@ public class StorageProductServiceImpl implements StorageProductService {
     public Product saveProduct(Product product) {
         return productRepository.save(product);
     }
+
 }

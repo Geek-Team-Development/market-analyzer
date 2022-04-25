@@ -9,6 +9,7 @@ import ru.manalyzer.persist.Favorite;
 import ru.manalyzer.persist.Product;
 import ru.manalyzer.repository.FavoriteRepository;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,7 +46,7 @@ public class FavoritesServiceImpl implements FavoritesService {
 
     @Override
     public void saveProductToFavoritesCart(ProductDto productDto, String userLogin) {
-        final String userId = getUserId(userLogin);
+        String userId = getUserId(userLogin);
         Favorite favoriteCart = favoriteRepository.findByUserId(userId)
                 .orElse(getNewFavorite(userId));
 
@@ -55,13 +56,26 @@ public class FavoritesServiceImpl implements FavoritesService {
     }
 
     @Override
-    public Flux<ProductDto> deleteProductFromFavoritesCart(String id) {
-        return null;
+    public void deleteProductFromFavoritesCart(String productId, String shopName, String userLogin) {
+        Optional<Product> productOpt = storageProductService.findProductByShopIdAndShopName(productId, shopName);
+        if (productOpt.isPresent()) {
+            Optional<Favorite> favoriteOpt = favoriteRepository.findByUserId(getUserId(userLogin));
+
+            if (favoriteOpt.isPresent()) {
+                Favorite favorite = favoriteOpt.get();
+                favorite.getProducts().remove(productOpt.get());
+                favoriteRepository.save(favorite);
+            }
+        }
     }
 
     @Override
-    public Flux<ProductDto> clearFavoritesCart() {
-        return null;
+    public void clearFavoritesCart(String userLogin) {
+        favoriteRepository.findByUserId(getUserId(userLogin))
+                .ifPresent(favorite -> {
+                    favorite.getProducts().clear();
+                    favoriteRepository.save(favorite);
+                });
     }
 
     private String getUserId(String userLogin) {
@@ -75,7 +89,12 @@ public class FavoritesServiceImpl implements FavoritesService {
     }
 
     private Product getProduct(ProductDto productDto) {
-        return storageProductService.findProductByShopIdAndShopName(productDto.getId(), productDto.getShopName())
-                .orElse(storageProductService.saveProduct(productMapper.toEntity(productDto)));
+        Product product = productMapper.toEntity(productDto);
+
+        storageProductService.findProductByShopIdAndShopName(productDto.getId(), productDto.getShopName())
+                .ifPresent(value -> product.setId(value.getId()));
+
+        return storageProductService.saveProduct(product);
     }
+
 }

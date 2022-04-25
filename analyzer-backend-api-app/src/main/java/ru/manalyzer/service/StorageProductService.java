@@ -9,4 +9,5 @@ public interface StorageProductService {
     Optional<Product> findProductByShopIdAndShopName(String shopId, String shopName);
 
     Product saveProduct(Product product);
+
 }

@@ -9,7 +9,7 @@ public interface FavoritesService {
 
     void saveProductToFavoritesCart(ProductDto productDto, String userLogin);
 
-    Flux<ProductDto> deleteProductFromFavoritesCart(String id);
+    void deleteProductFromFavoritesCart(String productId, String shopName, String userLogin);
 
-    Flux<ProductDto> clearFavoritesCart();
+    void clearFavoritesCart(String userLogin);
 }
