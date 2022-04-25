@@ -2,7 +2,7 @@ import {ProductDto} from "../dto/product-dto";
 
 export class Util {
   public static mustBeDefinedErrorMessage(fieldName: string) : string {
-    return fieldName + " must be defined";
+    return fieldName + " обязательно для заполнения";
   }
 
   public static parseProduct(data: string): ProductDto {

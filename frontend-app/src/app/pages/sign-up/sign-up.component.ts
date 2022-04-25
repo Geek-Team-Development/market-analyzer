@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {UserDto} from "../../dto/user-dto";
 import {AuthService} from "../../services/auth.service";
 import {Router} from "@angular/router";
-import {SIGN_IN} from "../../config/backend-urls";
 import {Util} from "../../utils/util";
 import {FrontUrls} from "../../config/front-config";
 
@@ -32,7 +31,9 @@ export class SignUpComponent implements OnInit {
       .subscribe({
         next: (signUpResult) => {
           let navigateUrl = signUpResult.redirectUrl ? signUpResult.redirectUrl : '/' + FrontUrls.SIGN_IN;
-          this.router.navigateByUrl(navigateUrl);
+          this.router.navigateByUrl(navigateUrl).then(() => {
+            this.authService.redirectUrl = undefined;
+          });
         },
         error: (errorResult) => {
           console.log(errorResult);
@@ -50,21 +51,21 @@ export class SignUpComponent implements OnInit {
     }
     if (this.userDto.password === '') {
       this.signUpError.passwordError =
-        Util.mustBeDefinedErrorMessage('Password');
+        Util.mustBeDefinedErrorMessage('Пароль');
       result = false;
     }
     if(this.repeatPassword !== this.userDto.password) {
-      this.signUpError.repeatPasswordError = 'Passwords is not mismatch';
+      this.signUpError.repeatPasswordError = 'Пароли не совпадают';
       result = false;
     }
     if (this.userDto.firstName === '') {
       this.signUpError.firstNameError =
-        Util.mustBeDefinedErrorMessage('First name');
+        Util.mustBeDefinedErrorMessage('Имя');
       result = false;
     }
     if(this.userDto.lastName === '') {
       this.signUpError.lastNameError =
-        Util.mustBeDefinedErrorMessage('Last name');
+        Util.mustBeDefinedErrorMessage('Фамилия');
       result = false;
     }
     return result;

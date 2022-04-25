@@ -42,4 +42,8 @@ export class NavBarComponent implements OnInit {
   clickLeftMenu() {
     this.leftMenuIsActive = !this.leftMenuIsActive;
   }
+
+  getUsername() {
+    return this.authService.getUsername();
+  }
 }
