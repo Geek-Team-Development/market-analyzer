@@ -30,23 +30,24 @@ export class FavoritesComponent implements OnInit {
   }
 
   clear() {
-    this.favoriteService.clear()
-      .subscribe({
-        next: value => {
-          this.products = [];
-        },
-        error: err => {
-          console.log(err);
-        }
-      })
+    if(this.products.length > 0) {
+      this.favoriteService.clear()
+        .subscribe({
+          next: () => {
+            this.products = [];
+          },
+          error: err => {
+            console.log(err);
+          }
+        });
+    };
   }
 
   productDeleted($event: ProductDto) {
-    for(let i = 0; i < this.products.length; i++) {
-      if(this.products[i].id == $event.id && this.products[i].shopName == $event.id) {
-        delete this.products[i];
-        break;
+    this.products.forEach((product,index)=>{
+      if(product.id == $event.id && product.shopName == $event.shopName) {
+        this.products.splice(index, 1);
       }
-    }
+    });
   }
 }

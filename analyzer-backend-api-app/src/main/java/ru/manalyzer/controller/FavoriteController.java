@@ -2,6 +2,7 @@ package ru.manalyzer.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import reactor.core.publisher.Flux;
 import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.service.FavoritesService;
 
+@PreAuthorize("isAuthenticated()")
 @Secured({"ROLE_USER", "ROLE_ADMIN"})
 @RestController
 @RequestMapping("/favorites")

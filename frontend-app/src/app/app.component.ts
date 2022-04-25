@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import {APP_NAME} from "./config/front-config";
+import {APP_NAME, FrontUrls} from "./config/front-config";
 import {AuthService} from "./services/auth.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-root',
@@ -10,11 +11,13 @@ import {AuthService} from "./services/auth.service";
 export class AppComponent {
   title = APP_NAME;
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService,
+              private router: Router) {
     authService.signIn(null)
       .subscribe({
         error: () => {
           authService.logout();
+          this.router.navigateByUrl(FrontUrls.MAIN);
         }
       });
   }

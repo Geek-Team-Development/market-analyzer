@@ -39,7 +39,7 @@ export class ProductCardComponent implements OnInit {
     $event.preventDefault();
     this.favoriteService.remove(this.product.id, this.product.shopName)
       .subscribe({
-        next: value => {
+        next: () => {
           this.productDeleted.emit(this.product);
         },
         error: err => {
