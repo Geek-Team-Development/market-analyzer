@@ -1,9 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {Credentials} from "../../model/credentials";
-import {Util} from "../../utils/util";
 import {Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
 import {FrontUrls} from "../../config/front-config";
+import {FormBuilder, Validators} from "@angular/forms";
+
+const { required, email, maxLength } = Validators;
 
 @Component({
   selector: 'app-sign-in',
@@ -12,51 +14,35 @@ import {FrontUrls} from "../../config/front-config";
 })
 export class SignInComponent implements OnInit {
 
-  credentials: Credentials = new Credentials();
-  signInError: SignInError = new SignInError();
+  public form = this.formBuilder.group({
+    email: [ null ],
+    password: [ null ]
+  });
+
+  error: string = '';
 
   constructor(private authService: AuthService,
-              private router: Router) {
+              private router: Router,
+              private formBuilder: FormBuilder) {
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
   signIn() {
-    if (!this.checkValidCredentials()) {
+    if(!this.form.valid) {
       return;
     }
-    this.authService.signIn(this.credentials)
+    this.authService.signIn(this.form.value)
       .subscribe({
         next: (signInResult) => {
           let navigateUrl = signInResult.redirectUrl ? signInResult.redirectUrl : '/' + FrontUrls.MAIN;
-          console.log(navigateUrl);
           this.router.navigateByUrl(navigateUrl).then(() => {
             this.authService.redirectUrl = undefined;
           });
         },
         error: (errorResult) => {
-          console.log(errorResult);
+          this.error = errorResult;
         }
       });
   }
-
-  private checkValidCredentials(): boolean {
-    let result = true;
-    this.signInError = new SignInError();
-    if (this.credentials.email === '') {
-      this.signInError.emailError = Util.mustBeDefinedErrorMessage('Email');
-      result = false;
-    }
-    if (this.credentials.password === '') {
-      this.signInError.passwordError = Util.mustBeDefinedErrorMessage('Пароль');
-      result = false;
-    }
-    return result;
-  }
-}
-
-class SignInError {
-  emailError: string = '';
-  passwordError: string = '';
 }

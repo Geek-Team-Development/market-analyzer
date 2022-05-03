@@ -24,13 +24,13 @@
       <img [attr.src]="getLogo(product.shopName)" class="tw-h-8 tw-object-contain tw-object-left">
     </div>
     <div class="tw-relative tw-inset-y-0 tw-right-0 tw-flex tw-items-center">
-      <div *ngIf="!isAddedToFavorites" class="tw-block tw-px-3 tw-py-2 tw-text-sm tw-text-[#00dd00] tw-bg-[#3a3a3a]
+      <div *ngIf="!isAddedToFavorites" data-tid="add-favorites-btn" class="tw-block tw-px-3 tw-py-2 tw-text-sm tw-text-[#00dd00] tw-bg-[#3a3a3a]
             tw-border tw-border-[#00dd00] hover:tw-text-[#00ff00] hover:tw-bg-[#4a4a4a] hover:tw-border-[#00ff00]
             active:tw-tw-text-[#00dd00] active:tw-bg-[#3a3a3a] active:tw-border-[#00dd00]
              tw-rounded-md tw-cursor-pointer" (click)="addToFavorites($event)">
         <i class="fas fa-heart"></i>
       </div>
-      <div *ngIf="isAddedToFavorites" class="tw-block tw-px-3 tw-py-2 tw-text-sm tw-text-[#bbbbbb] tw-bg-[#3a3a3a]
+      <div *ngIf="isAddedToFavorites" data-tid="remove-favorites-btn" class="tw-block tw-px-3 tw-py-2 tw-text-sm tw-text-[#bbbbbb] tw-bg-[#3a3a3a]
             tw-border tw-border-[#aa0000] hover:tw-text-[#ffffff] hover:tw-bg-[#4a4a4a] hover:tw-border-[#ff0000]
             active:tw-tw-text-[#bbbbbb] active:tw-bg-[#3a3a3a] active:tw-border-[#aa0000]
              tw-rounded-md tw-cursor-pointer" (click)="removeFromFavorites(product, $event)">
