@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import ru.manalyzer.Parser;
 import ru.manalyzer.diginetica.dto.ConverterDto;
@@ -12,6 +13,7 @@ import ru.manalyzer.diginetica.property.DigineticaConnectionProperties;
 import ru.manalyzer.dto.ProductDto;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -37,8 +39,15 @@ public class DigineticaParser implements Parser {
      */
     @Override
     public Flux<ProductDto> parse(String searchName) {
+        return invokeRequest(searchName)
+                .flatMapIterable(DigineticaResponseDto::getProducts)
+                .filter(oldiProductDto -> oldiProductDto.getName().toLowerCase().contains(searchName.toLowerCase()))
+                .map(converterDigineticaDtoToDto::convertToDto);
+    }
+
+    private Mono<DigineticaResponseDto> invokeRequest(String searchString) {
         // Set search query parameter
-        connectionProperties.getQueryParams().put(connectionProperties.getSearchParamName(), searchName);
+        connectionProperties.getQueryParams().put(connectionProperties.getSearchParamName(), searchString);
 
         WebClient client = WebClient.create(connectionProperties.getSearchUri());
         return client
@@ -56,10 +65,31 @@ public class DigineticaParser implements Parser {
                                 .filter(throwable -> throwable instanceof TimeoutException)
                 )
                 .doOnError(this::exceptionHandle)
-                .onErrorReturn(new DigineticaResponseDto())
-                .flatMapIterable(DigineticaResponseDto::getProducts)
-                .filter(oldiProductDto -> oldiProductDto.getName().toLowerCase().contains(searchName.toLowerCase()))
+                .onErrorReturn(new DigineticaResponseDto());
+    }
+
+    /**
+     * Loads product by productId and converts to ProductDto format
+     * @param productDto - product for reload
+     * @return Mono<ProductDto> or empty Mono<ProductDto> if an error occurred
+     */
+    @Override
+    public Mono<ProductDto> parseOneProduct(ProductDto productDto) {
+        return invokeRequest(productDto.getId())
+                .map(DigineticaResponseDto::getProducts)
+                .filter(list -> list.size() > 0)
+                .map(list -> list.get(0))
                 .map(converterDigineticaDtoToDto::convertToDto);
+    }
+
+    @Override
+    public Mono<ProductDto> parseProductPage(ProductDto productDto) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getShopName() {
+        return connectionProperties.getShopName();
     }
 
     private void exceptionHandle(Throwable throwable) {

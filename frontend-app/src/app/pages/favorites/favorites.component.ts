@@ -21,12 +21,21 @@ export class FavoritesComponent implements OnInit {
     this.favoriteService.getAll()
       .subscribe({
         next: response => {
-          this.products.push(response);
+          this.pushProduct(response)
         },
         error: err => {
           console.log(err);
         }
       })
+  }
+
+  pushProduct(product: ProductDto) {
+    let index = this.products.findIndex(e => e.id === product.id && e.shopName === product.shopName);
+    if (index === -1) {
+      this.products.push(product);
+    } else {
+      this.products[index] = product;
+    }
   }
 
   clear() {

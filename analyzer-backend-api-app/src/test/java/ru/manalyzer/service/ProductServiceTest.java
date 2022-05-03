@@ -10,7 +10,9 @@ import ru.manalyzer.Parser;
 import ru.manalyzer.controller.param.ProductRequestParam;
 import ru.manalyzer.dto.ProductDto;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,7 +33,10 @@ public class ProductServiceTest {
     public static void initClass() {
         oldiParser = mock(Parser.class);
         mvideoParser = mock(Parser.class);
-        productService = new ProductServiceImpl(List.of(mvideoParser, oldiParser));
+        Map<String, Parser> parserMap = new HashMap<>();
+        parserMap.put("Oldi", oldiParser);
+        parserMap.put("M.Video", mvideoParser);
+        productService = new ProductServiceImpl(parserMap);
 
         oldiFlux = Flux.just(
                 new ProductDto("1",

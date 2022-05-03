@@ -46,23 +46,29 @@ public class MVideoParser implements Parser {
             if(productIds.size() == 0) {
                 return Flux.empty();
             }
-            Flux<MaterialPrice> prices = getProductPrice(productIds)
-                    .sort(Comparator.comparing(MaterialPrice::getProductId));
-            Flux<ProductDetail> details = getProductDetails(productIds, searchName)
-                    .sort(Comparator.comparing(ProductDetail::getProductId));
-            return Flux.zip(prices, details).map(tuple -> {
-                ProductDto product = new ProductDto();
-                MaterialPrice price = tuple.getT1();
-                ProductDetail detail = tuple.getT2();
-                String id = price.getProductId();
-                product.setId(id);
-                product.setShopName(properties.getShopName());
-                product.setPrice(price.getPrice().getBasePrice());
-                product.setName(detail.getName());
-                product.setImageLink(properties.getImageLinkPrefix() + detail.getImage());
-                product.setProductLink(properties.getProductLinkPrefix() + detail.getNameTranslit() + "-" + id);
-                return product;
-            });
+
+            return createProductDtoFlux(productIds, searchName);
+        });
+    }
+
+    private Flux<ProductDto> createProductDtoFlux(List<String> productIds, String searchName) {
+        Flux<MaterialPrice> prices = getProductPrice(productIds)
+                .sort(Comparator.comparing(MaterialPrice::getProductId));
+        Flux<ProductDetail> details = getProductDetails(productIds, searchName)
+                .sort(Comparator.comparing(ProductDetail::getProductId));
+
+        return Flux.zip(prices, details).map(tuple -> {
+            ProductDto product = new ProductDto();
+            MaterialPrice price = tuple.getT1();
+            ProductDetail detail = tuple.getT2();
+            String id = price.getProductId();
+            product.setId(id);
+            product.setShopName(properties.getShopName());
+            product.setPrice(price.getPrice().getBasePrice());
+            product.setName(detail.getName());
+            product.setImageLink(properties.getImageLinkPrefix() + detail.getImage());
+            product.setProductLink(properties.getProductLinkPrefix() + detail.getNameTranslit() + "-" + id);
+            return product;
         });
     }
 
@@ -116,5 +122,20 @@ public class MVideoParser implements Parser {
                 .bodyToMono(new ParameterizedTypeReference<MVideoResponse<ProductDetails>>() {
                 })
                 .flatMapIterable(productDetails -> productDetails.getBody().getProducts());
+    }
+
+    @Override
+    public Mono<ProductDto> parseOneProduct(ProductDto productDto) {
+        return Mono.from(createProductDtoFlux(List.of(productDto.getId()), productDto.getName()));
+    }
+
+    @Override
+    public Mono<ProductDto> parseProductPage(ProductDto productDto) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getShopName() {
+        return properties.getShopName();
     }
 }
