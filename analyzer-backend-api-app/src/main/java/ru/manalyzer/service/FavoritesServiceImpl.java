@@ -65,8 +65,10 @@ public class FavoritesServiceImpl implements FavoritesService {
                             activeParserMap.get(productDto.getShopName())
                                     .parseOneProduct(productDto)
                                     .subscribe(dto -> {
-                                        fluxSink.next(dto);
-                                        saveProductPrice(saveOrUpdateProduct(dto));
+                                        if (!productDto.equals(dto)) {
+                                            fluxSink.next(dto);
+                                            saveProductPrice(saveOrUpdateProduct(dto));
+                                        }
                                     });
                         }
                 )));
