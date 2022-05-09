@@ -1,21 +1,32 @@
 package ru.manalyzer.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import ru.manalyzer.Parser;
 import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.mapper.Mapper;
+import ru.manalyzer.mapper.PriceMapper;
 import ru.manalyzer.persist.Favorite;
 import ru.manalyzer.persist.Product;
+import ru.manalyzer.persist.ProductPrice;
 import ru.manalyzer.repository.FavoriteRepository;
+import ru.manalyzer.repository.ProductPriceRepository;
+import ru.manalyzer.repository.ReactiveFavoriteRepository;
 
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class FavoritesServiceImpl implements FavoritesService {
 
     private final FavoriteRepository favoriteRepository;
+
+    private final ReactiveFavoriteRepository reactiveFavoriteRepository;
+
+    private final ProductPriceRepository productPriceRepository;
 
     private final AuthenticationService authenticationService;
 
@@ -23,25 +34,45 @@ public class FavoritesServiceImpl implements FavoritesService {
 
     private final Mapper<Product, ProductDto> productMapper;
 
+    private final PriceMapper<ProductPrice, Product> productDtoToProductPriceMapper;
+
+    private final Map<String, Parser> activeParserMap;
+
     @Autowired
     public FavoritesServiceImpl(FavoriteRepository favoriteRepository,
+                                ReactiveFavoriteRepository reactiveFavoriteRepository, ProductPriceRepository productPriceRepository,
                                 AuthenticationService authenticationService,
                                 StorageProductService storageProductService,
-                                Mapper<Product, ProductDto> productMapper) {
+                                Mapper<Product, ProductDto> productMapper,
+                                PriceMapper<ProductPrice, Product> productDtoToProductPriceMapper,
+                                @Qualifier("activeParserMap") Map<String, Parser> activeParserMap) {
         this.favoriteRepository = favoriteRepository;
+        this.reactiveFavoriteRepository = reactiveFavoriteRepository;
+        this.productPriceRepository = productPriceRepository;
         this.authenticationService = authenticationService;
         this.storageProductService = storageProductService;
         this.productMapper = productMapper;
+        this.productDtoToProductPriceMapper = productDtoToProductPriceMapper;
+        this.activeParserMap = activeParserMap;
     }
 
     @Override
     public Flux<ProductDto> getFavoritesCartOfUser(String userLogin) {
-        return Flux.fromIterable(
-                favoriteRepository.findByUserId(getUserId(userLogin)).orElse(new Favorite())
-                        .getProducts().stream()
-                        .map(productMapper::toDto)
-                        .collect(Collectors.toList())
-        );
+        return Flux.create(fluxSink -> reactiveFavoriteRepository.findByUserId(Mono.just(getUserId(userLogin)))
+                .subscribe(favorite -> favorite.getProducts().parallelStream().forEach(product -> {
+                            ProductDto productDto = productMapper.toDto(product);
+                            fluxSink.next(productDto);
+                            activeParserMap.get(productDto.getShopName())
+                                    .parseOneProduct(productDto)
+                                    .subscribe(dto -> {
+                                        if (!productDto.equals(dto)) {
+                                            fluxSink.next(dto);
+                                            saveProductPrice(saveOrUpdateProduct(dto));
+                                        }
+                                    });
+                        }
+                )));
+
     }
 
     @Override
@@ -50,9 +81,11 @@ public class FavoritesServiceImpl implements FavoritesService {
         Favorite favoriteCart = favoriteRepository.findByUserId(userId)
                 .orElse(getNewFavorite(userId));
 
-        favoriteCart.getProducts().add(getProduct(productDto));
+        Product product = saveOrUpdateProduct(productDto);
+        favoriteCart.getProducts().add(product);
 
         favoriteRepository.save(favoriteCart);
+        productPriceRepository.save(productDtoToProductPriceMapper.toProductPrice(product));
     }
 
     @Override
@@ -88,7 +121,7 @@ public class FavoritesServiceImpl implements FavoritesService {
         return favorite;
     }
 
-    private Product getProduct(ProductDto productDto) {
+    private Product saveOrUpdateProduct(ProductDto productDto) {
         Product product = productMapper.toEntity(productDto);
 
         storageProductService.findProductByShopIdAndShopName(productDto.getId(), productDto.getShopName())
@@ -97,4 +130,9 @@ public class FavoritesServiceImpl implements FavoritesService {
         return storageProductService.saveProduct(product);
     }
 
+    private void saveProductPrice(Product product) {
+        ProductPrice productPrice = productDtoToProductPriceMapper.toProductPrice(product);
+
+        productPriceRepository.save(productPrice);
+    }
 }

@@ -1,29 +1,30 @@
 package ru.manalyzer.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import ru.manalyzer.Parser;
 import ru.manalyzer.controller.param.ProductRequestParam;
 import ru.manalyzer.dto.ProductDto;
 
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private final List<Parser> parsers;
+    private final Map<String, Parser> activeParserMap;
 
     @Autowired
-    public ProductServiceImpl(List<Parser> parsers) {
-        this.parsers = parsers;
+    public ProductServiceImpl(@Qualifier("activeParserMap") Map<String, Parser> activeParserMap) {
+        this.activeParserMap = activeParserMap;
     }
 
     @Override
     public Flux<ProductDto> findProducts(ProductRequestParam requestParam) {
-        AtomicInteger counter = new AtomicInteger(parsers.size());
-        return Flux.create(fluxSink -> parsers.forEach(parser -> parser.parse(requestParam.getSearchName())
+        AtomicInteger counter = new AtomicInteger(activeParserMap.size());
+        return Flux.create(fluxSink -> activeParserMap.values().forEach(parser -> parser.parse(requestParam.getSearchName())
                 .doOnComplete(() -> {
                     if (counter.decrementAndGet() == 0) {
                         fluxSink.complete();
