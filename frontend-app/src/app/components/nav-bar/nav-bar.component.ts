@@ -14,6 +14,7 @@ export class NavBarComponent implements OnInit {
   signup = '/' + FrontUrls.SIGN_UP;
   signin = '/' + FrontUrls.SIGN_IN;
   favorites = '/' + FrontUrls.FAVORITES;
+  users = '/' + FrontUrls.USERS;
 
   currentUrl: string = this.main;
 

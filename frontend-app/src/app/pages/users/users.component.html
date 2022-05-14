@@ -1,0 +1,10 @@
+<div>
+  <a *ngFor="let user of users;" class="tw-block tw-border tw-rounded-xl tw-border tw-border-yellow-500
+     hover:tw-scale-[1.01] tw-duration-300 tw-p-3 tw-my-3 tw-bg-[#2a2a2a] tw-text-lg
+     tw-cursor-pointer tw-no-underline tw-text-white"
+       [routerLink]="usersURL + '/' + user.id">
+    <div>
+      {{user.email}}
+    </div>
+  </a>
+</div>

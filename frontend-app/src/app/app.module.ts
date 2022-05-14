@@ -4,7 +4,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {MainComponent} from './pages/main/main.component';
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NavBarComponent} from './components/nav-bar/nav-bar.component';
 import {SignUpComponent} from './pages/sign-up/sign-up.component';
@@ -17,6 +17,8 @@ import {UnauthorizedInterceptor} from "./utils/unauthorized-interceptor";
 import {MatDividerModule} from "@angular/material/divider";
 import { FavoritesComponent } from './pages/favorites/favorites.component';
 import { ProductCardComponent } from './components/product-card/product-card.component';
+import {UsersComponent} from "./pages/users/users.component";
+import {ProfileComponent} from "./pages/profile/profile.component";
 
 @NgModule({
   declarations: [
@@ -26,7 +28,9 @@ import { ProductCardComponent } from './components/product-card/product-card.com
     SignUpComponent,
     SignInComponent,
     FavoritesComponent,
-    ProductCardComponent
+    ProductCardComponent,
+    UsersComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
@@ -37,7 +41,8 @@ import { ProductCardComponent } from './components/product-card/product-card.com
     MatProgressSpinnerModule,
     MatButtonModule,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
+    ReactiveFormsModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: UnauthorizedInterceptor, multi: true }
