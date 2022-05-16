@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {ProductDto} from "../../dto/product-dto";
 import {ProductService} from "../../services/product.service";
+import {Sort} from "../../dto/sort";
+import {MatSelectChange} from "@angular/material/select";
 
 @Component({
   selector: 'app-main',
@@ -13,26 +15,59 @@ export class MainComponent implements OnInit {
   products: ProductDto[] = [];
   isWaiting: boolean = false;
 
+  private currentPage: number = 0;
+
+  public sorts = new Map<Sort, string>([
+    [Sort.PRICE_ASC, 'по возрастанию цены'],
+    [Sort.PRICE_DESC, 'по убыванию цены']
+  ]);
+
+  public currentSort = Sort.PRICE_ASC;
+
   constructor(private productService: ProductService) {
+
   }
 
   ngOnInit(): void { }
 
   search() {
     if (this.searchName !== '') {
-      this.products = [];
-      this.isWaiting = true;
-      this.productService.getProducts(this.searchName)
-        .subscribe({
-          next: value => {
-            this.products.push(value);
-          }, error: e => {
-            console.log(e);
-            this.isWaiting = false;
-          }, complete: () => {
-            this.isWaiting = false;
-          }
-        });
+      this.reset();
+      this.findProducts();
     }
+  }
+
+  findProducts() {
+    this.isWaiting = true;
+    this.productService.getProducts(this.searchName, Sort[this.currentSort], this.currentPage)
+      .subscribe({
+        next: value => {
+          this.products.push(value);
+        }, error: e => {
+          console.log(e);
+          this.isWaiting = false;
+        }, complete: () => {
+          this.isWaiting = false;
+        }
+      });
+  }
+
+  nextPage() {
+    this.currentPage++;
+    this.findProducts();
+  }
+
+  selectionChange($event: MatSelectChange) {
+    this.currentSort = +$event.value;
+    this.search();
+  }
+
+  public getCurrentSort() {
+    return this.sorts.get(this.currentSort);
+  }
+
+  private reset() {
+    this.products = [];
+    this.currentPage = 0;
   }
 }

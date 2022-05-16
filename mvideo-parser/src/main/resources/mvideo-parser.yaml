@@ -23,6 +23,7 @@ mvideo:
     product-link-prefix: https://www.mvideo.ru/products/
     ids-request:
       search-param-name: query
+      sort-param-name: sort
+      offset-param-name: offset
       default-params:
-        offset: 0
         limit: 24

@@ -27,5 +27,9 @@ public class DigineticaConnectionProperties {
 
     protected String searchParamName;
 
+    protected String sortParamName;
+
+    protected String offsetParamName;
+
     protected Map<String, String> queryParams = new HashMap<>();
 }

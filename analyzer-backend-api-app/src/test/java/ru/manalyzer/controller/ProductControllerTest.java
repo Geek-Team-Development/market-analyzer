@@ -13,8 +13,11 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import ru.manalyzer.controller.param.ProductRequestParam;
 import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.dto.Sort;
 import ru.manalyzer.service.ProductService;
 import ru.manalyzer.service.ProductServiceImpl;
+
+import java.util.Optional;
 
 
 public class ProductControllerTest {
@@ -31,7 +34,7 @@ public class ProductControllerTest {
     @BeforeAll
     public static void initAll() {
         productService = Mockito.mock(ProductServiceImpl.class);
-        productController = new ProductController(productService);
+//        productController = new ProductController(productService);
 
         productDtoFlux = Flux.create(sink -> {
                         sink.next(new ProductDto(
@@ -74,7 +77,7 @@ public class ProductControllerTest {
     @Test
     public void findProductsTest() {
         String searchName = "macbook";
-        ProductRequestParam requestParam = new ProductRequestParam(searchName);
+        ProductRequestParam requestParam = new ProductRequestParam(searchName, Optional.of("0"), Optional.of(Sort.price_asc));
 
         Mockito.when(productService.findProducts(requestParam))
                 .thenReturn(productDtoFlux);

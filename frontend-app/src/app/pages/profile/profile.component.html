@@ -56,8 +56,8 @@
                 <label for="roles" class="tw-block tw-font-medium tw-text-white">Роли</label>
                 <p class="tw-mt-2 tw-text-yellow-500">Текущие роли: {{roles}}</p>
                 <select multiple formControlName="roles" type="text" name="city" id="roles" autocomplete="address-level2"
-                       class="tw-mt-1 focus:tw-ring-indigo-500 focus:tw-border-indigo-500
-                       tw-block tw-w-full tw-shadow-sm tw-border-gray-300 tw-rounded-md tw-border tw-border-white tw-bg-[#2a2a2a] tw-w-full
+                        class="tw-mt-1 focus:tw-ring-indigo-500 focus:tw-border-indigo-500
+                       tw-block tw-w-full tw-shadow-sm tw-rounded-md tw-border tw-border-white tw-bg-[#2a2a2a] tw-w-full
                 tw-caret-white tw-text-white tw-rounded-md focus:tw-bg-[#2a2a2a]">
                   <option *ngFor="let role of Roles" [selected]="matchRole(role)">{{role}}</option>
                 </select>
@@ -112,6 +112,15 @@
           </div>
         </div>
       </form>
+    </div>
+<!--    <div *ngIf="!authService.isAdmin()" class="tw-my-5 md:tw-col-span-2">-->
+<!--      <div (click)="delete()" class="tw-text-red-500 tw-text-lg tw-border tw-bg-[#2a2a2a]-->
+<!--       tw-border-red-500 tw-p-2 tw-rounded-xl tw-block tw-cursor-pointer hover:tw-scale-105 tw-duration-300">Удалить</div>-->
+<!--    </div>-->
+    <div *ngIf="roles.indexOf('ADMIN') == -1" class="tw-px-4 tw-py-3 tw-text-right sm:tw-px-6">
+      <button (click)="delete()" class="tw-inline-flex tw-justify-center tw-text-red-500
+            tw-py-2 tw-px-4 tw-border tw-border-red-500 tw-font-medium
+             tw-rounded-xl tw-bg-[#2a2a2a] hover:tw-scale-105 tw-duration-300">Удалить</button>
     </div>
   </div>
 </div>

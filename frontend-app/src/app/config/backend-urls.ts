@@ -7,6 +7,8 @@ export class SearchProducts {
   url = '/api/v1/product';
   paramNames = class {
     static SEARCH_NAME = 'searchName';
+    static SORT_NAME = 'sort';
+    static PAGE_NUMBER = 'pageNumber';
   }
 }
 

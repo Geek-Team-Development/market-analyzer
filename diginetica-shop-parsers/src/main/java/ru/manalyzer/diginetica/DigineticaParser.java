@@ -11,9 +11,9 @@ import ru.manalyzer.diginetica.dto.ConverterDto;
 import ru.manalyzer.diginetica.dto.DigineticaResponseDto;
 import ru.manalyzer.diginetica.property.DigineticaConnectionProperties;
 import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.dto.Sort;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -38,16 +38,18 @@ public class DigineticaParser implements Parser {
      * @return Flux<ProductDto> or empty Flux<ProductDto> if an error occurred
      */
     @Override
-    public Flux<ProductDto> parse(String searchName) {
-        return invokeRequest(searchName)
+    public Flux<ProductDto> parse(String searchName, Sort sort, String pageNumber) {
+        return invokeRequest(searchName, sort, pageNumber)
                 .flatMapIterable(DigineticaResponseDto::getProducts)
-                .filter(oldiProductDto -> oldiProductDto.getName().toLowerCase().contains(searchName.toLowerCase()))
+//                .filter(oldiProductDto -> oldiProductDto.getName().toLowerCase().contains(searchName.toLowerCase()))
                 .map(converterDigineticaDtoToDto::convertToDto);
     }
 
-    private Mono<DigineticaResponseDto> invokeRequest(String searchString) {
+    private Mono<DigineticaResponseDto> invokeRequest(String searchString, Sort sort, String pageNumber) {
         // Set search query parameter
         connectionProperties.getQueryParams().put(connectionProperties.getSearchParamName(), searchString);
+        connectionProperties.getQueryParams().put(connectionProperties.getOffsetParamName(), pageNumber);
+        connectionProperties.getQueryParams().put(connectionProperties.getSortParamName(), sort.toString().toUpperCase());
 
         WebClient client = WebClient.create(connectionProperties.getSearchUri());
         return client
@@ -75,7 +77,7 @@ public class DigineticaParser implements Parser {
      */
     @Override
     public Mono<ProductDto> parseOneProduct(ProductDto productDto) {
-        return invokeRequest(productDto.getId())
+        return invokeRequest(productDto.getId(), Sort.price_asc, "0")
                 .map(DigineticaResponseDto::getProducts)
                 .filter(list -> list.size() > 0)
                 .map(list -> list.get(0))

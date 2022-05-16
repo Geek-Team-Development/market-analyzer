@@ -84,6 +84,8 @@ public class MVideoProperties {
                 factory = YamlPropertySourceFactory.class)
         public static class IdsRequest {
             private String searchParamName;
+            private String sortParamName;
+            private String offsetParamName;
             private Map<String, String> defaultParams;
         }
     }

@@ -8,5 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Price {
+    private String salePrice;
     private String basePrice;
 }

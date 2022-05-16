@@ -1,11 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {UsersService} from "../../services/users.service";
 import {UserDto} from "../../dto/user-dto";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {map, Observable} from "rxjs";
 import {AuthService} from "../../services/auth.service";
 import {FormBuilder, Validators} from "@angular/forms";
 import {Roles} from "../../dto/roles";
+import {USERS} from "../../config/backend-urls";
+import {FrontUrls} from "../../config/front-config";
 
 const { email, required } = Validators;
 
@@ -40,7 +42,8 @@ export class ProfileComponent implements OnInit {
   constructor(private userService: UsersService,
               private route: ActivatedRoute,
               public authService: AuthService,
-              private formBuilder: FormBuilder) { }
+              private formBuilder: FormBuilder,
+              private router: Router) { }
 
   ngOnInit(): void {
     this.route.params
@@ -118,5 +121,22 @@ export class ProfileComponent implements OnInit {
 
   public matchRole(role: string) :  boolean {
     return this.roles.indexOf(role) != -1;
+  }
+
+  delete() {
+    this.userService.deleteUser(this.id)
+      .subscribe({
+        next: () => {
+          if(this.authService.isAdmin()) {
+            this.router.navigateByUrl(FrontUrls.USERS);
+          } else {
+            this.authService.logout();
+            this.router.navigateByUrl(FrontUrls.MAIN);
+          }
+        },
+        error: err => {
+          console.log(err);
+        }
+      });
   }
 }
