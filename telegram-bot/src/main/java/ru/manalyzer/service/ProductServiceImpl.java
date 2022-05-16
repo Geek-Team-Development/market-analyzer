@@ -7,16 +7,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import ru.manalyzer.dto.ProductDto;
-import ru.manalyzer.property.RestConnectionProperty;
+import ru.manalyzer.property.RestConnectionProperties;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private final RestConnectionProperty restConnectionProperty;
+    private final RestConnectionProperties restConnectionProperty;
 
     private final WebClient webClient;
 
-    public ProductServiceImpl(RestConnectionProperty restConnectionProperty) {
+    public ProductServiceImpl(RestConnectionProperties restConnectionProperty) {
         this.restConnectionProperty = restConnectionProperty;
         this.webClient = WebClient.create(restConnectionProperty.getUri());
     }

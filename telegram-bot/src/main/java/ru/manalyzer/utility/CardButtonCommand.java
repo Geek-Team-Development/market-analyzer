@@ -1,4 +1,4 @@
-package ru.manalyzer.entity;
+package ru.manalyzer.utility;
 
 public enum CardButtonCommand {
 

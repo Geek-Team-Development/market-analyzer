@@ -13,13 +13,13 @@ import org.springframework.stereotype.Component;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@PropertySource("classpath:rest-connection.properties")
-@ConfigurationProperties(value = "rest")
-public class RestConnectionProperty {
+@PropertySource("classpath:telegram.properties")
+@ConfigurationProperties(value = "card-slider.navigation")
+public class CardSliderNavigationProperties {
 
-    private String uri;
+    private String buttonNextFormat;
 
-    private String productSearchPath;
+    private String buttonPreviousFormat;
 
-    private String searchParamName;
+    private String buttonPageFormat;
 }

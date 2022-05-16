@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @PropertySource("classpath:telegram.properties")
 @ConfigurationProperties(value = "bot")
-public class TelegramProperty {
+public class TelegramProperties {
 
     private String username;
 

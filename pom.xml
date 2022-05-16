@@ -35,6 +35,8 @@
         <reactor-test.version>3.2.3.RELEASE</reactor-test.version>
         <mongock.version>5.0.39</mongock.version>
         <telegrambots.version>6.0.1</telegrambots.version>
+        <redis.version>2.3.3.RELEASE</redis.version>
+        <jedis.version>3.3.0</jedis.version>
     </properties>
 
 </project>
