@@ -34,6 +34,7 @@ import {MatSelectModule} from "@angular/material/select";
     UsersComponent,
     ProfileComponent
   ],
+
   imports: [
     BrowserModule,
     AppRoutingModule,

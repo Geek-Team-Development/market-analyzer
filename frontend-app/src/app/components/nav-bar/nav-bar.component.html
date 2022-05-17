@@ -22,7 +22,7 @@
         </div>
         <div class="tw-hidden tw-relative tw-flex tw-flex-row tw-grow sm:tw-block sm:tw-ml-6">
           <div class="tw-absolute tw-inset-y-0 tw-items-center tw-left-0 tw-flex tw-space-x-4">
-            <a [routerLink]="main" class="tw-block tw-px-3 tw-py-2 tw-rounded-md
+            <a [routerLink]="main" data-tid="big-main" class="tw-block tw-px-3 tw-py-2 tw-rounded-md
             tw-text-sm tw-font-medium tw-no-underline"
                [class]="currentUrl === main ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
                 ' hover:tw-text-white'" aria-current="page">Главная</a>
@@ -33,12 +33,12 @@
           </div>
           <div class="tw-absolute tw-inset-y-0 tw-right-0 tw-flex
                 tw-items-center tw-pr-2 sm:tw-ml-6 sm:tw-pr-0">
-            <a *ngIf="!authService.isAuthenticated()" [routerLink]="signin"
+            <a *ngIf="!authService.isAuthenticated()" [routerLink]="signin" data-tid="big-sign-in"
                class="tw-block tw-px-3 tw-py-2 tw-text-sm tw-text-white
                hover:tw-bg-gray-700 tw-rounded-md tw-no-underline"
                [class]="currentUrl === signin ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
                                ' hover:tw-text-white'">Вход</a>
-            <a [routerLink]="signup"
+            <a [routerLink]="signup" data-tid="big-sign-up"
                class="tw-block tw-px-3 tw-py-2 tw-ml-2 tw-text-sm tw-text-white hover:tw-bg-gray-700 tw-rounded-md tw-no-underline"
                [class]="currentUrl === signup ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
                 ' hover:tw-text-white'">Регистрация</a>
@@ -46,9 +46,9 @@
         </div>
       </div>
 
-      <div *ngIf="authService.isAuthenticated()" class="tw-absolute tw-inset-y-0 tw-right-0 tw-flex
+      <div *ngIf="authService.isAuthenticated()" data-tid="user-menu" class="tw-absolute tw-inset-y-0 tw-right-0 tw-flex
       tw-items-center tw-pr-2 sm:tw-static sm:tw-inset-auto sm:tw-ml-6 sm:tw-pr-0">
-        <button type="button"
+        <button type="button" data-tid="notify"
                 class="tw-bg-gray-800 tw-p-1 tw-rounded-full tw-text-gray-400 hover:tw-text-white focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-offset-2 focus:tw-ring-offset-gray-800 focus:tw-ring-white">
           <span class="tw-sr-only">View notifications</span>
           <svg class="tw-h-6 tw-w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -59,7 +59,7 @@
         </button>
         <div class="tw-ml-3 tw-relative">
           <div>
-            <button type="button" [matMenuTriggerFor]="menu"
+            <button type="button" [matMenuTriggerFor]="menu" data-tid="user-menu-button"
                     class="tw-bg-gray-800 tw-flex tw-text-sm tw-rounded-full focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-offset-2 focus:tw-ring-offset-gray-800 focus:tw-ring-white"
                     id="user-menu-button" aria-expanded="false" aria-haspopup="true">
               <span class="tw-sr-only">Open user menu</span>
@@ -67,7 +67,7 @@
                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                    alt="">
             </button>
-            <mat-menu #menu="matMenu"
+            <mat-menu #menu="matMenu" data-tid="mat-menu"
                       class="tw-z-10 tw-right-0 tw-mt-2 tw-w-48 tw-rounded-md tw-p-0
                     tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none
                      tw-border tw-border-yellow-300 tw-bg-gray-800 tw-text-left"
@@ -79,16 +79,16 @@
                   tw-no-underline" role="menuitem"
                  tabindex="-1"
                  id="user-menu-item-2">Профиль</a>
-              <a [routerLink]="favorites"
+              <a [routerLink]="favorites" data-tid="favorites"
                  class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700
                   tw-no-underline" role="menuitem"
                  tabindex="-1"
-                 id="user-menu-item-2">Избранное</a>
-              <a *ngIf="authService.isAuthenticated()" (click)="logout()"
+                 id="user-menu-item-1">Избранное</a>
+              <div data-tid="logout" (click)="logout()"
                  class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700
                   tw-no-underline tw-cursor-pointer" role="menuitem"
                  tabindex="-1"
-                 id="user-menu-item-2">Выход</a>
+                 id="user-menu-item-2">Выход</div>
             </mat-menu>
           </div>
         </div>
@@ -98,16 +98,16 @@
 
   <div class="sm:tw-hidden" [class]="leftMenuIsActive ? 'tw-block' : 'tw-hidden'" id="mobile-menu">
     <div class="tw-px-2 tw-pt-2 tw-pb-3 tw-space-y-1">
-      <a [routerLink]="main"
+      <a [routerLink]="main" data-tid="mobile-main"
          class="tw-block tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium tw-no-underline"
          [class]="currentUrl === main ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 ' +
           'hover:tw-bg-gray-700 hover:tw-text-white'"
          aria-current="page">Главная</a>
-      <a *ngIf="!authService.isAuthenticated()" [routerLink]="signin"
+      <a *ngIf="!authService.isAuthenticated()" [routerLink]="signin" data-tid="mobile-sign-in"
          class="tw-block tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium tw-no-underline"
          [class]="currentUrl === signin ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 ' +
           'hover:tw-bg-gray-700 hover:tw-text-white'">Вход</a>
-      <a [routerLink]="signup"
+      <a [routerLink]="signup" data-tid="mobile-sign-up"
          class="tw-block tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium tw-no-underline"
          [class]="currentUrl === signup ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 ' +
           'hover:tw-bg-gray-700 hover:tw-text-white'">Регистрация</a>

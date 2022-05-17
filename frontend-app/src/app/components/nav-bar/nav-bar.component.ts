@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {NavigationEnd, Router} from "@angular/router";
 import {FrontUrls} from "../../config/front-config";
 import {AuthService} from "../../services/auth.service";
+import {filter} from "rxjs";
 
 @Component({
   selector: 'app-nav-bar',
@@ -22,12 +23,12 @@ export class NavBarComponent implements OnInit {
 
   constructor(private router: Router,
               public authService: AuthService) {
-    router.events.subscribe({
+    router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe({
       next: value => {
-        if(value instanceof NavigationEnd) {
-          let navEnd = value as NavigationEnd;
-          this.currentUrl = navEnd.url;
-        }
+        this.currentUrl = (value as NavigationEnd).url;
       }
     })
   }
