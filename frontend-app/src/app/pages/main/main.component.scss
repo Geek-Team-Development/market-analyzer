@@ -1,1 +1,13 @@
+.search-group {
+  @apply tw-relative tw-flex tw-flex-wrap tw-items-stretch tw-w-full tw-p-0 tw-flex-[1_0_0%];
+}
 
+.search-field {
+  @apply tw-w-auto tw-grow tw-border tw-border-[#00ff00] tw-rounded-l-md tw-bg-[#2a2a2a];
+  @apply tw-caret-white tw-text-white;
+  box-shadow: 0 0 60px -15px rgba(255,255,255,0.3);
+}
+
+.search-btn {
+  @apply tw-block tw-bg-[#00ff00] hover:tw-bg-[#00dd00] tw-w-16 tw-rounded-r-md;
+}

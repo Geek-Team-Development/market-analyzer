@@ -3,14 +3,14 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ProductCardComponent} from './product-card.component';
 import {ProductDto} from "../../dto/product-dto";
 import {FavoritesService} from "../../services/favorites.service";
-import {By} from "@angular/platform-browser";
-import {of} from "rxjs";
+import {first, of} from "rxjs";
+import {click} from "../../../test-utils/util";
 import any = jasmine.any;
 
 describe('ProductCardComponent', () => {
   let component: ProductCardComponent;
   let fixture: ComponentFixture<ProductCardComponent>;
-  let favoriteServiceSpy = jasmine.createSpyObj<FavoritesService>('FavoriteService', ['add']);
+  let favoriteServiceSpy = jasmine.createSpyObj<FavoritesService>('FavoriteService', ['add', 'remove']);
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -38,19 +38,30 @@ describe('ProductCardComponent', () => {
     let addSpy = favoriteServiceSpy.add;
     addSpy.and.returnValue(of(any(Object)));
     fixture.detectChanges();
-    let favoriteButton = fixture.debugElement
-      .query(By.css('.tw-block'));
-
-    expect(favoriteButton)
-      .withContext('favorite button is defined')
-      .toBeTruthy();
-
-    const event = Util.makeClickEvent(favoriteButton.nativeElement);
-    favoriteButton.triggerEventHandler('click', event);
+    click(fixture, '[data-tid="add-favorites-btn"]');
     expect(addSpy)
       .withContext(`add on favorite service called with ${expectedProduct}`)
       .toHaveBeenCalledWith(expectedProduct);
   });
+
+  it('should emit product remove event from favorites' +
+    ' when removing on server is successful', () => {
+    let expectedProduct = TestingProduct.getProduct();
+    component.product = expectedProduct;
+    component.isAddedToFavorites = true;
+    let removeSpy = favoriteServiceSpy.remove;
+    removeSpy.and.returnValue(of(any(Object)));
+    fixture.detectChanges();
+    component.productDeleted
+      .pipe(first())
+      .subscribe(value => {
+        expect(value).toEqual(expectedProduct);
+      });
+    click(fixture, '[data-tid="remove-favorites-btn"]');
+    expect(removeSpy.calls.count()).toEqual(1);
+    expect(removeSpy)
+      .toHaveBeenCalledWith(expectedProduct.id, expectedProduct.shopName);
+  })
 });
 
 class TestingProduct {
@@ -63,22 +74,5 @@ class TestingProduct {
     productDto.productLink = 'https://product.tv.ru';
     productDto.imageLink = 'https://img.oldi.ru';
     return productDto;
-  }
-}
-
-class Util {
-
-  static makeClickEvent(target: EventTarget) : Partial<MouseEvent> {
-    return {
-      preventDefault(): void { },
-      stopPropagation(): void { },
-      stopImmediatePropagation(): void { },
-      type: 'click',
-      target,
-      currentTarget: target,
-      bubbles: true,
-      cancelable: true,
-      button: 0
-    }
   }
 }

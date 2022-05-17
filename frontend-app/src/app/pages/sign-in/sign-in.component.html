@@ -1,27 +1,19 @@
-<div class="tw-min-h-full tw-flex tw-items-center tw-justify-center tw-py-12 tw-px-4 tw-sm:px-6 tw-lg:px-8">
-  <div class="tw-max-w-md w-full tw-space-y-8 tw-border tw-border-yellow-300 tw-min-w-[20rem] lg:tw-min-w-[25rem]
-   tw-rounded-xl py-3 px-4 tw-bg-[#2a2a2a] tw-shadow-[0_0_60px_-15px_rgba(255,255,255,0.3)]">
+<div class="sign-in-page">
+  <div class="sign-in-form">
 
-    <div>
-      <h2 class="tw-mt-6 tw-text-center tw-text-3xl tw-font-extrabold
-       tw-text-white">Вход</h2>
-    </div>
-
-    <form (submit)="signIn()">
+    <h2 class="form-header">Вход</h2>
+    <p *ngIf="error !== ''" class="tw-text-red-500 tw-mt-2">{{error}}</p>
+    <form [formGroup]="form" (submit)="signIn()" data-tid="form">
       <div class="mb-3">
-        <input type="text" [(ngModel)]="credentials.email" placeholder="Email address"
-               class="tw-border tw-border-white tw-bg-[#2a2a2a] tw-w-full
-                tw-caret-white tw-text-white tw-rounded-md focus:tw-bg-[#2a2a2a]" id="email" name="email">
-        <p *ngIf="signInError.emailError !== ''" class="tw-text-red-500">{{signInError.emailError}}</p>
+        <input type="text" placeholder="Email" formControlName="email"
+               class="input-field" data-tid="email" required>
       </div>
       <div class="mb-3">
-        <input type="password" [(ngModel)]="credentials.password" placeholder="Пароль"
-               class="tw-border tw-border-white tw-bg-[#2a2a2a] tw-w-full
-                tw-caret-white tw-text-white tw-rounded-md" id="password" name="password">
-        <p *ngIf="signInError.passwordError !== ''" class="tw-text-red-500">{{signInError.passwordError}}</p>
+        <input type="password" placeholder="Пароль" formControlName="password"
+               class="input-field" data-tid="password" required>
       </div>
-      <button type="submit" class="tw-block tw-w-full tw-p-3 tw-text-white tw-text-xl tw-rounded-2xl
-        tw-bg-green-600 hover:tw-bg-green-700 active:tw-scale-95 tw-rounded-md">Войти</button>
+      <button type="submit" class="btn-submit" data-tid="sign-in-btn">Войти</button>
     </form>
+
   </div>
 </div>

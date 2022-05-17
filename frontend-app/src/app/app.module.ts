@@ -32,6 +32,7 @@ import {ProfileComponent} from "./pages/profile/profile.component";
     UsersComponent,
     ProfileComponent
   ],
+
   imports: [
     BrowserModule,
     AppRoutingModule,
