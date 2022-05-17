@@ -1,0 +1,24 @@
+.sign-in-page {
+  @apply tw-min-h-full tw-flex tw-items-center tw-justify-center;
+  @apply tw-py-12 tw-px-4 sm:tw-px-6 lg:tw-px-8;
+}
+
+.sign-in-form {
+  @apply tw-max-w-md tw-space-y-8 tw-border tw-border-yellow-300 tw-min-w-[20rem] lg:tw-min-w-[25rem];
+  @apply tw-rounded-xl tw-py-4 tw-px-6 tw-bg-[#2a2a2a];
+  box-shadow: 0 0 60px -15px rgba(255,255,255,0.3);
+}
+
+.form-header {
+  @apply tw-mt-6 tw-text-center tw-text-3xl tw-font-extrabold tw-text-white;
+}
+
+.input-field {
+  @apply tw-border tw-border-white tw-bg-[#2a2a2a] tw-w-full tw-caret-white
+  tw-text-white tw-rounded-md focus:tw-bg-[#2a2a2a];
+}
+
+.btn-submit {
+  @apply tw-block tw-w-full tw-p-3 tw-text-white tw-text-xl tw-rounded-2xl
+  tw-bg-green-600 hover:tw-bg-green-700 active:tw-scale-95 tw-rounded-md;
+}

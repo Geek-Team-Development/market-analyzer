@@ -29,7 +29,7 @@ export class AuthService {
         map(response => {
           if ('email' in response) {
             let responseCredentials = response as Credentials;
-            let credentials = new Credentials();
+            let credentials: Credentials = { email: responseCredentials.email, password: '' };
             credentials.email = responseCredentials.email;
             return new AuthResult(credentials, this.redirectUrl);
           }

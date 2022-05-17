@@ -5,9 +5,8 @@ import {Observable} from "rxjs";
 import {ProductDto} from "../../dto/product-dto";
 import {FormsModule} from "@angular/forms";
 import {HttpClientTestingModule} from "@angular/common/http/testing";
-import SpyObj = jasmine.SpyObj;
 import {ProductCardComponent} from "../../components/product-card/product-card.component";
-import {By} from "@angular/platform-browser";
+import {click, debugElements, setFieldValue} from "../../../test-utils/util";
 
 describe('MainComponent', () => {
   let component: MainComponent;
@@ -26,7 +25,6 @@ describe('MainComponent', () => {
         { provide: ProductService, useValue: productServiceSpy }
       ]
     }).compileComponents();
-    productServiceSpy = TestBed.inject(ProductService) as SpyObj<ProductService>;
   });
 
   beforeEach(() => {
@@ -35,11 +33,11 @@ describe('MainComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should return correct products', function () {
+  it('return correct products', function () {
     let expectedProducts = ExpectedProducts.getProducts();
     let getProductSpy = productServiceSpy.getProducts;
     getProductSpy.and.returnValue(new Observable<ProductDto>((
@@ -50,13 +48,8 @@ describe('MainComponent', () => {
       }
     )));
     let searchName = 'Телевизоры';
-    const compiled = fixture.nativeElement as HTMLElement;
-    let htmlInputElement = compiled.querySelector('input')!;
-    htmlInputElement.value = searchName;
-    htmlInputElement.dispatchEvent(new Event('input'));
-    fixture.detectChanges();
-    component.search();
-
+    setFieldValue(fixture, '[data-tid="search-input-field"]', searchName);
+    click(fixture, '[data-tid="search-button"]');
     expect(getProductSpy)
       .withContext('#getProduct called with param ' + `${searchName}`)
       .toHaveBeenCalledWith(searchName);
@@ -76,7 +69,7 @@ describe('MainComponent', () => {
     let expectedProducts = ExpectedProducts.getProducts();
     component.products = expectedProducts;
     fixture.detectChanges();
-    let productCards = fixture.debugElement.queryAll(By.css('app-product-card'));
+    let productCards = debugElements(fixture, '[data-tid="product-card"]');
     expect(productCards.length)
       .withContext(`Product cards length must be ${expectedProducts.length}`)
       .toBe(component.products.length);
