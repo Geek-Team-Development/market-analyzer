@@ -7,6 +7,8 @@ export class FrontUrls {
   static readonly SIGN_UP = 'signup';
   static readonly SIGN_IN = 'signin';
   static readonly FAVORITES = 'favorites';
+  static readonly USERS = 'users';
+  static readonly PROFILE = FrontUrls.USERS + '/:id';
 }
 
 @Injectable({

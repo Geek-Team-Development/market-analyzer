@@ -26,6 +26,10 @@
             tw-text-sm tw-font-medium tw-no-underline"
                [class]="currentUrl === main ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
                 ' hover:tw-text-white'" aria-current="page">Главная</a>
+            <a *ngIf="authService.isAdmin()" [routerLink]="users" class="tw-block tw-px-3 tw-py-2 tw-rounded-md
+            tw-text-sm tw-font-medium tw-no-underline"
+               [class]="currentUrl === users ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
+                ' hover:tw-text-white'" aria-current="page">Пользователи</a>
           </div>
           <div class="tw-absolute tw-inset-y-0 tw-right-0 tw-flex
                 tw-items-center tw-pr-2 sm:tw-ml-6 sm:tw-pr-0">
@@ -70,6 +74,11 @@
                       role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
               <div class="tw-px-4 tw-py-2 tw-text-sm tw-text-white">Вы вошли под именем {{getUsername()}}</div>
               <mat-divider class="tw-bg-yellow-300 tw-mx-2"></mat-divider>
+              <a [routerLink]="users + '/' + authService.getUserId()"
+                 class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700
+                  tw-no-underline" role="menuitem"
+                 tabindex="-1"
+                 id="user-menu-item-2">Профиль</a>
               <a [routerLink]="favorites" data-tid="favorites"
                  class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700
                   tw-no-underline" role="menuitem"

@@ -5,6 +5,7 @@ import {AuthResult} from "../model/auth-result";
 import {Credentials} from "../model/credentials";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {LOGOUT, SIGN_IN, SIGN_UP} from "../config/backend-urls";
+import {Roles} from "../dto/roles";
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ import {LOGOUT, SIGN_IN, SIGN_UP} from "../config/backend-urls";
 export class AuthService {
 
   public redirectUrl?: string;
-  private currentUser?: Credentials;
+  private currentUser?: UserDto;
   private currentUserKey = 'current_user';
 
   constructor(private http: HttpClient) {
@@ -45,7 +46,7 @@ export class AuthService {
       .pipe(
         map(response => {
           if(response) {
-            this.currentUser = response as Credentials;
+            this.currentUser = response as UserDto;
             localStorage.setItem(this.currentUserKey, JSON.stringify(response));
             return new AuthResult(this.currentUser, this.redirectUrl);
           }
@@ -70,5 +71,17 @@ export class AuthService {
 
   public getUsername() {
     return this.currentUser?.email;
+  }
+
+  public isAdmin() : boolean {
+    return this.isAuthenticated() && this.currentUser?.roles.indexOf(Roles.ADMIN) != -1;
+  }
+
+  public getUserId() {
+    return this.currentUser?.id;
+  }
+
+  public getRoles() {
+    return this.currentUser?.roles;
   }
 }

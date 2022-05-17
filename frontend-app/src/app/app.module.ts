@@ -17,6 +17,8 @@ import {UnauthorizedInterceptor} from "./utils/unauthorized-interceptor";
 import {MatDividerModule} from "@angular/material/divider";
 import { FavoritesComponent } from './pages/favorites/favorites.component';
 import { ProductCardComponent } from './components/product-card/product-card.component';
+import {UsersComponent} from "./pages/users/users.component";
+import {ProfileComponent} from "./pages/profile/profile.component";
 
 @NgModule({
   declarations: [
@@ -26,20 +28,23 @@ import { ProductCardComponent } from './components/product-card/product-card.com
     SignUpComponent,
     SignInComponent,
     FavoritesComponent,
-    ProductCardComponent
+    ProductCardComponent,
+    UsersComponent,
+    ProfileComponent
   ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        FormsModule,
-        BrowserAnimationsModule,
-        HttpClientModule,
-        MatProgressSpinnerModule,
-        MatButtonModule,
-        MatMenuModule,
-        MatDividerModule,
-        ReactiveFormsModule
-    ],
+
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatDividerModule,
+    ReactiveFormsModule
+  ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: UnauthorizedInterceptor, multi: true }
   ],
