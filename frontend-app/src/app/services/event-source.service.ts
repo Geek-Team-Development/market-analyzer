@@ -9,9 +9,12 @@ export class EventSourceService {
 
   constructor(private searchProducts: SearchProducts) { }
 
-  getEventSource(searchName: string): EventSource {
+  getEventSource(searchName: string, sort: string, pageNumber: number): EventSource {
+    console.log(sort);
     const params = new HttpParams()
-      .set(this.searchProducts.paramNames.SEARCH_NAME, searchName);
+      .set(this.searchProducts.paramNames.SEARCH_NAME, searchName)
+      .set(this.searchProducts.paramNames.SORT_NAME, sort)
+      .set(this.searchProducts.paramNames.PAGE_NUMBER, pageNumber);
     const fullUrl = `${this.searchProducts.url}?${params.toString()}`;
     return new EventSource(fullUrl);
   }

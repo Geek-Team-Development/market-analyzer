@@ -9,10 +9,12 @@ import reactor.test.StepVerifier;
 import ru.manalyzer.Parser;
 import ru.manalyzer.controller.param.ProductRequestParam;
 import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.dto.Sort;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -76,10 +78,10 @@ public class ProductServiceTest {
     @Test
     public void findProductsTest() {
         String searchName = "macbook";
-        ProductRequestParam requestParam = new ProductRequestParam(searchName);
+        ProductRequestParam requestParam = new ProductRequestParam(searchName, Optional.of("0"), Optional.of(Sort.price_asc));
 
-        when(oldiParser.parse(requestParam.getSearchName())).thenReturn(oldiFlux);
-        when(mvideoParser.parse(requestParam.getSearchName())).thenReturn(mvideoFlux);
+        when(oldiParser.parse(requestParam.getSearchName(), Sort.price_asc, "0")).thenReturn(oldiFlux);
+        when(mvideoParser.parse(requestParam.getSearchName(), Sort.price_asc, "0")).thenReturn(mvideoFlux);
 
         Flux<ProductDto> productDtoFlux = productService.findProducts(requestParam);
 
@@ -96,10 +98,10 @@ public class ProductServiceTest {
     @Test
     public void findProductsOnBackpressureTest() {
         String searchName = "macbook";
-        ProductRequestParam requestParam = new ProductRequestParam(searchName);
+        ProductRequestParam requestParam = new ProductRequestParam(searchName, Optional.of("0"), Optional.of(Sort.price_asc));
 
-        when(oldiParser.parse(requestParam.getSearchName())).thenReturn(oldiFlux);
-        when(mvideoParser.parse(requestParam.getSearchName())).thenReturn(mvideoFlux);
+        when(oldiParser.parse(requestParam.getSearchName(), Sort.price_asc, "0")).thenReturn(oldiFlux);
+        when(mvideoParser.parse(requestParam.getSearchName(), Sort.price_asc, "0")).thenReturn(mvideoFlux);
 
         Flux<ProductDto> productDtoFlux = productService.findProducts(requestParam);
 

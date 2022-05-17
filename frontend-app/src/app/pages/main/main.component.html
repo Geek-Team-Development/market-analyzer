@@ -6,6 +6,18 @@
       <i class="fa-solid fa-magnifying-glass tw-scale-[1.4] active:tw-scale-[1.2]"></i>
     </button>
   </div>
+  <div class="tw-text-white tw-mt-3 tw-text-base">Сортировка</div>
+  <mat-form-field>
+    <mat-select (selectionChange)="selectionChange($event)" [value]="currentSort">
+      <mat-select-trigger>
+        <span class="tw-text-yellow-500">
+          {{getCurrentSort()}}
+        </span>
+      </mat-select-trigger>
+      <mat-option class="tw-text-yellow-500 tw-bg-[#2a2a2a] hover:tw-bg-[#1a1a1a]" *ngFor="let sort of sorts | keyvalue"
+                  [value]="sort.key">{{sort.value}}</mat-option>
+    </mat-select>
+  </mat-form-field>
   <mat-spinner *ngIf="isWaiting" class="tw-mx-auto tw-mt-3" [diameter]="64"></mat-spinner>
 </div>
 <div *ngIf="products.length > 0" class="mt-3">
@@ -13,5 +25,9 @@
     <div class="tw-grid tw-grid-cols-1 tw-gap-y-10 tw-gap-x-6 sm:tw-grid-cols-2 lg:tw-grid-cols-4 xl:tw-gap-x-8">
       <app-product-card *ngFor="let product of products;" [product]="product" data-tid="product-card"></app-product-card>
     </div>
+  </div>
+  <div (click)="nextPage()" class="tw-border tw-border-yellow-500 tw-rounded-xl tw-text-white
+   tw-p-3 tw-mb-3 tw-text-center tw-text-xl tw-cursor-pointer tw-bg-[#2a2a2a] hover:tw-scale-105 tw-duration-300">
+    Показать еще...
   </div>
 </div>

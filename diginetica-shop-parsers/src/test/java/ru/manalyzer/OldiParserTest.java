@@ -50,6 +50,8 @@ public class OldiParserTest {
                 String.format("http://localhost:%s", mockWebServer.getPort()),
                 "",
                 "st",
+                "sort",
+                "offset",
                 new HashMap<>()
         );
         ConverterDigineticaDtoToDto converterDto =
@@ -76,7 +78,7 @@ public class OldiParserTest {
                 .setBody(mapper.writeValueAsString(responseDto))
                 .addHeader("Content-Type", "application/json"));
 
-        Flux<ProductDto> products = oldiParser.parse("macbook");
+        Flux<ProductDto> products = oldiParser.parse("macbook", Sort.price_asc, "0");
 
         ProductDto productDto = new ProductDto(
                 "1",
@@ -101,7 +103,7 @@ public class OldiParserTest {
                 .setBody(mapper.writeValueAsString(new DigineticaResponseDto()))
                 .addHeader("Content-Type", "application/json"));
 
-        Flux<ProductDto> products = oldiParser.parse("macbook");
+        Flux<ProductDto> products = oldiParser.parse("macbook", Sort.price_asc, "0");
 
         StepVerifier.create(products)
                 .expectSubscription()
@@ -138,7 +140,7 @@ public class OldiParserTest {
                 .setBody(mapper.writeValueAsString(responseDto))
                 .addHeader("Content-Type", "application/json"));
 
-        Flux<ProductDto> products = oldiParser.parse("macbook");
+        Flux<ProductDto> products = oldiParser.parse("macbook", Sort.price_asc, "0");
 
         StepVerifier.create(products.onBackpressureBuffer(), 0)
                 .expectSubscription()

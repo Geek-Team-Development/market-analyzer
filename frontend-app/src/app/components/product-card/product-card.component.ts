@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ProductDto} from "../../dto/product-dto";
 import {Logos} from "../../config/front-config";
 import {FavoritesService} from "../../services/favorites.service";
+import {AuthService} from "../../services/auth.service";
 
 @Component({
   selector: 'app-product-card',
@@ -15,7 +16,8 @@ export class ProductCardComponent implements OnInit {
   @Output() productDeleted: EventEmitter<ProductDto> = new EventEmitter<ProductDto>();
 
   constructor(private logos: Logos,
-              private favoriteService: FavoritesService) { }
+              private favoriteService: FavoritesService,
+              public authService: AuthService) { }
 
   ngOnInit(): void { }
 

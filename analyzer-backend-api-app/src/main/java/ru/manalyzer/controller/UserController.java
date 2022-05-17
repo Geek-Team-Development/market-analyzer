@@ -39,4 +39,9 @@ public class UserController {
     public UserDto updatePassword(@PathVariable String id, @RequestBody String password) {
         return userService.updatePassword(id, password);
     }
+
+    @DeleteMapping(value = "/{id}")
+    public void deleteUser(@PathVariable String id) {
+        userService.deleteById(id);
+    }
 }

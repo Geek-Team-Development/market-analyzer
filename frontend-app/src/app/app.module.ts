@@ -19,6 +19,8 @@ import { FavoritesComponent } from './pages/favorites/favorites.component';
 import { ProductCardComponent } from './components/product-card/product-card.component';
 import {UsersComponent} from "./pages/users/users.component";
 import {ProfileComponent} from "./pages/profile/profile.component";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatSelectModule} from "@angular/material/select";
 
 @NgModule({
   declarations: [
@@ -43,7 +45,9 @@ import {ProfileComponent} from "./pages/profile/profile.component";
     MatButtonModule,
     MatMenuModule,
     MatDividerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatSelectModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: UnauthorizedInterceptor, multi: true }

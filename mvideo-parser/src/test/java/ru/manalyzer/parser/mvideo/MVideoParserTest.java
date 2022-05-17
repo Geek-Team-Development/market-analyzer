@@ -15,6 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.dto.Sort;
 import ru.manalyzer.parser.mvideo.config.MVideoProperties;
 import ru.manalyzer.parser.mvideo.dto.*;
 import ru.manalyzer.parser.mvideo.service.MVideoHeadersService;
@@ -84,7 +85,7 @@ public class MVideoParserTest {
 
         MVideoParser mVideoParser = new MVideoParser(webClient, mVideoHeadersService, properties);
         long start = System.currentTimeMillis();
-        List<ProductDto> result = mVideoParser.parse(searchName)
+        List<ProductDto> result = mVideoParser.parse(searchName, Sort.price_asc, "0")
                 .collectList()
                 .block();
         System.out.println("Время " + (System.currentTimeMillis() - start));
@@ -144,7 +145,7 @@ public class MVideoParserTest {
                 .map(product -> {
                     MaterialPrice materialPrice = new MaterialPrice();
                     Price price = new Price();
-                    price.setBasePrice(product.getPrice());
+                    price.setSalePrice(product.getPrice());
                     materialPrice.setPrice(price);
                     materialPrice.setProductId(product.getId());
                     return materialPrice;

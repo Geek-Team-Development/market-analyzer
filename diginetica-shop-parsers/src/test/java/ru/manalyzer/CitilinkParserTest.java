@@ -15,6 +15,7 @@ import ru.manalyzer.diginetica.dto.DigineticaProductDto;
 import ru.manalyzer.diginetica.dto.DigineticaResponseDto;
 import ru.manalyzer.diginetica.property.DigineticaConnectionProperties;
 import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.dto.Sort;
 import ru.manalyzer.parsers.citilink.CitilinkConnectionProperties;
 import ru.manalyzer.parsers.citilink.CitilinkParser;
 import ru.manalyzer.parsers.citilink.ConverterCitilinkDtoToDto;
@@ -50,6 +51,8 @@ public class CitilinkParserTest {
                 String.format("http://localhost:%s", mockWebServer.getPort()),
                 "",
                 "st",
+                "sort",
+                "offset",
                 new HashMap<>()
         );
         ConverterDigineticaDtoToDto converterDto =
@@ -76,7 +79,7 @@ public class CitilinkParserTest {
                 .setBody(mapper.writeValueAsString(responseDto))
                 .addHeader("Content-Type", "application/json"));
 
-        Flux<ProductDto> products = citilinkParser.parse("macbook");
+        Flux<ProductDto> products = citilinkParser.parse("macbook", Sort.price_asc, "0");
 
         ProductDto productDto = new ProductDto(
                 "1",
@@ -101,7 +104,7 @@ public class CitilinkParserTest {
                 .setBody(mapper.writeValueAsString(new DigineticaResponseDto()))
                 .addHeader("Content-Type", "application/json"));
 
-        Flux<ProductDto> products = citilinkParser.parse("macbook");
+        Flux<ProductDto> products = citilinkParser.parse("macbook", Sort.price_asc, "0");
 
         StepVerifier.create(products)
                 .expectSubscription()
@@ -138,7 +141,7 @@ public class CitilinkParserTest {
                 .setBody(mapper.writeValueAsString(responseDto))
                 .addHeader("Content-Type", "application/json"));
 
-        Flux<ProductDto> products = citilinkParser.parse("macbook");
+        Flux<ProductDto> products = citilinkParser.parse("macbook", Sort.price_asc, "0");
 
         StepVerifier.create(products.onBackpressureBuffer(), 0)
                 .expectSubscription()

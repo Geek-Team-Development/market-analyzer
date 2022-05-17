@@ -46,4 +46,8 @@ export class UsersService {
         })
       )
   }
+
+  public deleteUser(id: string | null) {
+    return this.http.delete(USERS + '/' + id);
+  }
 }

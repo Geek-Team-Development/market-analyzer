@@ -8,16 +8,21 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 import ru.manalyzer.Parser;
 import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.dto.Sort;
 import ru.manalyzer.parser.mvideo.config.MVideoProperties;
 import ru.manalyzer.parser.mvideo.dto.*;
 import ru.manalyzer.parser.mvideo.service.MVideoHeadersService;
 
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Парсер информации о продуктах с сервера MVideo
@@ -40,10 +45,10 @@ public class MVideoParser implements Parser {
         this.properties = properties;
     }
 
-    public Flux<ProductDto> parse(String searchName) {
+    public Flux<ProductDto> parse(String searchName, Sort sort, String pageNumber) {
         logger.info("Products requested with name {}", searchName);
-        return getProductIds(searchName).flatMapMany(productIds -> {
-            if(productIds.size() == 0) {
+        return getProductIds(searchName, sort, pageNumber).flatMapMany(productIds -> {
+            if (productIds.size() == 0) {
                 return Flux.empty();
             }
 
@@ -52,35 +57,53 @@ public class MVideoParser implements Parser {
     }
 
     private Flux<ProductDto> createProductDtoFlux(List<String> productIds, String searchName) {
-        Flux<MaterialPrice> prices = getProductPrice(productIds)
-                .sort(Comparator.comparing(MaterialPrice::getProductId));
-        Flux<ProductDetail> details = getProductDetails(productIds, searchName)
-                .sort(Comparator.comparing(ProductDetail::getProductId));
+        Mono<List<MaterialPrice>> prices = getProductPrice(productIds);
+        Mono<List<ProductDetail>> details = getProductDetails(productIds, searchName);
 
-        return Flux.zip(prices, details).map(tuple -> {
-            ProductDto product = new ProductDto();
-            MaterialPrice price = tuple.getT1();
-            ProductDetail detail = tuple.getT2();
-            String id = price.getProductId();
-            product.setId(id);
-            product.setShopName(properties.getShopName());
-            product.setPrice(price.getPrice().getBasePrice());
-            product.setName(detail.getName());
-            product.setImageLink(properties.getImageLinkPrefix() + detail.getImage());
-            product.setProductLink(properties.getProductLinkPrefix() + detail.getNameTranslit() + "-" + id);
-            return product;
+        Map<String, ProductDto> map = new LinkedHashMap<>();
+        productIds.forEach(productId -> {
+            ProductDto productDto = new ProductDto();
+            productDto.setId(productId);
+            productDto.setShopName("MVideo");
+            map.put(productId, productDto);
         });
+
+        return Mono.zip(prices, details)
+                .flatMapIterable(tuple -> {
+                    tuple.getT1()
+                            .forEach(materialPrice -> {
+                                ProductDto productDto = map.get(materialPrice.getProductId());
+                                String price = materialPrice.getPrice().getSalePrice();
+                                if(price == null) {
+                                    price = materialPrice.getPrice().getBasePrice();
+                                }
+                                productDto.setPrice(price);
+                            });
+                    tuple.getT2()
+                            .forEach(productDetail -> {
+                                String id = productDetail.getProductId();
+                                ProductDto productDto = map.get(id);
+                                productDto.setName(productDetail.getName());
+                                productDto.setProductLink(properties.getProductLinkPrefix() + productDetail.getNameTranslit() + "-" + id);
+                                productDto.setImageLink(properties.getImageLinkPrefix() + productDetail.getImage());
+                            });
+                    return map.values();
+                });
     }
 
-    private Mono<List<String>> getProductIds(String searchName) {
+    private Mono<List<String>> getProductIds(String searchName, Sort sort, String pageNumber) {
         HttpHeaders productIdsRequestHeaders = mVideoHeadersService.getIdsHeaders();
         return webClient
                 .get()
                 .uri(uriBuilder -> {
                     String searchParamName = properties.getIdsRequest().getSearchParamName();
+                    String sortParamName = properties.getIdsRequest().getSortParamName();
+                    String offsetParamName = properties.getIdsRequest().getOffsetParamName();
                     uriBuilder
                             .path(properties.getSearchUrl())
-                            .queryParam(searchParamName, searchName);
+                            .queryParam(searchParamName, searchName)
+                            .queryParam(offsetParamName, pageNumber)
+                            .queryParam(sortParamName, sort.toString());
                     Map<String, String> defaultParams = properties.getIdsRequest().getDefaultParams();
                     defaultParams.forEach(uriBuilder::queryParam);
                     return uriBuilder.build();
@@ -93,7 +116,7 @@ public class MVideoParser implements Parser {
                 .onErrorReturn(List.of());
     }
 
-    private Flux<MaterialPrice> getProductPrice(List<String> productIds) {
+    private Mono<List<MaterialPrice>> getProductPrice(List<String> productIds) {
         String productIdsStr = String.join(",", productIds);
         HttpHeaders productIdsRequestHeaders = mVideoHeadersService.getIdsHeaders();
         return webClient
@@ -106,11 +129,11 @@ public class MVideoParser implements Parser {
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<MVideoResponse<ProductPrices>>() {
                 })
-                .flatMapIterable(productPrices -> productPrices.getBody().getMaterialPrices());
+                .map(productPricesMVideoResponse -> productPricesMVideoResponse.getBody().getMaterialPrices());
     }
 
-    private Flux<ProductDetail> getProductDetails(List<String> productIds,
-                                                  String searchName) {
+    private Mono<List<ProductDetail>> getProductDetails(List<String> productIds,
+                                                        String searchName) {
         ProductListPostObject postObject = new ProductListPostObject(productIds);
         HttpHeaders productDetailsRequestHeaders = mVideoHeadersService.getDetailsHeaders(searchName);
         return webClient
@@ -121,7 +144,7 @@ public class MVideoParser implements Parser {
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<MVideoResponse<ProductDetails>>() {
                 })
-                .flatMapIterable(productDetails -> productDetails.getBody().getProducts());
+                .map(productDetailsMVideoResponse -> productDetailsMVideoResponse.getBody().getProducts());
     }
 
     @Override

@@ -13,4 +13,6 @@ public interface UserService {
     UserDto updateUser(UserDto user);
 
     UserDto updatePassword(String id, String password);
+
+    void deleteById(String id);
 }
