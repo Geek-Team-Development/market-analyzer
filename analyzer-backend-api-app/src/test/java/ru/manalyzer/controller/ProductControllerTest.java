@@ -77,7 +77,7 @@ public class ProductControllerTest {
     @Test
     public void findProductsTest() {
         String searchName = "macbook";
-        ProductRequestParam requestParam = new ProductRequestParam(searchName, Optional.of("0"), Optional.of(Sort.price_asc));
+        ProductRequestParam requestParam = new ProductRequestParam(searchName, 0, Sort.price_asc);
 
         Mockito.when(productService.findProducts(requestParam))
                 .thenReturn(productDtoFlux);

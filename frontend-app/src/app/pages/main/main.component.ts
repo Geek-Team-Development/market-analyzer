@@ -11,22 +11,19 @@ import {MatSelectChange} from "@angular/material/select";
 })
 export class MainComponent implements OnInit {
 
-  searchName: string = '';
   products: ProductDto[] = [];
   isWaiting: boolean = false;
-
-  private currentPage: number = 0;
 
   public sorts = new Map<Sort, string>([
     [Sort.PRICE_ASC, 'по возрастанию цены'],
     [Sort.PRICE_DESC, 'по убыванию цены']
   ]);
 
+  searchName: string = '';
+  private currentPage: number = 0;
   public currentSort = Sort.PRICE_ASC;
 
-  constructor(private productService: ProductService) {
-
-  }
+  constructor(private productService: ProductService) { }
 
   ngOnInit(): void { }
 
@@ -57,8 +54,8 @@ export class MainComponent implements OnInit {
     this.findProducts();
   }
 
-  selectionChange($event: MatSelectChange) {
-    this.currentSort = +$event.value;
+  selectionChange(value: string) {
+    this.currentSort = +value;
     this.search();
   }
 

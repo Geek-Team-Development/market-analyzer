@@ -38,6 +38,11 @@ services:
     ports:
       - 6379:6379
 
+  telegram-bot:
+    image: geekteam/telegram-bot
+    ports:
+      - 8090:8090
+
 volumes:
   mongodb-data:
   rabbitmq-data:

@@ -28,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Flux<ProductDto> findProducts(ProductRequestParam requestParam) {
         AtomicInteger counter = new AtomicInteger(activeParserMap.size());
-        return Flux.create(fluxSink -> activeParserMap.values().forEach(parser -> parser.parse(requestParam.getSearchName(), requestParam.getSort().orElse(Sort.price_asc), requestParam.getPageNumber().orElse("0"))
+        return Flux.create(fluxSink -> activeParserMap.values().forEach(parser -> parser.parse(requestParam.getSearchName(), requestParam.getSort(), requestParam.getPageNumber())
                 .doOnComplete(() -> {
                     if (counter.decrementAndGet() == 0) {
                         fluxSink.complete();
@@ -40,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Flux<ProductDto> findProducts(String parserName, ProductRequestParam requestParam) {
         Parser neededParser = activeParserMap.get(parserName);
-        return Flux.create(fluxSink -> neededParser.parse(requestParam.getSearchName(), requestParam.getSort().orElse(Sort.price_asc), requestParam.getPageNumber().orElse("0"))
+        return Flux.create(fluxSink -> neededParser.parse(requestParam.getSearchName(), requestParam.getSort(), requestParam.getPageNumber())
                 .doOnComplete(fluxSink::complete)
                 .subscribe(fluxSink::next));
     }

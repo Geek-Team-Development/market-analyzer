@@ -38,17 +38,17 @@ public class DigineticaParser implements Parser {
      * @return Flux<ProductDto> or empty Flux<ProductDto> if an error occurred
      */
     @Override
-    public Flux<ProductDto> parse(String searchName, Sort sort, String pageNumber) {
+    public Flux<ProductDto> parse(String searchName, Sort sort, int pageNumber) {
         return invokeRequest(searchName, sort, pageNumber)
                 .flatMapIterable(DigineticaResponseDto::getProducts)
 //                .filter(oldiProductDto -> oldiProductDto.getName().toLowerCase().contains(searchName.toLowerCase()))
                 .map(converterDigineticaDtoToDto::convertToDto);
     }
 
-    private Mono<DigineticaResponseDto> invokeRequest(String searchString, Sort sort, String pageNumber) {
+    private Mono<DigineticaResponseDto> invokeRequest(String searchString, Sort sort, int pageNumber) {
         // Set search query parameter
         connectionProperties.getQueryParams().put(connectionProperties.getSearchParamName(), searchString);
-        connectionProperties.getQueryParams().put(connectionProperties.getOffsetParamName(), pageNumber);
+        connectionProperties.getQueryParams().put(connectionProperties.getOffsetParamName(), Integer.toString(pageNumber));
         connectionProperties.getQueryParams().put(connectionProperties.getSortParamName(), sort.toString().toUpperCase());
 
         WebClient client = WebClient.create(connectionProperties.getSearchUri());
@@ -77,7 +77,7 @@ public class DigineticaParser implements Parser {
      */
     @Override
     public Mono<ProductDto> parseOneProduct(ProductDto productDto) {
-        return invokeRequest(productDto.getId(), Sort.price_asc, "0")
+        return invokeRequest(productDto.getId(), Sort.price_asc, 0)
                 .map(DigineticaResponseDto::getProducts)
                 .filter(list -> list.size() > 0)
                 .map(list -> list.get(0))

@@ -6,7 +6,7 @@ import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.dto.Sort;
 
 public interface Parser {
-    Flux<ProductDto> parse(String searchName, Sort sort, String pageNumber);
+    Flux<ProductDto> parse(String searchName, Sort sort, int pageNumber);
 
     Mono<ProductDto> parseOneProduct(ProductDto productDto);
 

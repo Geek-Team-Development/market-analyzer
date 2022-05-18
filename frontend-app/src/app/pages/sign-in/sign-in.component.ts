@@ -1,11 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {Credentials} from "../../model/credentials";
 import {Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
 import {FrontUrls} from "../../config/front-config";
 import {FormBuilder, Validators} from "@angular/forms";
 
-const { required, email, maxLength } = Validators;
+const { required, email } = Validators;
 
 @Component({
   selector: 'app-sign-in',
@@ -15,11 +14,13 @@ const { required, email, maxLength } = Validators;
 export class SignInComponent implements OnInit {
 
   public form = this.formBuilder.group({
-    email: [ null ],
+    email: [ null, [required, email] ],
     password: [ null ]
   });
 
-  error: string = '';
+  public formControls = this.form.controls;
+
+  errorSignInMessage: string = '';
 
   constructor(private authService: AuthService,
               private router: Router,
@@ -41,7 +42,10 @@ export class SignInComponent implements OnInit {
           });
         },
         error: (errorResult) => {
-          this.error = errorResult;
+          if(errorResult.status == 504) {
+            errorResult.message = 'Сервер не доступен. Попробуйте позже'
+          }
+          this.errorSignInMessage = errorResult.message;
         }
       });
   }

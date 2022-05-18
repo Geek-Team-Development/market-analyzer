@@ -15,8 +15,8 @@ public class ProductRequestParam {
 
     private String searchName;
 
-    private Optional<String> pageNumber;
+    private int pageNumber = 0;
 
-    private Optional<Sort> sort;
+    private Sort sort = Sort.price_asc;
 
 }

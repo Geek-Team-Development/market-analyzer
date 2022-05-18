@@ -17,7 +17,7 @@ public class PaginationServiceImpl implements PaginationService {
     private final ParserProductsStorage parserProductsStorage;
 
     private final ProductRequestParam currentRequestParam =
-            new ProductRequestParam("", Optional.of("0"), Optional.of(Sort.price_asc));
+            new ProductRequestParam("", 0, Sort.price_asc);
 
     @Autowired
     public PaginationServiceImpl(ParserProductsStorage parserProductsStorage) {
@@ -28,16 +28,16 @@ public class PaginationServiceImpl implements PaginationService {
     public Flux<ProductDto> findProducts(ProductRequestParam requestParam) {
         String requestedSearchName = requestParam.getSearchName();
         String currentSearchName = currentRequestParam.getSearchName();
-        int requestedPage = Integer.parseInt(requestParam.getPageNumber().orElse("0"));
-        int currentPage = Integer.parseInt(currentRequestParam.getPageNumber().orElse("0"));
-        Sort requestedSort = requestParam.getSort().orElse(Sort.price_asc);
-        Sort currentSort = currentRequestParam.getSort().orElse(Sort.price_asc);
+        int requestedPage = requestParam.getPageNumber();
+        int currentPage = currentRequestParam.getPageNumber();
+        Sort requestedSort = requestParam.getSort();
+        Sort currentSort = currentRequestParam.getSort();
         if(!currentSearchName.equals(requestedSearchName) || requestedPage <= currentPage || requestedSort != currentSort) {
             parserProductsStorage.clear();
         }
         currentRequestParam.setSearchName(requestedSearchName);
         currentRequestParam.setPageNumber(requestParam.getPageNumber());
-        currentRequestParam.setSort(Optional.of(requestedSort));
+        currentRequestParam.setSort(requestedSort);
         return parserProductsStorage.getProducts(requestedSearchName, requestedSort, requestedPage);
     }
 }

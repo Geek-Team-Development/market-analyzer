@@ -74,8 +74,8 @@ public class ParserProductsStorageImpl implements ParserProductsStorage {
         ProductRequestParam requestParam = new ProductRequestParam();
         requestParam.setSearchName(searchName);
         int parserCurrentPage = currentPage == 0 ? 0 : parserProducts.getCurrentPage() + 24;
-        requestParam.setPageNumber(Optional.of(Integer.toString(parserCurrentPage)));
-        requestParam.setSort(Optional.of(sort));
+        requestParam.setPageNumber(parserCurrentPage);
+        requestParam.setSort(sort);
         parserProducts.setCurrentPage(parserCurrentPage);
         return requestParam;
     }

@@ -45,7 +45,7 @@ public class MVideoParser implements Parser {
         this.properties = properties;
     }
 
-    public Flux<ProductDto> parse(String searchName, Sort sort, String pageNumber) {
+    public Flux<ProductDto> parse(String searchName, Sort sort, int pageNumber) {
         logger.info("Products requested with name {}", searchName);
         return getProductIds(searchName, sort, pageNumber).flatMapMany(productIds -> {
             if (productIds.size() == 0) {
@@ -91,7 +91,7 @@ public class MVideoParser implements Parser {
                 });
     }
 
-    private Mono<List<String>> getProductIds(String searchName, Sort sort, String pageNumber) {
+    private Mono<List<String>> getProductIds(String searchName, Sort sort, int pageNumber) {
         HttpHeaders productIdsRequestHeaders = mVideoHeadersService.getIdsHeaders();
         return webClient
                 .get()

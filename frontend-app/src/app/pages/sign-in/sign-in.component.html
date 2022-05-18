@@ -2,11 +2,17 @@
   <div class="sign-in-form">
 
     <h2 class="form-header">Вход</h2>
-    <p *ngIf="error !== ''" class="tw-text-red-500 tw-mt-2">{{error}}</p>
+    <p *ngIf="errorSignInMessage !== ''" class="tw-text-red-500 tw-mt-2">{{errorSignInMessage}}</p>
     <form [formGroup]="form" (submit)="signIn()" data-tid="form">
       <div class="mb-3">
         <input type="text" placeholder="Email" formControlName="email"
                class="input-field" data-tid="email" required>
+        <div *ngIf="formControls['email'].touched" class="tw-text-lg">
+          <p *ngIf="formControls['email'].errors?.['email']"
+             class="tw-text-red-500 tw-mt-2">Некорректный email</p>
+          <p *ngIf="formControls['email'].errors?.['required']"
+             class="tw-text-red-500 tw-mt-2">Email не должен быть пустым</p>
+        </div>
       </div>
       <div class="mb-3">
         <input type="password" placeholder="Пароль" formControlName="password"

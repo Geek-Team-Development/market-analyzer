@@ -78,10 +78,10 @@ public class ProductServiceTest {
     @Test
     public void findProductsTest() {
         String searchName = "macbook";
-        ProductRequestParam requestParam = new ProductRequestParam(searchName, Optional.of("0"), Optional.of(Sort.price_asc));
+        ProductRequestParam requestParam = new ProductRequestParam(searchName, 0, Sort.price_asc);
 
-        when(oldiParser.parse(requestParam.getSearchName(), Sort.price_asc, "0")).thenReturn(oldiFlux);
-        when(mvideoParser.parse(requestParam.getSearchName(), Sort.price_asc, "0")).thenReturn(mvideoFlux);
+        when(oldiParser.parse(requestParam.getSearchName(), Sort.price_asc, 0)).thenReturn(oldiFlux);
+        when(mvideoParser.parse(requestParam.getSearchName(), Sort.price_asc, 0)).thenReturn(mvideoFlux);
 
         Flux<ProductDto> productDtoFlux = productService.findProducts(requestParam);
 
@@ -98,10 +98,10 @@ public class ProductServiceTest {
     @Test
     public void findProductsOnBackpressureTest() {
         String searchName = "macbook";
-        ProductRequestParam requestParam = new ProductRequestParam(searchName, Optional.of("0"), Optional.of(Sort.price_asc));
+        ProductRequestParam requestParam = new ProductRequestParam(searchName, 0, Sort.price_asc);
 
-        when(oldiParser.parse(requestParam.getSearchName(), Sort.price_asc, "0")).thenReturn(oldiFlux);
-        when(mvideoParser.parse(requestParam.getSearchName(), Sort.price_asc, "0")).thenReturn(mvideoFlux);
+        when(oldiParser.parse(requestParam.getSearchName(), Sort.price_asc, 0)).thenReturn(oldiFlux);
+        when(mvideoParser.parse(requestParam.getSearchName(), Sort.price_asc, 0)).thenReturn(mvideoFlux);
 
         Flux<ProductDto> productDtoFlux = productService.findProducts(requestParam);
 

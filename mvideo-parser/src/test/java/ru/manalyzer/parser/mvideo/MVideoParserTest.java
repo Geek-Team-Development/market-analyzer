@@ -85,7 +85,7 @@ public class MVideoParserTest {
 
         MVideoParser mVideoParser = new MVideoParser(webClient, mVideoHeadersService, properties);
         long start = System.currentTimeMillis();
-        List<ProductDto> result = mVideoParser.parse(searchName, Sort.price_asc, "0")
+        List<ProductDto> result = mVideoParser.parse(searchName, Sort.price_asc, 0)
                 .collectList()
                 .block();
         System.out.println("Время " + (System.currentTimeMillis() - start));

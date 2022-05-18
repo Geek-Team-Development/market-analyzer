@@ -79,7 +79,7 @@ public class CitilinkParserTest {
                 .setBody(mapper.writeValueAsString(responseDto))
                 .addHeader("Content-Type", "application/json"));
 
-        Flux<ProductDto> products = citilinkParser.parse("macbook", Sort.price_asc, "0");
+        Flux<ProductDto> products = citilinkParser.parse("macbook", Sort.price_asc, 0);
 
         ProductDto productDto = new ProductDto(
                 "1",
@@ -104,7 +104,7 @@ public class CitilinkParserTest {
                 .setBody(mapper.writeValueAsString(new DigineticaResponseDto()))
                 .addHeader("Content-Type", "application/json"));
 
-        Flux<ProductDto> products = citilinkParser.parse("macbook", Sort.price_asc, "0");
+        Flux<ProductDto> products = citilinkParser.parse("macbook", Sort.price_asc, 0);
 
         StepVerifier.create(products)
                 .expectSubscription()
@@ -141,7 +141,7 @@ public class CitilinkParserTest {
                 .setBody(mapper.writeValueAsString(responseDto))
                 .addHeader("Content-Type", "application/json"));
 
-        Flux<ProductDto> products = citilinkParser.parse("macbook", Sort.price_asc, "0");
+        Flux<ProductDto> products = citilinkParser.parse("macbook", Sort.price_asc, 0);
 
         StepVerifier.create(products.onBackpressureBuffer(), 0)
                 .expectSubscription()
