@@ -8,21 +8,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 import ru.manalyzer.Parser;
 import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.dto.Sort;
+import ru.manalyzer.parser.mvideo.config.FilterParam;
 import ru.manalyzer.parser.mvideo.config.MVideoProperties;
 import ru.manalyzer.parser.mvideo.dto.*;
 import ru.manalyzer.parser.mvideo.service.MVideoHeadersService;
 
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
 
 /**
  * Парсер информации о продуктах с сервера MVideo
@@ -33,6 +28,7 @@ public class MVideoParser implements Parser {
     private final MVideoHeadersService mVideoHeadersService;
     private final WebClient webClient;
     private final MVideoProperties.Parser properties;
+    private final List<FilterParam> filterParamList = new ArrayList<>();
 
     private static final Logger logger = LoggerFactory.getLogger(MVideoParser.class);
 
@@ -43,6 +39,7 @@ public class MVideoParser implements Parser {
         this.webClient = webClient;
         this.mVideoHeadersService = mVideoHeadersService;
         this.properties = properties;
+        this.filterParamList.add(new FilterParam());
     }
 
     public Flux<ProductDto> parse(String searchName, Sort sort, int pageNumber) {
@@ -64,7 +61,7 @@ public class MVideoParser implements Parser {
         productIds.forEach(productId -> {
             ProductDto productDto = new ProductDto();
             productDto.setId(productId);
-            productDto.setShopName("MVideo");
+            productDto.setShopName(properties.getShopName());
             map.put(productId, productDto);
         });
 
@@ -99,21 +96,26 @@ public class MVideoParser implements Parser {
                     String searchParamName = properties.getIdsRequest().getSearchParamName();
                     String sortParamName = properties.getIdsRequest().getSortParamName();
                     String offsetParamName = properties.getIdsRequest().getOffsetParamName();
+                    String filterParamName = properties.getIdsRequest().getFilterParamName();
+                    String filterParamValue = Base64.getEncoder().encodeToString(filterParamList.get(0).toString().getBytes());
                     uriBuilder
                             .path(properties.getSearchUrl())
                             .queryParam(searchParamName, searchName)
                             .queryParam(offsetParamName, pageNumber)
-                            .queryParam(sortParamName, sort.toString());
+                            .queryParam(sortParamName, sort.toString())
+                            .queryParam(filterParamName, "{filterParamValue}");
                     Map<String, String> defaultParams = properties.getIdsRequest().getDefaultParams();
                     defaultParams.forEach(uriBuilder::queryParam);
-                    return uriBuilder.build();
+                    return uriBuilder.build(filterParamValue);
                 })
                 .headers(httpHeaders -> httpHeaders.addAll(productIdsRequestHeaders))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<MVideoResponse<ProductIds>>() {
                 })
                 .map(productIds -> productIds.getBody().getProducts())
-                .onErrorReturn(List.of());
+                .doOnError(exception -> {
+
+                });
     }
 
     private Mono<List<MaterialPrice>> getProductPrice(List<String> productIds) {

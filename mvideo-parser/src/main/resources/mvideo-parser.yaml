@@ -25,5 +25,6 @@ mvideo:
       search-param-name: query
       sort-param-name: sort
       offset-param-name: offset
+      filter-param-name: filterParams
       default-params:
         limit: 24

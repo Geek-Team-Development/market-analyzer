@@ -86,6 +86,7 @@ public class MVideoProperties {
             private String searchParamName;
             private String sortParamName;
             private String offsetParamName;
+            private String filterParamName;
             private Map<String, String> defaultParams;
         }
     }
