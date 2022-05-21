@@ -4,8 +4,10 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -26,11 +28,15 @@ import ru.manalyzer.repository.FavoriteRepository;
 import ru.manalyzer.repository.ProductPriceRepository;
 import ru.manalyzer.repository.ReactiveFavoriteRepository;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.*;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 public class FavoriteServiceTest {
 
@@ -115,12 +121,20 @@ public class FavoriteServiceTest {
 
     @Test
     public void getFavoritesCartOfUserTest() {
-        when(favoriteRepository.findByUserId("test"))
-                .thenReturn(Optional.of(new Favorite(
-                        "test",
-                        Set.of(productMapper.toEntity(macbookPro), productMapper.toEntity(macbookAir),
-                                productMapper.toEntity(macMini))
-                )));
+        when(reactiveFavoriteRepository.findByUserId(any()))
+                .thenAnswer(invocationOnMock -> {
+                    Mono<String> userIdMono = invocationOnMock.getArgument(0);
+                    String userId = userIdMono.block();
+                    assertNotNull(userId);
+                    if(userId.equals("test")) {
+                        return Flux.just(new Favorite(
+                                "test",
+                                Set.of(productMapper.toEntity(macbookPro), productMapper.toEntity(macbookAir),
+                                        productMapper.toEntity(macMini))
+                        ));
+                    }
+                    return null;
+                });
 
         when(oldiParser.parseOneProduct(Mockito.argThat(dto -> dto.getShopName().equals(oldiShopName))))
                 .thenReturn(Mono.just(macbookAir));
@@ -155,5 +169,50 @@ public class FavoriteServiceTest {
                 .thenCancel()
                 .verify();
 
+    }
+
+    @Test
+    public void updateTest() {
+        ProductDto newMacbookProDto = new ProductDto();
+        newMacbookProDto.setId(macbookPro.getId());
+        newMacbookProDto.setShopName(macbookPro.getShopName());
+        BigDecimal newPrice = new BigDecimal(macbookPro.getPrice()).add(new BigDecimal("2000"));
+        newMacbookProDto.setPrice(newPrice.toString());
+        newMacbookProDto.setProductLink(macbookPro.getProductLink());
+        newMacbookProDto.setImageLink(macbookPro.getImageLink());
+        newMacbookProDto.setName(macbookPro.getName());
+        Product newMacbookPro = productMapper.toEntity(newMacbookProDto);
+        Product oldMacbookPro = productMapper.toEntity(macbookPro);
+        Product oldMacBookProAir = productMapper.toEntity(macbookAir);
+        Product oldMacMini = productMapper.toEntity(macMini);
+        ((ProductMapper)productMapper).mapSpecificFields(newMacbookProDto, newMacbookPro);
+        ((ProductMapper)productMapper).mapSpecificFields(macbookPro, oldMacbookPro);
+        ((ProductMapper)productMapper).mapSpecificFields(macbookAir, oldMacBookProAir);
+        ((ProductMapper)productMapper).mapSpecificFields(macMini, oldMacMini);
+
+        ProductPrice expectedProductPrice = productDtoToProductPriceMapper.toProductPrice(newMacbookPro);
+        ((ProductToProductPriceMapper)productDtoToProductPriceMapper).mapSpecificFields(newMacbookPro, expectedProductPrice);
+
+        when(reactiveFavoriteRepository.findAll())
+                .thenReturn(Flux.just(new Favorite(
+                        "test",
+                        Set.of(oldMacbookPro, oldMacBookProAir, oldMacMini)
+                )));
+        when(oldiParser.parseOneProduct(Mockito.argThat(dto -> dto.getShopName().equals(oldiShopName))))
+                .thenReturn(Mono.just(macbookAir));
+        when(mvideoParser.parseOneProduct(Mockito.argThat(dto -> dto.getShopName().equals(mvideoShopName))))
+                .thenReturn(Mono.just(newMacbookProDto));
+        when(citilinkParser.parseOneProduct(Mockito.argThat(dto -> dto.getShopName().equals(citilinkShopName))))
+                .thenReturn(Mono.just(macMini));
+        when(storageProductService.saveProduct(newMacbookPro))
+                .thenReturn(newMacbookPro);
+
+        ArgumentCaptor<ProductPrice> captor = ArgumentCaptor.forClass(ProductPrice.class);
+
+        favoritesService.update();
+        verify(productPriceRepository, times(1)).save(any());
+        verify(productPriceRepository).save(captor.capture());
+        ProductPrice resultProductPrice = captor.getValue();
+        assertEquals(expectedProductPrice.getProductId(), resultProductPrice.getProductId());
     }
 }

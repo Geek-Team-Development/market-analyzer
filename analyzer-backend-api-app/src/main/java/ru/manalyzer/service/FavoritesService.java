@@ -12,4 +12,6 @@ public interface FavoritesService {
     void deleteProductFromFavoritesCart(String productId, String shopName, String userLogin);
 
     void clearFavoritesCart(String userLogin);
+
+    void update();
 }
