@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {NavigationEnd, Router} from "@angular/router";
 import {FrontUrls} from "../../config/front-config";
 import {AuthService} from "../../services/auth.service";
@@ -41,7 +41,7 @@ export class NavBarComponent implements OnInit {
   }
 
 
-  clickLeftMenu() {
+  clickSmallMenu() {
     this.leftMenuIsActive = !this.leftMenuIsActive;
   }
 

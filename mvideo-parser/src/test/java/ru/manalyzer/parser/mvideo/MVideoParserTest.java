@@ -16,7 +16,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.dto.Sort;
-import ru.manalyzer.parser.mvideo.config.MVideoProperties;
+import ru.manalyzer.parser.mvideo.config.properties.ParserProperties;
 import ru.manalyzer.parser.mvideo.dto.*;
 import ru.manalyzer.parser.mvideo.service.MVideoHeadersService;
 
@@ -41,7 +41,7 @@ import static org.mockserver.model.HttpResponse.response;
 public class MVideoParserTest {
 
     private static final String propertyFile = "/mvideo-parser-test/test.yaml";
-    private static MVideoProperties.Parser properties;
+    private static ParserProperties properties;
 
     private WebClient webClient;
     private ClientAndServer mockServer;
@@ -49,7 +49,7 @@ public class MVideoParserTest {
 
     @BeforeAll
     public void beforeAll() throws IOException {
-        Yaml yaml = new Yaml(new Constructor(MVideoProperties.Parser.class));
+        Yaml yaml = new Yaml(new Constructor(ParserProperties.class));
         try(InputStream inputStream = getClass().getResourceAsStream(propertyFile)) {
             properties = yaml.load(inputStream);
         }

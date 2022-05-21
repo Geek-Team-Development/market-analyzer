@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {ProductDto} from "../../dto/product-dto";
 import {ProductService} from "../../services/product.service";
 import {Sort} from "../../dto/sort";
-import {MatSelectChange} from "@angular/material/select";
 
 @Component({
   selector: 'app-main',

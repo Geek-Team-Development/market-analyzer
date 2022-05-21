@@ -26,5 +26,11 @@ mvideo:
       sort-param-name: sort
       offset-param-name: offset
       filter-param-name: filterParams
+      filter-param-names:
+        - availableForSale
+#        - sale
+      filter-params:
+        availableForSale: "[\"Только в наличии\",\"-9\",\"Да\"]"
+#        sale: "[\"Товары со скидкой\",\"-8\",\"Более 5%\"]"
       default-params:
         limit: 24

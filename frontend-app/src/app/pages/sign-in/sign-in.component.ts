@@ -3,6 +3,8 @@ import {Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
 import {FrontUrls} from "../../config/front-config";
 import {FormBuilder, Validators} from "@angular/forms";
+import {MatDialog} from "@angular/material/dialog";
+import {ErrorDialogComponent} from "../../components/error-dialog/error-dialog.component";
 
 const { required, email } = Validators;
 
@@ -20,11 +22,10 @@ export class SignInComponent implements OnInit {
 
   public formControls = this.form.controls;
 
-  errorSignInMessage: string = '';
-
   constructor(private authService: AuthService,
               private router: Router,
-              private formBuilder: FormBuilder) {
+              private formBuilder: FormBuilder,
+              private dialog: MatDialog) {
   }
 
   ngOnInit(): void { }
@@ -42,11 +43,20 @@ export class SignInComponent implements OnInit {
           });
         },
         error: (errorResult) => {
+          let errorMessage = '';
           if(errorResult.status == 504) {
-            errorResult.message = 'Сервер не доступен. Попробуйте позже'
+            errorMessage = 'Сервер не доступен. Попробуйте позже';
+            this.openErrorDialog(errorMessage);
+            return;
           }
-          this.errorSignInMessage = errorResult.message;
         }
       });
+  }
+
+  openErrorDialog(errorMessage: string) {
+    this.dialog.open(ErrorDialogComponent, {
+      data: errorMessage,
+      panelClass: 'custom-modal-dialog'
+    });
   }
 }

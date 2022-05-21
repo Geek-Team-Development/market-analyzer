@@ -9,37 +9,34 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import ru.manalyzer.Parser;
 import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.dto.Sort;
-import ru.manalyzer.parser.mvideo.config.FilterParam;
-import ru.manalyzer.parser.mvideo.config.MVideoProperties;
+import ru.manalyzer.parser.mvideo.config.properties.ParserProperties;
 import ru.manalyzer.parser.mvideo.dto.*;
 import ru.manalyzer.parser.mvideo.service.MVideoHeadersService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Парсер информации о продуктах с сервера MVideo
  */
 @Service
-public class MVideoParser implements Parser {
+public class MVideoParser implements ru.manalyzer.Parser {
 
     private final MVideoHeadersService mVideoHeadersService;
     private final WebClient webClient;
-    private final MVideoProperties.Parser properties;
-    private final List<FilterParam> filterParamList = new ArrayList<>();
+    private final ParserProperties properties;
 
     private static final Logger logger = LoggerFactory.getLogger(MVideoParser.class);
 
     @Autowired
     public MVideoParser(WebClient webClient,
                         MVideoHeadersService mVideoHeadersService,
-                        MVideoProperties.Parser properties) {
+                        ParserProperties properties) {
         this.webClient = webClient;
         this.mVideoHeadersService = mVideoHeadersService;
         this.properties = properties;
-        this.filterParamList.add(new FilterParam());
     }
 
     public Flux<ProductDto> parse(String searchName, Sort sort, int pageNumber) {
@@ -56,35 +53,13 @@ public class MVideoParser implements Parser {
     private Flux<ProductDto> createProductDtoFlux(List<String> productIds, String searchName) {
         Mono<List<MaterialPrice>> prices = getProductPrice(productIds);
         Mono<List<ProductDetail>> details = getProductDetails(productIds, searchName);
-
-        Map<String, ProductDto> map = new LinkedHashMap<>();
-        productIds.forEach(productId -> {
-            ProductDto productDto = new ProductDto();
-            productDto.setId(productId);
-            productDto.setShopName(properties.getShopName());
-            map.put(productId, productDto);
-        });
+        Map<String, ProductDto> productMap = initProductMap(productIds);
 
         return Mono.zip(prices, details)
                 .flatMapIterable(tuple -> {
-                    tuple.getT1()
-                            .forEach(materialPrice -> {
-                                ProductDto productDto = map.get(materialPrice.getProductId());
-                                String price = materialPrice.getPrice().getSalePrice();
-                                if(price == null) {
-                                    price = materialPrice.getPrice().getBasePrice();
-                                }
-                                productDto.setPrice(price);
-                            });
-                    tuple.getT2()
-                            .forEach(productDetail -> {
-                                String id = productDetail.getProductId();
-                                ProductDto productDto = map.get(id);
-                                productDto.setName(productDetail.getName());
-                                productDto.setProductLink(properties.getProductLinkPrefix() + productDetail.getNameTranslit() + "-" + id);
-                                productDto.setImageLink(properties.getImageLinkPrefix() + productDetail.getImage());
-                            });
-                    return map.values();
+                    setProductDetails(productMap, tuple.getT2());
+                    setProductPrices(productMap, tuple.getT1());
+                    return productMap.values();
                 });
     }
 
@@ -93,29 +68,46 @@ public class MVideoParser implements Parser {
         return webClient
                 .get()
                 .uri(uriBuilder -> {
-                    String searchParamName = properties.getIdsRequest().getSearchParamName();
-                    String sortParamName = properties.getIdsRequest().getSortParamName();
-                    String offsetParamName = properties.getIdsRequest().getOffsetParamName();
+                    uriBuilder.path(properties.getSearchUrl());
+                    Map<String, String> params = getParamsForIdsRequest(searchName, sort, pageNumber);
+                    params.forEach(uriBuilder::queryParam);
+                    Map<String, List<String>> filterParams = getFilterParams();
+                    filterParams.forEach((filterParamName, filterParamValues) ->
+                            filterParamValues.forEach(filterParamValue ->
+                                    uriBuilder.queryParam(filterParamName, "{filterParams}")));
                     String filterParamName = properties.getIdsRequest().getFilterParamName();
-                    String filterParamValue = Base64.getEncoder().encodeToString(filterParamList.get(0).toString().getBytes());
-                    uriBuilder
-                            .path(properties.getSearchUrl())
-                            .queryParam(searchParamName, searchName)
-                            .queryParam(offsetParamName, pageNumber)
-                            .queryParam(sortParamName, sort.toString())
-                            .queryParam(filterParamName, "{filterParamValue}");
-                    Map<String, String> defaultParams = properties.getIdsRequest().getDefaultParams();
-                    defaultParams.forEach(uriBuilder::queryParam);
-                    return uriBuilder.build(filterParamValue);
+                    List<String> filterParamValuesB64 = filterParams.get(filterParamName);
+                    return uriBuilder.build(filterParamValuesB64.toArray());
                 })
                 .headers(httpHeaders -> httpHeaders.addAll(productIdsRequestHeaders))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<MVideoResponse<ProductIds>>() {
                 })
                 .map(productIds -> productIds.getBody().getProducts())
-                .doOnError(exception -> {
+                .onErrorReturn(List.of());
+    }
 
-                });
+    private Map<String, String> getParamsForIdsRequest(String searchName, Sort sort, int pageNumber) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put(properties.getIdsRequest().getSearchParamName(), searchName);
+        result.put(properties.getIdsRequest().getOffsetParamName(), Integer.toString(pageNumber));
+        result.put(properties.getIdsRequest().getSortParamName(), sort.toString());
+        result.putAll(properties.getIdsRequest().getDefaultParams());
+        return result;
+    }
+
+    private Map<String, List<String>> getFilterParams() {
+        Map<String, List<String>> result = new LinkedHashMap<>();
+        String filterParamName = properties.getIdsRequest().getFilterParamName();
+        List<String> filterParamKeys = properties.getIdsRequest().getFilterParamNames();
+        List<String> filterParamValuesB64 = new ArrayList<>();
+        filterParamKeys.forEach(filterParamKey -> {
+            String filterParamValue = properties.getIdsRequest().getFilterParams().get(filterParamKey);
+            String filterParamValueB64 = Base64.getEncoder().encodeToString(filterParamValue.getBytes());
+            filterParamValuesB64.add(filterParamValueB64);
+        });
+        result.put(filterParamName, filterParamValuesB64);
+        return result;
     }
 
     private Mono<List<MaterialPrice>> getProductPrice(List<String> productIds) {
@@ -147,6 +139,44 @@ public class MVideoParser implements Parser {
                 .bodyToMono(new ParameterizedTypeReference<MVideoResponse<ProductDetails>>() {
                 })
                 .map(productDetailsMVideoResponse -> productDetailsMVideoResponse.getBody().getProducts());
+    }
+
+    private Map<String, ProductDto> initProductMap(List<String> productIds) {
+        Map<String, ProductDto> productMap = new LinkedHashMap<>();
+        productIds.forEach(productId -> {
+            ProductDto productDto = new ProductDto();
+            productDto.setId(productId);
+            productDto.setShopName(properties.getShopName());
+            productMap.put(productId, productDto);
+        });
+        return productMap;
+    }
+
+    private void setProductDetails(Map<String, ProductDto> productMap, List<ProductDetail> productDetails) {
+        productDetails.forEach(productDetail -> {
+            String id = productDetail.getProductId();
+            ProductDto productDto = productMap.get(id);
+            productDto.setName(productDetail.getName());
+            productDto.setProductLink(properties.getProductLinkPrefix() + productDetail.getNameTranslit() + "-" + id);
+            productDto.setImageLink(properties.getImageLinkPrefix() + productDetail.getImage());
+        });
+    }
+
+    private void setProductPrices(Map<String, ProductDto> productMap, List<MaterialPrice> prices) {
+        prices.forEach(materialPrice -> {
+            ProductDto productDto = productMap.get(materialPrice.getProductId());
+            String salePrice = materialPrice.getPrice().getSalePrice();
+            String basePrice = materialPrice.getPrice().getBasePrice();
+            if(salePrice == null && basePrice == null) {
+                productMap.remove(materialPrice.getProductId());
+                return;
+            }
+            String price = salePrice;
+            if(price == null) {
+                price = materialPrice.getPrice().getBasePrice();
+            }
+            productDto.setPrice(price);
+        });
     }
 
     @Override

@@ -8,7 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
-import ru.manalyzer.parser.mvideo.config.MVideoProperties;
+import ru.manalyzer.parser.mvideo.config.properties.MVideoProperties;
 
 import java.io.IOException;
 import java.io.InputStream;

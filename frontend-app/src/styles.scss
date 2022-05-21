@@ -5,6 +5,9 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+//@import "./app/components/error-dialog/error-dialog.component";
+
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
 // Be sure that you only ever include this mixin once!
@@ -60,4 +63,10 @@ body::-webkit-scrollbar-thumb {
   background-color: #3a3a3a;
   border-radius: 20px;
   border: 1px solid yellow;
+}
+
+.custom-modal-dialog {
+  mat-dialog-container {
+    @apply tw-p-0 tw-rounded-none;
+  }
 }

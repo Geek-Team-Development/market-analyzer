@@ -5,7 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
-import ru.manalyzer.parser.mvideo.config.MVideoProperties;
+import ru.manalyzer.parser.mvideo.config.properties.HeadersProperties;
 
 import javax.annotation.PostConstruct;
 
@@ -15,11 +15,11 @@ public class MVideoHeadersService implements HeadersService {
     private HttpHeaders commonHeaders;
     private HttpHeaders detailsHeaders;
     private final MVideoCookieService mVideoCookieService;
-    private final MVideoProperties.Headers properties;
+    private final HeadersProperties properties;
 
     @Autowired
     public MVideoHeadersService(MVideoCookieService mVideoCookieService,
-                                MVideoProperties.Headers properties) {
+                                HeadersProperties properties) {
         this.mVideoCookieService = mVideoCookieService;
         this.properties = properties;
     }

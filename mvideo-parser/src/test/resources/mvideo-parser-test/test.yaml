@@ -6,6 +6,12 @@ imageLinkPrefix: https://img.mvideo.ru/
 productLinkPrefix: https://www.mvideo.ru/products/
 idsRequest:
   searchParamName: query
+  sortParamName: sort
+  offsetParamName: offset
+  filterParamName: filterParams
+  filterParamNames:
+    - availableForSale
+  filterParams:
+    availableForSale: "[\"Только в наличии\",\"-9\",\"Да\"]"
   defaultParams:
-    offset: 0
     limit: 24

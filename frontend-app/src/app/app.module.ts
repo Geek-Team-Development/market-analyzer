@@ -21,18 +21,25 @@ import {UsersComponent} from "./pages/users/users.component";
 import {ProfileComponent} from "./pages/profile/profile.component";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatSelectModule} from "@angular/material/select";
+import {NavBarAppNameComponent} from "./components/nav-bar/components/nav-bar-app-name.component";
+import {NavBarSmallMenuBtnComponent} from "./components/nav-bar/components/nav-bar-small-menu-btn.component";
+import {ErrorDialogComponent} from "./components/error-dialog/error-dialog.component";
+import {MatDialogModule} from "@angular/material/dialog";
 
 @NgModule({
   declarations: [
     AppComponent,
     MainComponent,
     NavBarComponent,
+    NavBarAppNameComponent,
+    NavBarSmallMenuBtnComponent,
     SignUpComponent,
     SignInComponent,
     FavoritesComponent,
     ProductCardComponent,
     UsersComponent,
-    ProfileComponent
+    ProfileComponent,
+    ErrorDialogComponent
   ],
 
   imports: [
@@ -47,7 +54,8 @@ import {MatSelectModule} from "@angular/material/select";
     MatDividerModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatSelectModule
+    MatSelectModule,
+    MatDialogModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: UnauthorizedInterceptor, multi: true }
