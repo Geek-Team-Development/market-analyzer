@@ -22,14 +22,13 @@ export class SignInComponent implements OnInit {
   });
 
   public formControls = this.form.controls;
-  errorSignInMessage: string = '';
   private chatId: string = '';
 
   constructor(private authService: AuthService,
               private userService: UsersService,
               private router: Router,
               private formBuilder: FormBuilder,
-              private dialog: MatDialog) {
+              private dialog: MatDialog,
               private route: ActivatedRoute) {
   }
 

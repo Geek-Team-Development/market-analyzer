@@ -34,9 +34,9 @@ public class UserCollectionInitializerChangeLog {
         mongoTemplate.indexOps(User.class).ensureIndex(
                 new Index().on(INDEX_EMAIL_FIELD, Sort.Direction.ASC).named(INDEX_EMAIL_NAME).unique()
         );
-        mongoTemplate.indexOps(User.class).ensureIndex(
-                new Index().on(INDEX_CHAT_FIELD, Sort.Direction.ASC).named(INDEX_CHAT_NAME).unique()
-        );
+//        mongoTemplate.indexOps(User.class).ensureIndex(
+//                new Index().on(INDEX_CHAT_FIELD, Sort.Direction.ASC).named(INDEX_CHAT_NAME).unique()
+//        );
     }
 
     @RollbackExecution
