@@ -3,29 +3,49 @@ package ru.manalyzer.service;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import ru.manalyzer.utility.CardButtonCommand;
+import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.dto.UserDto;
+import ru.manalyzer.property.MessageProperties;
+import ru.manalyzer.telegram.BotSender;
+import ru.manalyzer.telegram.command.CardButtonCommand;
+import ru.manalyzer.telegram.command.CommandParser;
+import ru.manalyzer.telegram.slider.CardSliderNavigator;
 import ru.manalyzer.storage.entity.ProductCardSlider;
 import ru.manalyzer.storage.repository.ProductCardSliderRepository;
-import ru.manalyzer.telegram.SpacePriceBotSender;
-import ru.manalyzer.utility.CardSliderNavigator;
 
 import java.util.Optional;
 
 @Service
 public class TelegramServiceImpl implements TelegramService {
 
-    private final ProductService productService;
+    private final ProductSearchService productService;
+
+    private final DatabaseFavoritesService databaseFavoritesService;
+
+    private final DatabaseUserService databaseUserService;
 
     private final ProductCardSliderRepository productCardSliderRepository;
 
-    private final SpacePriceBotSender spacePriceBotSender;
+    private final BotSender botSender;
 
-    public TelegramServiceImpl(ProductService productService,
+    private final CommandParser commandParser;
+
+    private final MessageProperties messageProperties;
+
+    public TelegramServiceImpl(ProductSearchService productService,
+                               DatabaseFavoritesService databaseFavoritesService,
+                               DatabaseUserService databaseUserService,
                                ProductCardSliderRepository productCardSliderRepository,
-                               SpacePriceBotSender spacePriceBotSender) {
+                               BotSender botSender,
+                               CommandParser commandParser,
+                               MessageProperties messageProperties) {
         this.productService = productService;
+        this.databaseFavoritesService = databaseFavoritesService;
+        this.databaseUserService = databaseUserService;
         this.productCardSliderRepository = productCardSliderRepository;
-        this.spacePriceBotSender = spacePriceBotSender;
+        this.botSender = botSender;
+        this.commandParser = commandParser;
+        this.messageProperties = messageProperties;
     }
 
     @Override
@@ -33,26 +53,38 @@ public class TelegramServiceImpl implements TelegramService {
         String chatId = message.getChatId().toString();
 
         // Disable old Card slider if exist
-        productCardSliderRepository.findById(chatId).ifPresent(productCardSlider -> {
-            productCardSlider.disable();
-            spacePriceBotSender.sendProductCardSlider(productCardSlider);
-        });
+        disableProductCardSlider(chatId);
 
         // Create new product card slider
-        ProductCardSlider productCardSlider = new ProductCardSlider(chatId);
-        productCardSliderRepository.save(productCardSlider);
+        ProductCardSlider productCardSlider = newProductCardSlider(chatId);
 
         // find products
         productService.findProducts(message.getText())
-                .subscribe(productDto -> {
-                    productCardSlider.getProducts().add(productDto);
-                    Optional<Message> msg = spacePriceBotSender.sendProductCardSlider(productCardSlider);
+                .subscribe(productDto -> addProductToCardSlider(productCardSlider, productDto));
+    }
 
-                    // if message is first, then set messageId to product card slider
-                    msg.ifPresent(m -> productCardSlider.setMessageId(m.getMessageId()));
+    private void disableProductCardSlider(String chatId) {
+        Optional<ProductCardSlider> productCardSliderOpt = productCardSliderRepository.findById(chatId);
+        if (productCardSliderOpt.isPresent()) {
+            ProductCardSlider productCardSlider = productCardSliderOpt.get();
+            productCardSlider.disable();
+            botSender.sendProductCardSlider(productCardSlider);
+        }
+    }
 
-                    productCardSliderRepository.save(productCardSlider);
-                });
+    private ProductCardSlider newProductCardSlider(String chatId) {
+        ProductCardSlider productCardSlider = new ProductCardSlider(chatId);
+        return productCardSliderRepository.save(productCardSlider);
+    }
+
+    private void addProductToCardSlider(ProductCardSlider productCardSlider, ProductDto productDto) {
+        productCardSlider.getProducts().add(productDto);
+        Optional<Message> msg = botSender.sendProductCardSlider(productCardSlider);
+
+        // if message is first, then set messageId to product card slider
+        msg.ifPresent(m -> productCardSlider.setMessageId(m.getMessageId()));
+
+        productCardSliderRepository.save(productCardSlider);
     }
 
     @Override
@@ -73,12 +105,58 @@ public class TelegramServiceImpl implements TelegramService {
                     sendAndSaveCardSlider(productCardSlider);
                 }
                 break;
+            case ADD_FAVORITES:
+                databaseFavoritesService.saveProductToFavoritesCart(productCardSlider);
+                botSender.sendProductCardSlider(productCardSlider);
+                break;
+            case REMOVE_FAVORITES:
+                databaseFavoritesService.deleteProductFromFavoritesCart(productCardSlider);
+                botSender.sendProductCardSlider(productCardSlider);
+                break;
         }
     }
 
+    @Override
+    public void commandRequest(Message message) {
+            switch (commandParser.parseCommand(message)) {
+                case START:
+                    botSender.sendInformationMessage(message.getChatId().toString(), messageProperties.getGreetings());
+                    break;
+                case AUTHORIZATION:
+                    break;
+                case FAVORITES:
+                    sendFavorites(message);
+                    break;
+            }
+
+    }
+
+    @Override
+    public void authorizeRequest(UserDto userDto) {
+        botSender.sendInformationMessage(userDto.getTelegramChatId(), messageProperties.getAuthorizedOk());
+        productCardSliderRepository.findById(userDto.getTelegramChatId())
+                .ifPresent(botSender::sendProductCardSlider);
+    }
+
     private void sendAndSaveCardSlider(ProductCardSlider productCardSlider) {
-        spacePriceBotSender.sendProductCardSlider(productCardSlider);
+        botSender.sendProductCardSlider(productCardSlider);
         productCardSliderRepository.save(productCardSlider);
     }
 
+    private void sendFavorites(Message message) {
+        String chatId = message.getChatId().toString();
+
+        // Disable old Card slider if exist
+        disableProductCardSlider(chatId);
+
+        // Create new product card slider
+        ProductCardSlider productCardSlider = newProductCardSlider(chatId);
+
+        String userId = databaseUserService.findUserIdByChatId(chatId)
+                .orElseThrow(() -> new RuntimeException("User not authorized"));
+
+        // find favorites
+        databaseFavoritesService.getUserFavoriteProduct(userId)
+                .forEach(productDto -> addProductToCardSlider(productCardSlider, productDto));
+    }
 }

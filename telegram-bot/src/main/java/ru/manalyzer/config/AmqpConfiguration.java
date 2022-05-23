@@ -32,6 +32,21 @@ public class AmqpConfiguration {
     }
 
     @Bean
+    public Queue  commandTelegramQueue() {
+        return new Queue("command.telegram.queue", true);
+    }
+
+    @Bean
+    public Queue  authorizeTelegramQueue() {
+        return new Queue("authorize.telegram.queue", true);
+    }
+
+    @Bean
+    public Queue  notifyTelegramQueue() {
+        return new Queue("notify.telegram.queue", true);
+    }
+
+    @Bean
     public Binding productTelegramBinding(@Qualifier("productTelegramQueue") Queue productTelegramQueue,
                                           DirectExchange telegramExchange) {
         return BindingBuilder
@@ -51,11 +66,38 @@ public class AmqpConfiguration {
 
     @Bean
     public Binding messageTelegramBinding(@Qualifier("messageTelegramQueue") Queue messageTelegramQueue,
-                                           DirectExchange telegramExchange) {
+                                          DirectExchange telegramExchange) {
         return BindingBuilder
                 .bind(messageTelegramQueue)
                 .to(telegramExchange)
                 .with("message");
+    }
+
+    @Bean
+    public Binding commandTelegramBinding(@Qualifier("commandTelegramQueue") Queue commandTelegramQueue,
+                                           DirectExchange telegramExchange) {
+        return BindingBuilder
+                .bind(commandTelegramQueue)
+                .to(telegramExchange)
+                .with("command");
+    }
+
+    @Bean
+    public Binding authorizeTelegramBinding(@Qualifier("authorizeTelegramQueue") Queue authorizeTelegramQueue,
+                                          DirectExchange telegramExchange) {
+        return BindingBuilder
+                .bind(authorizeTelegramQueue)
+                .to(telegramExchange)
+                .with("authorize");
+    }
+
+    @Bean
+    public Binding notifyTelegramBinding(@Qualifier("notifyTelegramQueue") Queue notifyTelegramQueue,
+                                            DirectExchange telegramExchange) {
+        return BindingBuilder
+                .bind(notifyTelegramQueue)
+                .to(telegramExchange)
+                .with("notify");
     }
 
     @Bean

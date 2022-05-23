@@ -10,13 +10,13 @@ import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.property.RestConnectionProperties;
 
 @Service
-public class ProductServiceImpl implements ProductService {
+public class ProductSearchServiceImpl implements ProductSearchService {
 
     private final RestConnectionProperties restConnectionProperty;
 
     private final WebClient webClient;
 
-    public ProductServiceImpl(RestConnectionProperties restConnectionProperty) {
+    public ProductSearchServiceImpl(RestConnectionProperties restConnectionProperty) {
         this.restConnectionProperty = restConnectionProperty;
         this.webClient = WebClient.create(restConnectionProperty.getUri());
     }

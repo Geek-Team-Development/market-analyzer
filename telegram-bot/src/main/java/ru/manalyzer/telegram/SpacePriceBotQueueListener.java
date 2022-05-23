@@ -6,7 +6,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.dto.UserDto;
 import ru.manalyzer.service.TelegramService;
+
 
 @Component
 public class SpacePriceBotQueueListener {
@@ -31,5 +33,15 @@ public class SpacePriceBotQueueListener {
     @RabbitListener(queues = "callback.telegram.queue")
     public void listenCallbackTelegram(CallbackQuery callbackQuery) {
         telegramService.callbackRequest(callbackQuery);
+    }
+
+    @RabbitListener(queues = "command.telegram.queue")
+    public void listenCommandTelegram(Message message) {
+        telegramService.commandRequest(message);
+    }
+
+    @RabbitListener(queues = "authorize.telegram.queue")
+    public void listenAuthorizeTelegram(UserDto userDto) {
+        telegramService.authorizeRequest(userDto);
     }
 }

@@ -1,4 +1,4 @@
-package ru.manalyzer.utility;
+package ru.manalyzer.telegram.slider;
 
 import org.springframework.stereotype.Component;
 import ru.manalyzer.dto.ProductDto;

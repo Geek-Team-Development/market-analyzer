@@ -19,27 +19,15 @@ public class AmqpProperties {
 
     private String telegramExchange;
 
-    private String productTelegramQueue;
-
-    private String callbackTelegramQueue;
+    private String authorizeTelegramQueue;
 
     private String messageTelegramQueue;
 
-    private String commandTelegramQueue;
-
-    private String authorizeTelegramQueue;
-
     private String notifyTelegramQueue;
 
-    private String productTelegramBindingRoutingKey;
-
-    private String callbackTelegramBindingRoutingKey;
+    private String authorizeTelegramBindingRoutingKey;
 
     private String messageTelegramBindingRoutingKey;
-
-    private String commandTelegramBindingRoutingKey;
-
-    private String authorizeTelegramBindingRoutingKey;
 
     private String notifyTelegramBindingRoutingKey;
 }

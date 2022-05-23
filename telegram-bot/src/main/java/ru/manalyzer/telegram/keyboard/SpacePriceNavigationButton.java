@@ -1,20 +1,21 @@
-package ru.manalyzer.utility;
+package ru.manalyzer.telegram.keyboard;
 
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.manalyzer.property.CardSliderNavigationProperties;
 import ru.manalyzer.storage.entity.ProductCardSlider;
+import ru.manalyzer.telegram.command.CardButtonCommand;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
-public class CardSliderNavigationButtonFormatter implements CardSliderButtonFormatter {
+public class SpacePriceNavigationButton implements ChatButton {
 
     private final CardSliderNavigationProperties cardSliderNavigationProperties;
 
-    public CardSliderNavigationButtonFormatter(CardSliderNavigationProperties cardSliderNavigationProperties) {
+    public SpacePriceNavigationButton(CardSliderNavigationProperties cardSliderNavigationProperties) {
         this.cardSliderNavigationProperties = cardSliderNavigationProperties;
     }
 
@@ -39,10 +40,10 @@ public class CardSliderNavigationButtonFormatter implements CardSliderButtonForm
     }
 
     @Override
-    public InlineKeyboardMarkup format(ProductCardSlider productCardSlider) {
+    public List<InlineKeyboardButton> createButtons(ProductCardSlider productCardSlider) {
         // If Card Slider disable then return empty InlineKeyboardMarkup
         if (!productCardSlider.isActive()) {
-            return InlineKeyboardMarkup.builder().build();
+            return Collections.emptyList();
         }
 
         List<InlineKeyboardButton> navigationButtonRow = new ArrayList<>();
@@ -55,9 +56,7 @@ public class CardSliderNavigationButtonFormatter implements CardSliderButtonForm
             navigationButtonRow.add(getNextButton());
         }
 
-        return InlineKeyboardMarkup.builder()
-                .keyboard(List.of(navigationButtonRow))
-                .build();
+        return navigationButtonRow;
     }
 
     private boolean hasNext(ProductCardSlider productCardSlider) {

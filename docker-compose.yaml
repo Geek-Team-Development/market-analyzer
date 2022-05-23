@@ -1,16 +1,16 @@
 version: '3'
 services:
-  analyzer-backend-api-app:
-    image: geekteam/analyzer-backend-api-app:latest
-    ports:
-      - 8080:8080
+#  analyzer-backend-api-app:
+#    image: geekteam/analyzer-backend-api-app:latest
+#    ports:
+#      - 8080:8080
 
-  frontend:
-    image: geekteam/frontend
-    ports:
-      - 80:80
-    depends_on:
-      - analyzer-backend-api-app
+#  frontend:
+#    image: geekteam/frontend
+#    ports:
+#      - 80:80
+#    depends_on:
+#      - analyzer-backend-api-app
 
   db:
     image: mongo
@@ -38,10 +38,10 @@ services:
     ports:
       - 6379:6379
 
-  telegram-bot:
-    image: geekteam/telegram-bot
-    ports:
-      - 8090:8090
+#  telegram-bot:
+#    image: geekteam/telegram-bot
+#    ports:
+#      - 8090:8090
 
 volumes:
   mongodb-data:
