@@ -13,7 +13,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
-import ru.manalyzer.parser.mvideo.config.MVideoProperties;
+import ru.manalyzer.parser.mvideo.config.properties.CookieProperties;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,12 +35,12 @@ public class MVideoCookieServiceTest {
     private WebClient webClient;
     private ClientAndServer mockServer;
 
-    private static MVideoProperties.Cookies properties;
+    private static CookieProperties properties;
     private static final String propertyFile = "/mvideo-cookie-service-test/test.yaml";
 
     @BeforeAll
     public void beforeAll() throws IOException {
-        Yaml yaml = new Yaml(new Constructor(MVideoProperties.Cookies.class));
+        Yaml yaml = new Yaml(new Constructor(CookieProperties.class));
         try(InputStream inputStream = getClass().getResourceAsStream(propertyFile)) {
             properties = yaml.load(inputStream);
         }

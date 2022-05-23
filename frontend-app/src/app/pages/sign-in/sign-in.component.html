@@ -2,7 +2,6 @@
   <div class="sign-in-form">
 
     <h2 class="form-header">Вход</h2>
-    <p *ngIf="errorSignInMessage !== ''" class="tw-text-red-500 tw-mt-2">{{errorSignInMessage}}</p>
     <form [formGroup]="form" (submit)="signIn()" data-tid="form">
       <div class="mb-3">
         <input type="text" placeholder="Email" formControlName="email"

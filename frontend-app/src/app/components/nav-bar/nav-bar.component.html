@@ -1,47 +1,25 @@
-<nav class="tw-bg-gray-800 tw-mb-4 tw-sticky tw-top-0 tw-z-10">
-  <div class="tw-max-w-7xl tw-mx-auto tw-px-2 sm:tw-px-6 lg:tw-px-8">
-    <div class="tw-relative tw-flex tw-items-center tw-justify-between tw-h-16">
-      <div class="tw-absolute tw-inset-y-0 tw-left-0 tw-flex tw-items-center sm:tw-hidden">
-        <button type="button" (click)="clickLeftMenu()"
-                class="tw-inline-flex tw-items-center tw-justify-center tw-p-2 tw-rounded-md tw-text-gray-400 hover:tw-text-white hover:tw-bg-gray-700 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-inset focus:tw-ring-white"
-                aria-controls="mobile-menu" aria-expanded="false">
-          <span class="tw-sr-only">Open main menu</span>
-          <svg class="tw-block tw-h-6 tw-w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-               stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-          <svg class="tw-hidden tw-h-6 tw-w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-               stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center sm:tw-items-stretch sm:tw-justify-start">
-        <div class="tw-flex-shrink-0 tw-flex tw-items-center">
-          <div class="tw-text-white tw-text-4xl" style="font-family: 'Ms Madi', cursive;">Space Price</div>
-        </div>
-        <div class="tw-hidden tw-relative tw-flex tw-flex-row tw-grow sm:tw-block sm:tw-ml-6">
-          <div class="tw-absolute tw-inset-y-0 tw-items-center tw-left-0 tw-flex tw-space-x-4">
-            <a [routerLink]="main" data-tid="big-main" class="tw-block tw-px-3 tw-py-2 tw-rounded-md
-            tw-text-sm tw-font-medium tw-no-underline"
-               [class]="currentUrl === main ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
-                ' hover:tw-text-white'" aria-current="page">Главная</a>
-            <a *ngIf="authService.isAdmin()" [routerLink]="users" class="tw-block tw-px-3 tw-py-2 tw-rounded-md
-            tw-text-sm tw-font-medium tw-no-underline"
-               [class]="currentUrl === users ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
-                ' hover:tw-text-white'" aria-current="page">Пользователи</a>
+<nav class="nav-bar-panel">
+  <div class="nav-bar-panel-h-align">
+    <div class="nav-bar-panel-v-align">
+      <nav-bar-small-menu-btn (click)="clickSmallMenu()"></nav-bar-small-menu-btn>
+      <div class="nav-bar-content">
+        <nav-bar-app-name [appName]="'Space Price'"></nav-bar-app-name>
+        <div class="nav-bar-big-menu-panel">
+          <div class="nav-bar-big-menu-left-panel">
+            <a [routerLink]="main" data-tid="big-main" class="big-menu-item"
+               [class]="currentUrl === main ? 'big-menu-item-selected' :
+               'big-menu-item-non-selected'" aria-current="page">Главная</a>
+            <a *ngIf="authService.isAdmin()" [routerLink]="users" class="big-menu-item"
+               [class]="currentUrl === users ? 'big-menu-item-selected' :
+                'big-menu-item-non-selected'" aria-current="page">Пользователи</a>
           </div>
-          <div class="tw-absolute tw-inset-y-0 tw-right-0 tw-flex
-                tw-items-center tw-pr-2 sm:tw-ml-6 sm:tw-pr-0">
+          <div class="nav-bar-big-menu-right-panel">
             <a *ngIf="!authService.isAuthenticated()" [routerLink]="signin" data-tid="big-sign-in"
-               class="tw-block tw-px-3 tw-py-2 tw-text-sm tw-text-white
-               hover:tw-bg-gray-700 tw-rounded-md tw-no-underline"
-               [class]="currentUrl === signin ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
-                               ' hover:tw-text-white'">Вход</a>
+               class="big-menu-item" [class]="currentUrl === signin ? 'big-menu-item-selected' :
+                'big-menu-item-non-selected'">Вход</a>
             <a [routerLink]="signup" data-tid="big-sign-up"
-               class="tw-block tw-px-3 tw-py-2 tw-ml-2 tw-text-sm tw-text-white hover:tw-bg-gray-700 tw-rounded-md tw-no-underline"
-               [class]="currentUrl === signup ? 'tw-bg-gray-900 tw-text-white' : 'tw-text-gray-300 hover:tw-bg-gray-700' +
-                ' hover:tw-text-white'">Регистрация</a>
+               class="big-menu-item tw-ml-2" [class]="currentUrl === signup ?
+               'big-menu-item-selected' : 'big-menu-item-non-selected'">Регистрация</a>
           </div>
         </div>
       </div>
@@ -85,10 +63,10 @@
                  tabindex="-1"
                  id="user-menu-item-1">Избранное</a>
               <div data-tid="logout" (click)="logout()"
-                 class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700
+                   class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-white hover:tw-bg-gray-700
                   tw-no-underline tw-cursor-pointer" role="menuitem"
-                 tabindex="-1"
-                 id="user-menu-item-2">Выход</div>
+                   tabindex="-1"
+                   id="user-menu-item-2">Выход</div>
             </mat-menu>
           </div>
         </div>

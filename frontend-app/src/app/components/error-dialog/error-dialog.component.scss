@@ -1,0 +1,23 @@
+.dialog-header-panel {
+  @apply tw-flex tw-h-8 tw-bg-[#5a5a5a];
+}
+
+.dialog-header {
+  @apply tw-self-center tw-text-red-400 tw-ml-2 tw-font-semibold tw-text-base;
+}
+
+.dialog-content-panel {
+  @apply tw-flex tw-min-h-min tw-bg-[#3a3a3a] tw-text-center;
+}
+
+.dialog-content {
+  @apply tw-self-center tw-text-yellow-500 tw-m-4;
+}
+
+.dialog-footer-panel {
+  @apply tw-flex tw-min-h-min tw-bg-[#3a3a3a] tw-text-center tw-m-0;
+}
+
+.dialog-ok-btn {
+  @apply tw-mx-auto tw-bg-green-600 tw-text-white;
+}

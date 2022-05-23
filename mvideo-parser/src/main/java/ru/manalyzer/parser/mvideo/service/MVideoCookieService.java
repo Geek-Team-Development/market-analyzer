@@ -5,7 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import ru.manalyzer.parser.mvideo.config.MVideoProperties;
+import ru.manalyzer.parser.mvideo.config.properties.CookieProperties;
 
 import java.net.HttpCookie;
 import java.util.List;
@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 public class MVideoCookieService implements CookieService {
 
     private final WebClient webClient;
-    private final MVideoProperties.Cookies properties;
+    private final CookieProperties properties;
 
     @Autowired
-    public MVideoCookieService(WebClient webClient, MVideoProperties.Cookies properties) {
+    public MVideoCookieService(WebClient webClient, CookieProperties properties) {
         this.webClient = webClient;
         this.properties = properties;
     }
