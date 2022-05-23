@@ -13,6 +13,7 @@ import ru.manalyzer.telegram.slider.CardSliderNavigator;
 import ru.manalyzer.storage.entity.ProductCardSlider;
 import ru.manalyzer.storage.repository.ProductCardSliderRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -145,6 +146,14 @@ public class TelegramServiceImpl implements TelegramService {
 
     private void sendFavorites(Message message) {
         String chatId = message.getChatId().toString();
+        String userId = databaseUserService.findUserIdByChatId(chatId)
+                .orElseThrow(() -> new RuntimeException("User not authorized"));
+        List<ProductDto> products = databaseFavoritesService.getUserFavoriteProduct(userId);
+
+        if (products.isEmpty()) {
+            botSender.sendInformationMessage(chatId, messageProperties.getFavoritesEmpty());
+            return;
+        }
 
         // Disable old Card slider if exist
         disableProductCardSlider(chatId);
@@ -152,11 +161,7 @@ public class TelegramServiceImpl implements TelegramService {
         // Create new product card slider
         ProductCardSlider productCardSlider = newProductCardSlider(chatId);
 
-        String userId = databaseUserService.findUserIdByChatId(chatId)
-                .orElseThrow(() -> new RuntimeException("User not authorized"));
-
         // find favorites
-        databaseFavoritesService.getUserFavoriteProduct(userId)
-                .forEach(productDto -> addProductToCardSlider(productCardSlider, productDto));
+        products.forEach(productDto -> addProductToCardSlider(productCardSlider, productDto));
     }
 }

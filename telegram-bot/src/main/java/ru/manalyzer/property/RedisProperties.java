@@ -13,13 +13,11 @@ import org.springframework.stereotype.Component;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@PropertySource("classpath:message.properties")
-@ConfigurationProperties(value = "message")
-public class MessageProperties {
+@PropertySource("classpath:redis.properties")
+@ConfigurationProperties(value = "redis")
+public class RedisProperties {
 
-    private String greetings;
+    private String host;
 
-    private String authorizedOk;
-
-    private String favoritesEmpty;
+    private Integer port;
 }
