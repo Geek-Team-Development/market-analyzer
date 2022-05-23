@@ -13,12 +13,12 @@ export class AppComponent {
 
   constructor(private authService: AuthService,
               private router: Router) {
-    authService.signIn(null)
-      .subscribe({
-        error: () => {
-          authService.logout();
-          this.router.navigateByUrl(FrontUrls.MAIN);
-        }
-      });
+    // authService.signIn(null)
+    //   .subscribe({
+    //     error: () => {
+    //       authService.logout();
+    //       this.router.navigateByUrl(FrontUrls.MAIN);
+    //     }
+    //   });
   }
 }

@@ -9,9 +9,13 @@ import ru.manalyzer.persist.User;
 @ChangeUnit(id = "init-collection-users", order = "1", author = "root")
 public class UserCollectionInitializerChangeLog {
 
-    private static final String INDEX_FIELD = "email";
+    private static final String INDEX_EMAIL_FIELD = "email";
 
-    private static final String INDEX_NAME = "ui_email";
+    private static final String INDEX_EMAIL_NAME = "ui_email";
+
+    private static final String INDEX_CHAT_FIELD = "telegramChatId";
+
+    private static final String INDEX_CHAT_NAME = "ui_chat";
 
     @BeforeExecution
     public void before(MongoTemplate mongoTemplate) {
@@ -28,13 +32,16 @@ public class UserCollectionInitializerChangeLog {
     @Execution
     public void execution(MongoTemplate mongoTemplate) {
         mongoTemplate.indexOps(User.class).ensureIndex(
-                new Index().on(INDEX_FIELD, Sort.Direction.ASC).named(INDEX_NAME).unique()
+                new Index().on(INDEX_EMAIL_FIELD, Sort.Direction.ASC).named(INDEX_EMAIL_NAME).unique()
+        );
+        mongoTemplate.indexOps(User.class).ensureIndex(
+                new Index().on(INDEX_CHAT_FIELD, Sort.Direction.ASC).named(INDEX_CHAT_NAME).unique()
         );
     }
 
     @RollbackExecution
     public void rollback(MongoTemplate mongoTemplate) {
-        mongoTemplate.indexOps(User.class).dropIndex(INDEX_NAME);
+        mongoTemplate.indexOps(User.class).dropIndex(INDEX_EMAIL_NAME);
     }
 
 }

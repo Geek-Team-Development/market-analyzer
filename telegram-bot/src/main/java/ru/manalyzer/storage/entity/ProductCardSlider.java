@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.redis.core.RedisHash;
 import ru.manalyzer.dto.ProductDto;
-import ru.manalyzer.utility.CardSliderNavigator;
-import ru.manalyzer.utility.Navigable;
+import ru.manalyzer.telegram.slider.CardSliderNavigator;
+import ru.manalyzer.telegram.slider.Navigable;
 
 import java.util.ArrayList;
 import java.util.List;

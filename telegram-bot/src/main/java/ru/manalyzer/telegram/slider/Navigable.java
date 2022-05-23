@@ -1,4 +1,4 @@
-package ru.manalyzer.utility;
+package ru.manalyzer.telegram.slider;
 
 public interface Navigable {
 

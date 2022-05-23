@@ -16,7 +16,7 @@ public class MessageUpdateHandler extends UpdateHandler {
 
     @Override
     public boolean canHandle(Update update) {
-        return update.hasMessage();
+        return update.hasMessage() && !update.getMessage().isCommand();
     }
 
     @Override

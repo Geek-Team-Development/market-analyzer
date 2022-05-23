@@ -25,9 +25,21 @@ public class AmqpProperties {
 
     private String messageTelegramQueue;
 
+    private String commandTelegramQueue;
+
+    private String authorizeTelegramQueue;
+
+    private String notifyTelegramQueue;
+
     private String productTelegramBindingRoutingKey;
 
     private String callbackTelegramBindingRoutingKey;
 
     private String messageTelegramBindingRoutingKey;
+
+    private String commandTelegramBindingRoutingKey;
+
+    private String authorizeTelegramBindingRoutingKey;
+
+    private String notifyTelegramBindingRoutingKey;
 }

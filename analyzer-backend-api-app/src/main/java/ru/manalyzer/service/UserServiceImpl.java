@@ -18,14 +18,17 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final Mapper<User, UserDto> userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final TelegramService telegramService;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            Mapper<User, UserDto> userMapper,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           TelegramService telegramService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.telegramService = telegramService;
     }
 
     @Override
@@ -55,6 +58,14 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(password));
         user = userRepository.save(user);
         return userMapper.toDto(user);
+    }
+
+    @Override
+    public void addTelegramId(String email, String chatId) {
+        User user = userRepository.findByEmail(email).orElseThrow(RuntimeException::new);
+        user.setTelegramChatId(chatId);
+        userRepository.save(user);
+        telegramService.notifyChatIdUpdate(userMapper.toDto(user));
     }
 
     @Override

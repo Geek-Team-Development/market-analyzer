@@ -34,6 +34,9 @@ public class User extends AbstractPersistentObject {
     @Field
     private String city;
 
+    @Field
+    private String telegramChatId;
+
     @Field(targetType = FieldType.STRING)
     private List<Role> roles = new ArrayList<>();
 
