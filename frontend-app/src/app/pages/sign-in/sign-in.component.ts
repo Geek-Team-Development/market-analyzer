@@ -1,10 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
 import {FrontUrls} from "../../config/front-config";
 import {FormBuilder, Validators} from "@angular/forms";
 import {MatDialog} from "@angular/material/dialog";
 import {ErrorDialogComponent} from "../../components/error-dialog/error-dialog.component";
+import {UsersService} from "../../services/users.service";
 
 const { required, email } = Validators;
 
@@ -21,14 +22,42 @@ export class SignInComponent implements OnInit {
   });
 
   public formControls = this.form.controls;
+  errorSignInMessage: string = '';
+  private chatId: string = '';
 
   constructor(private authService: AuthService,
+              private userService: UsersService,
               private router: Router,
               private formBuilder: FormBuilder,
               private dialog: MatDialog) {
+              private route: ActivatedRoute) {
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(
+      (queryParam: any) => {
+        this.chatId = queryParam['id'];
+        this.addTelegramId();
+      }
+    )
+  }
+
+  addTelegramId() {
+    console.log("Current id=" + this.chatId);
+    if (this.chatId != undefined || this.chatId != '') {
+      if (this.authService.isAuthenticated()) {
+        this.userService.addTelegramId(this.chatId).subscribe({
+          next: () => {
+            this.router.navigateByUrl(FrontUrls.MAIN);
+          },
+          error: () => {
+            console.log("ChatId was not added")
+          }
+        });
+
+      }
+    }
+  }
 
   signIn() {
     if(!this.form.valid) {
@@ -37,6 +66,7 @@ export class SignInComponent implements OnInit {
     this.authService.signIn(this.form.value)
       .subscribe({
         next: (signInResult) => {
+          this.addTelegramId();
           let navigateUrl = signInResult.redirectUrl ? signInResult.redirectUrl : '/' + FrontUrls.MAIN;
           this.router.navigateByUrl(navigateUrl).then(() => {
             this.authService.redirectUrl = undefined;

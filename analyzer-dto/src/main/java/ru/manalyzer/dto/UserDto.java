@@ -25,6 +25,8 @@ public class UserDto extends AbstractPersistentDto {
 
     private String city;
 
+    private String telegramChatId;
+
     private List<Role> roles;
 
     @Override

@@ -47,6 +47,10 @@ export class UsersService {
       )
   }
 
+  public addTelegramId(chatId: string) {
+    return this.http.put(USERS + '/telegram', chatId);
+  }
+
   public deleteUser(id: string | null) {
     return this.http.delete(USERS + '/' + id);
   }

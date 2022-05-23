@@ -2,6 +2,8 @@ package ru.manalyzer.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import ru.manalyzer.dto.UserDto;
 import ru.manalyzer.service.UserService;
@@ -28,6 +30,11 @@ public class UserController {
     public UserDto getUser(@PathVariable String id) {
         return userService.getUserById(id)
                 .orElseThrow(() -> new RuntimeException("Not found"));
+    }
+
+    @PutMapping(value = "/telegram", consumes = MediaType.TEXT_PLAIN_VALUE)
+    public void addTelegramId(@RequestBody String chatId, Authentication authentication) {
+        userService.addTelegramId(((User) authentication.getPrincipal()).getUsername(), chatId);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

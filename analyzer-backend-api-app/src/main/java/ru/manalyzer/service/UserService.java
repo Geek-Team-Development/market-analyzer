@@ -14,5 +14,7 @@ public interface UserService {
 
     UserDto updatePassword(String id, String password);
 
+    void addTelegramId(String email, String chatId);
+
     void deleteById(String id);
 }
