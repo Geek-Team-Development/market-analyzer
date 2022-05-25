@@ -6,6 +6,7 @@ import {Credentials} from "../model/credentials";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {LOGOUT, SIGN_IN, SIGN_UP} from "../config/backend-urls";
 import {Roles} from "../dto/roles";
+import {WebSocketService} from "./web-socket.service";
 
 @Injectable({
   providedIn: 'root'

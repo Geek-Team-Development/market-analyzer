@@ -1,5 +1,6 @@
 package ru.manalyzer.service;
 
+import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,15 +28,23 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
     private final PasswordEncoder passwordEncoder;
 
+    private final DirectExchange frontNotifyExchange;
+
+    private final AmqpAdmin amqpAdmin;
+
     @Autowired
     public AuthenticationServiceImpl(UserRepository userRepository,
                                      Mapper<ru.manalyzer.persist.User,
                                              UserDto> userMapper,
-                                     PasswordEncoder passwordEncoder) {
+                                     PasswordEncoder passwordEncoder,
+                                     DirectExchange frontNotifyExchange,
+                                     AmqpAdmin amqpAdmin) {
 
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.frontNotifyExchange = frontNotifyExchange;
+        this.amqpAdmin = amqpAdmin;
     }
 
     @Override
@@ -69,6 +78,17 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         userDto.setRoles(List.of(Role.USER));
         ru.manalyzer.persist.User savedUser = userRepository.save(userMapper.toEntity(userDto));
+        createProductUpdateQueueForUser(savedUser.getId());
         return userMapper.toDto(savedUser);
+    }
+
+    private void createProductUpdateQueueForUser(String userId) {
+        Queue frontNotifyQueue = new Queue("front.notify.queue." + userId, false);
+        Binding binding = BindingBuilder
+                .bind(frontNotifyQueue)
+                .to(frontNotifyExchange)
+                .with(userId);
+        amqpAdmin.declareQueue(frontNotifyQueue);
+        amqpAdmin.declareBinding(binding);
     }
 }

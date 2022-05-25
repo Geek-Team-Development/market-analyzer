@@ -2,6 +2,7 @@ package ru.manalyzer.service;
 
 import reactor.core.publisher.Flux;
 import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.service.dto.ProductUpdateDto;
 
 public interface FavoritesService {
 
@@ -13,5 +14,7 @@ public interface FavoritesService {
 
     void clearFavoritesCart(String userLogin);
 
-    void update();
+    Flux<ProductUpdateDto> update();
+
+    Flux<String> getUsersWithProduct(ProductDto productDto);
 }

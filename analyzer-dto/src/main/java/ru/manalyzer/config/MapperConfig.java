@@ -4,9 +4,11 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.manalyzer.dto.NotificationDto;
 import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.dto.UserDto;
 import ru.manalyzer.mapper.*;
+import ru.manalyzer.persist.Notification;
 import ru.manalyzer.persist.Product;
 import ru.manalyzer.persist.ProductPrice;
 import ru.manalyzer.persist.User;
@@ -40,5 +42,8 @@ public class MapperConfig {
         return new UserMapper<>(modelMapper(), User.class, UserDto.class);
     }
 
-
+    @Bean
+    public Mapper<Notification, NotificationDto> notificationMapper() {
+        return new NotificationMapper<>(modelMapper(), Notification.class, NotificationDto.class);
+    }
 }
