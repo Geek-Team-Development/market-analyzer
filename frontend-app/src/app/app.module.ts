@@ -26,6 +26,7 @@ import {NavBarSmallMenuBtnComponent} from "./components/nav-bar/components/nav-b
 import {ErrorDialogComponent} from "./components/error-dialog/error-dialog.component";
 import {MatDialogModule} from "@angular/material/dialog";
 import {MatBadgeModule} from "@angular/material/badge";
+import { NotificationsComponent } from './pages/notifications/notifications.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import {MatBadgeModule} from "@angular/material/badge";
     ProductCardComponent,
     UsersComponent,
     ProfileComponent,
-    ErrorDialogComponent
+    ErrorDialogComponent,
+    NotificationsComponent
   ],
 
     imports: [

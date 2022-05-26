@@ -1,6 +1,7 @@
-import {Notification} from "./notification";
+import {NotifyMessage} from "./notifyMessage";
 
 export class Message {
-  notification: Notification = new Notification();
+  notifyMessage: NotifyMessage = new NotifyMessage();
   object: any;
+  readed: boolean = false;
 }

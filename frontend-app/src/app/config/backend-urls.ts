@@ -17,3 +17,4 @@ export const SIGN_IN = '/api/v1/signin';
 export const LOGOUT = '/api/v1/logout';
 export const FAVORITES = '/api/v1/favorites';
 export const USERS = '/api/v1/users';
+export const NOTIFICATIONS = '/api/v1/notifications';

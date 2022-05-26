@@ -1,0 +1,13 @@
+<div class="tw-w-full">
+  <a (click)="clickNotifyMessage(message.id)" class="notify-message-panel tw-block tw-no-underline hover:tw-scale-[1.01] tw-duration-100" *ngFor="let message of messages"
+       [class]="message.read ? 'tw-bg-[#3a3a3a] tw-text-gray-400' : 'tw-bg-[#2a2a2a]'">
+    <div class="sm:tw-flex">
+      <div class="tw-flex tw-break-all">
+        {{message.message}}
+      </div>
+      <div class="tw-mt-2 tw-w-full tw-text-right sm:tw-w-auto sm:tw-mt-0 sm:tw-flex sm:tw-ml-auto sm:tw-pl-2 tw-text-lime-500">
+        {{parseDate(message.date) | date:'dd.MM.yyyy HH:mm:ss'}}
+      </div>
+    </div>
+  </a>
+</div>

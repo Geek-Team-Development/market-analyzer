@@ -6,12 +6,12 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
 import ru.manalyzer.persist.Notification;
 
-@ChangeUnit(id = "init-collection-notifications", order = "7", author = "root")
+@ChangeUnit(id = "init-collection-notifications", order = "8", author = "root")
 public class NotificationCollectionInitializerChangeLog {
 
     private static final String INDEX_FIELD = "userId";
 
-    private static final String INDEX_NAME = "ui_userId";
+    private static final String INDEX_NAME = "ui_notification_userId";
 
     @BeforeExecution
     public void before(MongoTemplate mongoTemplate) {

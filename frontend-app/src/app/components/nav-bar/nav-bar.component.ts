@@ -5,6 +5,7 @@ import {AuthService} from "../../services/auth.service";
 import {filter} from "rxjs";
 import {MessageObserverService} from "../../services/message-observer.service";
 import {Message} from "../../dto/message";
+import {NotificationService} from "../../services/notification.service";
 
 @Component({
   selector: 'app-nav-bar',
@@ -23,11 +24,12 @@ export class NavBarComponent implements OnInit {
 
   leftMenuIsActive: boolean = false;
 
-  notificationCount: number = 0;
+  unreadedMessageCount: number = 0;
 
   constructor(private router: Router,
               public authService: AuthService,
-              private messageObserverService: MessageObserverService) {
+              private messageObserverService: MessageObserverService,
+              private notificationService: NotificationService) {
     router.events
       .pipe(
         filter(event => event instanceof NavigationEnd)
@@ -36,14 +38,27 @@ export class NavBarComponent implements OnInit {
         this.currentUrl = (value as NavigationEnd).url;
       }
     });
-    messageObserverService.message.subscribe({
+    messageObserverService.unreadedMessageCount.subscribe({
       next: value => {
-        this.messageReceived(value);
+        this.unreadedMessageCount = value;
       }
     })
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    let count = 0;
+    this.notificationService.getNotifications()
+      .subscribe({
+        next: value => {
+          if(!value.read) {
+            count++;
+          }
+        },
+        complete: () => {
+          this.unreadedMessageCount = count;
+        }
+      })
+  }
 
   logout() {
     this.authService.logout();
@@ -58,10 +73,7 @@ export class NavBarComponent implements OnInit {
     return this.authService.getUsername();
   }
 
-  private messageReceived(message: any) {
-    console.log(message);
-    if(this.currentUrl != FrontUrls.NOTIFICATIONS) {
-      this.notificationCount++;
-    }
+  notifyClick() {
+    this.router.navigateByUrl('/' + FrontUrls.NOTIFICATIONS);
   }
 }

@@ -3,7 +3,7 @@ import {SocketClientStateService} from "./socket-client-state.service";
 import {SocketClientState} from "../model/socket-client-state";
 import {AuthService} from "./auth.service";
 import {filter, first, Observable, switchMap} from "rxjs";
-import {Client, Stomp, StompHeaders, StompSubscription} from "@stomp/stompjs";
+import {Client, Stomp, StompSubscription} from "@stomp/stompjs";
 import * as SockJS from "sockjs-client";
 import {MessageObserverService} from "./message-observer.service";
 import {HttpXsrfTokenExtractor} from "@angular/common/http";
@@ -23,24 +23,25 @@ export class WebSocketService {
     socketClientStateService.state.subscribe({
       next: value => {
         if(value == SocketClientState.CONNECTED) {
-          this.getNotifications();
+          this.getNotifyMessages();
         }
       }
     })
   }
 
   public connectToStompEndpoint() {
-    this.client = Stomp.over(new SockJS("/api/v1/notifications"));
+    this.client = Stomp.over(new SockJS("/api/v1/notifies"));
     let xsrf = this.xsrfTokenExtractor.getToken();
     this.client.connect({'X-XSRF-TOKEN': xsrf}, () => {
       this.sharedService.state.next(SocketClientState.CONNECTED);
     });
   }
 
-  private getNotifications() {
+  private getNotifyMessages() {
     this.onMessage('/queue/front.notify.queue.' + this.authService.getUserId())
       .subscribe(msg => {
         this.messageObserverService.message.next(msg);
+        this.messageObserverService.incrementAndNext();
       });
   }
 

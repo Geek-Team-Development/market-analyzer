@@ -26,8 +26,12 @@
 
       <div *ngIf="authService.isAuthenticated()" data-tid="user-menu" class="tw-absolute tw-inset-y-0 tw-right-0 tw-flex
       tw-items-center tw-pr-2 sm:tw-static sm:tw-inset-auto sm:tw-ml-6 sm:tw-pr-0">
-        <button type="button" data-tid="notify" matBadge="{{notificationCount}}" [matBadgeHidden]="notificationCount == 0" matBadgeColor="warn"
-                class="tw-bg-gray-800 tw-p-1 tw-rounded-full tw-text-gray-400 hover:tw-text-white focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-offset-2 focus:tw-ring-offset-gray-800 focus:tw-ring-white">
+        <button type="button" data-tid="notify" matBadge="{{unreadedMessageCount}}"
+                [matBadgeHidden]="unreadedMessageCount == 0" matBadgeColor="warn"
+                (click)="notifyClick()"
+                class="tw-bg-gray-800 tw-p-1 tw-rounded-full tw-text-gray-400
+                hover:tw-text-white focus:tw-outline-none focus:tw-ring-2
+                focus:tw-ring-offset-2 focus:tw-ring-offset-gray-800 focus:tw-ring-white">
           <span class="tw-sr-only">View notifications</span>
           <svg class="tw-h-6 tw-w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                stroke="currentColor" aria-hidden="true">

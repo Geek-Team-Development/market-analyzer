@@ -12,7 +12,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 public class WebSocketSecurityConfiguration extends AbstractSecurityWebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/notifications")
+        registry.addEndpoint("/notifies")
                 .setAllowedOrigins("*")
                 .withSockJS()
                 .setSupressCors(true);
