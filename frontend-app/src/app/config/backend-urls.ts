@@ -18,3 +18,5 @@ export const LOGOUT = '/api/v1/logout';
 export const FAVORITES = '/api/v1/favorites';
 export const USERS = '/api/v1/users';
 export const NOTIFICATIONS = '/api/v1/notifications';
+export const STOMP_NOTIFY = '/api/v1/notifies';
+export const USER_QUEUE_PREFIX = '/queue/front.notify.queue.';

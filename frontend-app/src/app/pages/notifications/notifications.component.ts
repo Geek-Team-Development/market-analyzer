@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {NotifyMessage} from "../../dto/notifyMessage";
 import {MessageObserverService} from "../../services/message-observer.service";
 import {Message} from "../../dto/message";
 import {NotificationService} from "../../services/notification.service";
@@ -13,27 +12,13 @@ import {Router} from "@angular/router";
 })
 export class NotificationsComponent implements OnInit {
 
-  messages: NotifyMessage[] = [];
+  messages: Message[] = [];
 
   favorites = '/' + FrontUrls.FAVORITES;
-
-  date = new Date();
 
   constructor(private messageObserverService: MessageObserverService,
               private notificationService: NotificationService,
               private router: Router) {
-    // let message = new NotifyMessage();
-    // message.message = "Hello kjsahdkjashdkjashdkjashdkjashdkjahsdkjahsdkjahsdkjahsdkjahskdjhaksjdhakjsdhakjsdhkajsdhkajsdhaksjdhaksjdhaskdjh";
-    // message.date = "12.01.2020";
-    // message.read = true;
-    // this.messages.unshift(message);
-
-    // message = new NotifyMessage();
-    // message.message = "Привет kjsahdkjashdkjashdkjashdkjashdkjahsdkjahsdkjahsdkjahsdkjahskdjhaksjdhakjsdhakjsdhkajsdhkajsdhaksjdhaksjdhaskdjh";
-    // message.date = "14.01.2020";
-    // message.read = false;
-    // this.messages.unshift(message);
-
     messageObserverService.message.subscribe({
       next: message => {
         this.messageReceived(message);
@@ -47,34 +32,41 @@ export class NotificationsComponent implements OnInit {
   }
 
   private messageReceived(message: Message) {
-    this.messages = this.messages.sort((a, b) => {
-      return +a.date - +b.date;
-    })
-    this.messages.unshift(message.notifyMessage);
+    this.messages.unshift(message);
+    this.sort();
   }
 
   private getNotifications() {
+    this.messageObserverService.reset();
     this.notificationService.getNotifications()
       .subscribe({
         next: message => {
-          this.messages.unshift(message);
+          this.messageObserverService.nextMessage(message);
         }
       })
+  }
+
+  private sort() {
+    this.messages.sort((a, b) => {
+      return <any>new Date(b.notifyMessage.date) - <any>new Date(a.notifyMessage.date);
+    })
   }
 
   public parseDate(date: string) {
     return new Date(date);
   }
 
-  clickNotifyMessage(id: string) {
+  clickNotifyMessage(message: Message) {
     this.router.navigateByUrl('/' + FrontUrls.FAVORITES)
       .then(() => {
-        this.notificationService.markAsReaded(id)
-          .subscribe({
-            next: () => {
-              this.messageObserverService.decrementAndNext();
-            }
-          })
+        if(!message.read) {
+          this.notificationService.markAsReaded(message.notifyMessage.id)
+            .subscribe({
+              next: () => {
+                this.messageObserverService.decrementAndNext();
+              }
+            })
+        }
       });
   }
 }

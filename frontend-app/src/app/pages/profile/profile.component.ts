@@ -6,7 +6,6 @@ import {map, Observable} from "rxjs";
 import {AuthService} from "../../services/auth.service";
 import {FormBuilder, Validators} from "@angular/forms";
 import {Roles} from "../../dto/roles";
-import {USERS} from "../../config/backend-urls";
 import {FrontUrls} from "../../config/front-config";
 
 const { email, required } = Validators;

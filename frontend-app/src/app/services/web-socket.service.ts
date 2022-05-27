@@ -7,6 +7,7 @@ import {Client, Stomp, StompSubscription} from "@stomp/stompjs";
 import * as SockJS from "sockjs-client";
 import {MessageObserverService} from "./message-observer.service";
 import {HttpXsrfTokenExtractor} from "@angular/common/http";
+import {STOMP_NOTIFY, USER_QUEUE_PREFIX} from "../config/backend-urls";
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +31,7 @@ export class WebSocketService {
   }
 
   public connectToStompEndpoint() {
-    this.client = Stomp.over(new SockJS("/api/v1/notifies"));
+    this.client = Stomp.over(new SockJS(STOMP_NOTIFY));
     let xsrf = this.xsrfTokenExtractor.getToken();
     this.client.connect({'X-XSRF-TOKEN': xsrf}, () => {
       this.sharedService.state.next(SocketClientState.CONNECTED);
@@ -38,10 +39,9 @@ export class WebSocketService {
   }
 
   private getNotifyMessages() {
-    this.onMessage('/queue/front.notify.queue.' + this.authService.getUserId())
+    this.onMessage(USER_QUEUE_PREFIX + this.authService.getUserId())
       .subscribe(msg => {
-        this.messageObserverService.message.next(msg);
-        this.messageObserverService.incrementAndNext();
+        this.messageObserverService.nextMessage(msg);
       });
   }
 
@@ -56,11 +56,9 @@ export class WebSocketService {
 
   onMessage(topic: string): Observable<any> {
     return this.connect().pipe(first(), switchMap(client => {
-
       return new Observable<any>(observer => {
         let headers = { durable: 'false', 'auto-delete': 'false', exclusive: 'false' };
         const subscription: StompSubscription = client.subscribe(topic, message => {
-          console.log(message);
           observer.next(JSON.parse(message.body));
         }, headers);
         return () => client.unsubscribe(subscription.id);

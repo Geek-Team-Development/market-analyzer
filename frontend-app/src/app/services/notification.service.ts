@@ -1,10 +1,14 @@
 import {Injectable, NgZone} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {FAVORITES, NOTIFICATIONS} from "../config/backend-urls";
-import {Observable, Observer} from "rxjs";
+import {filter, Observable, Observer} from "rxjs";
 import {NotifyMessage} from "../dto/notifyMessage";
 import {ProductDto} from "../dto/product-dto";
 import {Util} from "../utils/util";
+import {Message} from "../dto/message";
+import {FrontUrls} from "../config/front-config";
+import {NavigationEnd, Router} from "@angular/router";
+import {MessageObserverService} from "./message-observer.service";
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +18,8 @@ export class NotificationService {
   constructor(private http: HttpClient,
               private ngZone: NgZone) { }
 
-  getNotifications(): Observable<NotifyMessage> {
-    return new Observable<NotifyMessage>((
+  getNotifications(): Observable<Message> {
+    return new Observable<Message>((
       observer => {
         let source = new EventSource(NOTIFICATIONS);
         return this.subscriber(observer, source);
@@ -27,11 +31,11 @@ export class NotificationService {
     return this.http.post(NOTIFICATIONS + `/` + notifyMessageId, {});
   }
 
-  private subscriber(observer: Observer<NotifyMessage>, source: EventSource) {
+  private subscriber(observer: Observer<Message>, source: EventSource) {
     source.onmessage = event => {
-      let notifyMessage = Util.parseNotifyMessage(event.data);
+      let message = JSON.parse(event.data);
       this.ngZone.run(() => {
-        observer.next(notifyMessage);
+        observer.next(message);
       })
     };
     source.onerror = error => {

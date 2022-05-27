@@ -160,12 +160,6 @@ public class FavoriteServiceTest {
                         Matchers.in(List.of("Macbook Pro", "Macbook Air", "Mac mini"))))
                 .assertNext(dto -> MatcherAssert.assertThat(dto.getName(),
                         Matchers.in(List.of("Macbook Pro", "Macbook Air", "Mac mini"))))
-                .assertNext(dto -> MatcherAssert.assertThat(dto.getName(),
-                        Matchers.in(List.of("Macbook Pro", "Macbook Air", "Mac mini"))))
-                .assertNext(dto -> MatcherAssert.assertThat(dto.getName(),
-                        Matchers.in(List.of("Macbook Pro", "Macbook Air", "Mac mini"))))
-                .assertNext(dto -> MatcherAssert.assertThat(dto.getName(),
-                        Matchers.in(List.of("Macbook Pro", "Macbook Air", "Mac mini"))))
                 .expectNoEvent(Duration.ofMillis(500))
                 .thenCancel()
                 .verify();
@@ -224,5 +218,6 @@ public class FavoriteServiceTest {
         verify(productPriceRepository).save(captor.capture());
         ProductPrice resultProductPrice = captor.getValue();
         assertEquals(expectedProductPrice.getProductId(), resultProductPrice.getProductId());
+        assertEquals(expectedProductPrice.getPrice(), resultProductPrice.getPrice());
     }
 }

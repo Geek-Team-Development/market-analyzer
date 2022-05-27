@@ -12,6 +12,7 @@ import ru.manalyzer.persist.Notification;
 import ru.manalyzer.persist.NotifyMessage;
 import ru.manalyzer.repository.NotificationRepository;
 import ru.manalyzer.repository.UserNotifyMessageRepository;
+import ru.manalyzer.service.dto.MessageToFront;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
@@ -55,11 +56,21 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public Flux<NotifyMessageDto> getNotifyMessages(String userLogin) {
+    public Flux<MessageToFront> getNotifyMessages(String userLogin) {
         UserDto userDto = authenticationService.findUserByEmail(userLogin);
         return notificationRepository.findByUserId(userDto.getId())
                 .flatMapIterable(Notification::getMessages)
-                .map(notifyMessageMapper::toDto);
+                .map(notifyMessageMapper::toDto)
+                .flatMap(notifyMessageDto ->
+                        userNotifyMessageRepository
+                                .findByUserIdAndNotifyMessageId(userDto.getId(),
+                                        notifyMessageDto.getId())
+                                .map(userNotifyMessage -> {
+                                    MessageToFront message = new MessageToFront();
+                                    message.setNotifyMessage(notifyMessageDto);
+                                    message.setRead(userNotifyMessage.isRead());
+                                    return message;
+                        }));
     }
 
     @Override

@@ -6,7 +6,7 @@ import {FormBuilder, Validators} from "@angular/forms";
 import {MatDialog} from "@angular/material/dialog";
 import {ErrorDialogComponent} from "../../components/error-dialog/error-dialog.component";
 import {UsersService} from "../../services/users.service";
-import {WebSocketService} from "../../services/web-socket.service";
+import {InitService} from "../../services/init.service";
 
 const { required, email } = Validators;
 
@@ -31,7 +31,7 @@ export class SignInComponent implements OnInit {
               private formBuilder: FormBuilder,
               private dialog: MatDialog,
               private route: ActivatedRoute,
-              private webSocketService: WebSocketService) {
+              private initService: InitService) {
   }
 
   ngOnInit(): void {
@@ -68,7 +68,7 @@ export class SignInComponent implements OnInit {
       .subscribe({
         next: (signInResult) => {
           this.addTelegramId();
-          this.webSocketService.connectToStompEndpoint();
+          this.initService.init();
           let navigateUrl = signInResult.redirectUrl ? signInResult.redirectUrl : '/' + FrontUrls.MAIN;
           this.router.navigateByUrl(navigateUrl).then(() => {
             this.authService.redirectUrl = undefined;

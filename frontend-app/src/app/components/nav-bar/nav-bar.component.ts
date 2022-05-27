@@ -1,11 +1,8 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {NavigationEnd, Router} from "@angular/router";
+import {Component, OnInit} from '@angular/core';
+import {Router} from "@angular/router";
 import {FrontUrls} from "../../config/front-config";
 import {AuthService} from "../../services/auth.service";
-import {filter} from "rxjs";
 import {MessageObserverService} from "../../services/message-observer.service";
-import {Message} from "../../dto/message";
-import {NotificationService} from "../../services/notification.service";
 
 @Component({
   selector: 'app-nav-bar',
@@ -28,16 +25,7 @@ export class NavBarComponent implements OnInit {
 
   constructor(private router: Router,
               public authService: AuthService,
-              private messageObserverService: MessageObserverService,
-              private notificationService: NotificationService) {
-    router.events
-      .pipe(
-        filter(event => event instanceof NavigationEnd)
-      ).subscribe({
-      next: value => {
-        this.currentUrl = (value as NavigationEnd).url;
-      }
-    });
+              private messageObserverService: MessageObserverService) {
     messageObserverService.unreadedMessageCount.subscribe({
       next: value => {
         this.unreadedMessageCount = value;
@@ -45,20 +33,7 @@ export class NavBarComponent implements OnInit {
     })
   }
 
-  ngOnInit(): void {
-    let count = 0;
-    this.notificationService.getNotifications()
-      .subscribe({
-        next: value => {
-          if(!value.read) {
-            count++;
-          }
-        },
-        complete: () => {
-          this.unreadedMessageCount = count;
-        }
-      })
-  }
+  ngOnInit(): void { }
 
   logout() {
     this.authService.logout();

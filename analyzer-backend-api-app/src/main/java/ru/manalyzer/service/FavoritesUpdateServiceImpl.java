@@ -6,7 +6,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import ru.manalyzer.dto.NotificationDto;
+import reactor.core.scheduler.Schedulers;
 import ru.manalyzer.dto.NotifyMessageDto;
 import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.persist.UserNotifyMessage;
@@ -41,68 +41,23 @@ public class FavoritesUpdateServiceImpl implements FavoritesUpdateService {
     }
 
     @Override
-//    @Scheduled(fixedRateString = "${update.service.delayBetweenUpdate}",
-//            initialDelayString = "${update.service.initialDelay}",
-//            timeUnit = TimeUnit.HOURS)
-    @Scheduled(fixedRateString = "40",
-            initialDelayString = "0",
-            timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedRateString = "${update.service.delayBetweenUpdate}",
+            initialDelayString = "${update.service.initialDelay}",
+            timeUnit = TimeUnit.HOURS)
     public void updateFavorites() {
         logger.info("Запустилось обновление продуктов из избранного");
-//        favoritesService.update()
-//                .subscribe(this::handleProductUpdated);
-        mmm();
+        favoritesService.update()
+                .subscribe(this::handleProductUpdated);
         logger.info("Закончилось обновление продуктов из избранного");
-    }
-
-//    @EventListener(ApplicationReadyEvent.class)
-    public void mmm() {
-//        Notification notification = new Notification();
-//        NotifyMessage notifyMessage = new NotifyMessage();
-//        notifyMessage.setId("1");
-//        notifyMessage.setDate(new Date());
-//        notifyMessage.setMessage("Message");
-//        notification.setId("1");
-//        notification.getMessages().add(notifyMessage);
-//        notification.setUserId("user1");
-//        notificationService.save(notificationMapper.toDto(notification)).subscribe();
-        MessageToFront messageToFront = new MessageToFront();
-        NotifyMessageDto notifyMessageDto = new NotifyMessageDto();
-        notifyMessageDto.setMessage("Hello");
-        notifyMessageDto.setDate(new Date());
-        messageToFront.setNotifyMessage(notifyMessageDto);
-        ProductDto oldProductDto = new ProductDto();
-        oldProductDto.setId("pr1");
-        oldProductDto.setName("name");
-        oldProductDto.setProductLink("prod link1");
-        oldProductDto.setImageLink("img link1");
-        oldProductDto.setPrice("10000");
-        oldProductDto.setShopName("MVideo");
-        ProductDto newProductDto = new ProductDto();
-        newProductDto.setId("pr1");
-        newProductDto.setName("name");
-        newProductDto.setProductLink("prod link1");
-        newProductDto.setImageLink("img link1");
-        newProductDto.setPrice("20000");
-        newProductDto.setShopName("MVideo");
-        ProductUpdateDto productUpdateDto = new ProductUpdateDto();
-        productUpdateDto.setOldProductDto(oldProductDto);
-        productUpdateDto.setNewProductDto(newProductDto);
-        messageToFront.setObject(productUpdateDto);
-        saveNotification("628fdf55fee8822a3ce811b2", productUpdateDto)
-                .subscribe(notifyMessageDto1 -> {
-                    sendMessage("628fdf55fee8822a3ce811b2", notifyMessageDto1, productUpdateDto);
-                });
     }
 
     private void handleProductUpdated(ProductUpdateDto productUpdateDto) {
         favoritesService.getUsersWithProduct(productUpdateDto.getNewProductDto())
-                .subscribe(userId -> {
-                    saveNotification(userId, productUpdateDto)
-                            .subscribe(savedNotifyMessageDto -> {
-                                sendMessage(userId, savedNotifyMessageDto, productUpdateDto);
-                            });
-                });
+                .subscribe(userId ->
+                        saveNotification(userId, productUpdateDto)
+                                .subscribe(savedNotifyMessageDto ->
+                                        sendMessage(userId, savedNotifyMessageDto,
+                                                productUpdateDto)));
     }
 
     private Mono<NotifyMessageDto> saveNotification(String userId, ProductUpdateDto productUpdateDto) {
@@ -113,6 +68,7 @@ public class FavoritesUpdateServiceImpl implements FavoritesUpdateService {
         notifyMessageDto.setMessage(message);
         notifyMessageDto.setDate(new Date());
         return notifyMessageService.save(notifyMessageDto)
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext(savedNotifyMessageDto -> {
                     UserNotifyMessage userNotifyMessage = new UserNotifyMessage();
                     userNotifyMessage.setUserId(userId);

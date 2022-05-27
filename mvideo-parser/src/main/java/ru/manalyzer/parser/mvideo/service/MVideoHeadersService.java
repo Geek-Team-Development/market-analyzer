@@ -26,14 +26,14 @@ public class MVideoHeadersService implements HeadersService {
 
     @PostConstruct
     public void init() {
-//        String requiredCookies = mVideoCookieService.getRequiredCookies();
-//        commonHeaders = new HttpHeaders();
-//        commonHeaders.set(HttpHeaders.HOST, properties.getHost());
-//        commonHeaders.set(HttpHeaders.USER_AGENT, properties.getUserAgent());
-//        commonHeaders.set(HttpHeaders.COOKIE, requiredCookies);
-//        detailsHeaders = new HttpHeaders();
-//        detailsHeaders.addAll(commonHeaders);
-//        detailsHeaders.setContentType(MediaType.APPLICATION_JSON);
+        String requiredCookies = mVideoCookieService.getRequiredCookies();
+        commonHeaders = new HttpHeaders();
+        commonHeaders.set(HttpHeaders.HOST, properties.getHost());
+        commonHeaders.set(HttpHeaders.USER_AGENT, properties.getUserAgent());
+        commonHeaders.set(HttpHeaders.COOKIE, requiredCookies);
+        detailsHeaders = new HttpHeaders();
+        detailsHeaders.addAll(commonHeaders);
+        detailsHeaders.setContentType(MediaType.APPLICATION_JSON);
     }
 
     @Override

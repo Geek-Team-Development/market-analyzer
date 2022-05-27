@@ -2,9 +2,6 @@ package ru.manalyzer.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.data.mongodb.core.mapping.DocumentPointer;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -12,7 +9,6 @@ import ru.manalyzer.Parser;
 import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.mapper.Mapper;
 import ru.manalyzer.mapper.PriceMapper;
-import ru.manalyzer.mapper.ProductMapper;
 import ru.manalyzer.persist.Favorite;
 import ru.manalyzer.persist.Product;
 import ru.manalyzer.persist.ProductPrice;
@@ -21,11 +17,8 @@ import ru.manalyzer.repository.ProductPriceRepository;
 import ru.manalyzer.repository.ReactiveFavoriteRepository;
 import ru.manalyzer.service.dto.ProductUpdateDto;
 
-import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class FavoritesServiceImpl implements FavoritesService {
@@ -66,19 +59,12 @@ public class FavoritesServiceImpl implements FavoritesService {
 
     @Override
     public Flux<ProductDto> getFavoritesCartOfUser(String userLogin) {
-        return Flux.create(fluxSink -> reactiveFavoriteRepository.findByUserId(Mono.just(getUserId(userLogin)))
-                .subscribe(favorite -> favorite.getProducts().parallelStream().forEach(product -> {
-                            ProductDto productDto = productMapper.toDto(product);
-                            fluxSink.next(productDto);
-                            updateOneProduct(productDto)
-                                    .subscribe(dto -> {
-                                        if (!productDto.equals(dto)) {
-                                            fluxSink.next(dto);
-                                        }
-                                    });
-                        }
-                )));
-
+        String userId = getUserId(userLogin);
+        return reactiveFavoriteRepository.findByUserId(Mono.just(getUserId(userLogin)))
+                .filter(favorite -> favorite.getUserId().equals(userId))
+                .flatMap(favorite -> Flux.fromIterable(favorite.getProducts()))
+                .map(productMapper::toDto)
+                .flatMap(this::updateOneProduct);
     }
 
     @Override
@@ -144,34 +130,33 @@ public class FavoritesServiceImpl implements FavoritesService {
 
     @Override
     public Flux<ProductUpdateDto> update() {
-        return Flux.create(fluxSink -> {
-            reactiveFavoriteRepository.findAll()
-                    .flatMap(favorite -> Flux.fromIterable(favorite.getProducts()))
-                    .map(productMapper::toDto)
-                    .distinct()
-                    .subscribe(productDto ->
-                            updateOneProduct(productDto).subscribe(dto -> {
-                                if(!productDto.equals(dto)) {
+
+        return reactiveFavoriteRepository.findAll()
+                .flatMap(favorite -> Flux.fromIterable(favorite.getProducts()))
+                .map(productMapper::toDto)
+                .distinct()
+                .flatMap(productDto ->
+                        updateOneProduct(productDto)
+                                .filter(updatedDto -> !productDto.equals(updatedDto))
+                                .map(updatedDto -> {
                                     ProductUpdateDto productUpdateDto = new ProductUpdateDto();
                                     productUpdateDto.setOldProductDto(productDto);
-                                    productUpdateDto.setNewProductDto(dto);
-                                    fluxSink.next(productUpdateDto);
-                                }
-                            }));
-        });
+                                    productUpdateDto.setNewProductDto(updatedDto);
+                                    return productUpdateDto;
+                        })
+                );
     }
 
     private Mono<ProductDto> updateOneProduct(ProductDto productDto) {
-        return Mono.create(monoSink -> {
-            activeParserMap.get(productDto.getShopName())
-                    .parseOneProduct(productDto)
-                    .subscribe(dto -> {
-                        if (!productDto.equals(dto)) {
-                            saveProductPrice(saveOrUpdateProduct(dto));
-                        }
-                        monoSink.success(dto);
-                    });
-        });
+        return activeParserMap.get(productDto.getShopName())
+                .parseOneProduct(productDto)
+                .mapNotNull(updatedDto -> {
+                    if (!productDto.equals(updatedDto)) {
+                        saveProductPrice(saveOrUpdateProduct(updatedDto));
+                        return updatedDto;
+                    }
+                    return productDto;
+                });
     }
 
     @Override
