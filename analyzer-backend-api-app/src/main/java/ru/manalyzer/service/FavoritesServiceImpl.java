@@ -9,6 +9,7 @@ import ru.manalyzer.Parser;
 import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.mapper.Mapper;
 import ru.manalyzer.mapper.PriceMapper;
+import ru.manalyzer.mapper.ProductMapper;
 import ru.manalyzer.persist.Favorite;
 import ru.manalyzer.persist.Product;
 import ru.manalyzer.persist.ProductPrice;
@@ -62,12 +63,10 @@ public class FavoritesServiceImpl implements FavoritesService {
                 .subscribe(favorite -> favorite.getProducts().parallelStream().forEach(product -> {
                             ProductDto productDto = productMapper.toDto(product);
                             fluxSink.next(productDto);
-                            activeParserMap.get(productDto.getShopName())
-                                    .parseOneProduct(productDto)
+                            updateOneProduct(productDto)
                                     .subscribe(dto -> {
                                         if (!productDto.equals(dto)) {
                                             fluxSink.next(dto);
-                                            saveProductPrice(saveOrUpdateProduct(dto));
                                         }
                                     });
                         }
@@ -134,5 +133,32 @@ public class FavoritesServiceImpl implements FavoritesService {
         ProductPrice productPrice = productDtoToProductPriceMapper.toProductPrice(product);
 
         productPriceRepository.save(productPrice);
+    }
+
+    @Override
+    public void update() {
+        reactiveFavoriteRepository.findAll()
+                .flatMap(favorite -> Flux.fromIterable(favorite.getProducts()))
+                .map(product -> {
+                    ProductDto productDto = productMapper.toDto(product);
+                    ((ProductMapper)productMapper).mapSpecificFields(product, productDto);
+                    return productDto;
+                })
+                .distinct()
+                .subscribe(productDto ->
+                        updateOneProduct(productDto).subscribe());
+    }
+
+    private Mono<ProductDto> updateOneProduct(ProductDto productDto) {
+        return Mono.create(monoSink -> {
+            activeParserMap.get(productDto.getShopName())
+                    .parseOneProduct(productDto)
+                    .subscribe(dto -> {
+                        if (!productDto.equals(dto)) {
+                            saveProductPrice(saveOrUpdateProduct(dto));
+                        }
+                        monoSink.success(dto);
+                    });
+        });
     }
 }
