@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.dto.PriceNotificationDto;
 import ru.manalyzer.dto.UserDto;
 import ru.manalyzer.service.TelegramService;
 
@@ -20,9 +20,9 @@ public class SpacePriceBotQueueListener {
         this.telegramService = telegramService;
     }
 
-    @RabbitListener(queues = "product.telegram.queue")
-    public void listenProductTelegram(ProductDto productDto) {
-        System.out.println(productDto);
+    @RabbitListener(queues = "notify.telegram.queue")
+    public void listenProductTelegram(PriceNotificationDto priceNotificationDto) {
+        telegramService.priceNotificationRequest(priceNotificationDto);
     }
 
     @RabbitListener(queues = "message.telegram.queue")

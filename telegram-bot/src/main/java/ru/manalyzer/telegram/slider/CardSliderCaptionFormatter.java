@@ -6,6 +6,7 @@ import ru.manalyzer.property.CardSliderCaptionProperties;
 import ru.manalyzer.storage.entity.ProductCardSlider;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 @Component
@@ -18,13 +19,14 @@ public class CardSliderCaptionFormatter implements CardSliderFormatter {
     }
 
     private String formatTitle(String title) {
+        title = title.replaceAll("[<>]", "");
         return String.format(cardSliderCaptionProperties.getTitleFormat(), title);
     }
 
     private String formatPrice(String price) {
         BigDecimal bigDecimalPrice = new BigDecimal(price);
-        NumberFormat currency = NumberFormat.getCurrencyInstance();
-        return String.format(cardSliderCaptionProperties.getPriceFormat(), currency.format(bigDecimalPrice));
+//        NumberFormat currency = NumberFormat.getCurrencyInstance();
+        return String.format(cardSliderCaptionProperties.getPriceFormat(), bigDecimalPrice);
     }
 
     private String formatShopLink(String productLink, String shopName) {

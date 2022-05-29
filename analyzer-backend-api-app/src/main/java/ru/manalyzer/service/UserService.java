@@ -10,6 +10,8 @@ public interface UserService {
 
     Optional<UserDto> getUserById(String id);
 
+    Optional<String> getTelegramChatIdByUserId(String userId);
+
     UserDto updateUser(UserDto user);
 
     UserDto updatePassword(String id, String password);
