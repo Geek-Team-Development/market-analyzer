@@ -14,7 +14,11 @@ public interface FavoritesService {
 
     void clearFavoritesCart(String userLogin);
 
-    Flux<ProductUpdateDto> update();
+    void update();
 
     Flux<String> getUsersWithProduct(ProductDto productDto);
+
+    void addProductUpdateListener(Object object, ProductUpdateListener listener);
+
+    void removeProductUpdateListener(Object object);
 }

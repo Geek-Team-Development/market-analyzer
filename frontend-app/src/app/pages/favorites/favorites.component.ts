@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {ProductDto} from "../../dto/product-dto";
 import {FavoritesService} from "../../services/favorites.service";
 import {MessageObserverService} from "../../services/message-observer.service";
+import {Message} from "../../dto/message";
+import {ProductUpdate} from "../../dto/product-update";
 
 @Component({
   selector: 'app-favorites',
@@ -13,7 +15,13 @@ export class FavoritesComponent implements OnInit {
   products: ProductDto[] = [];
 
   constructor(private favoriteService: FavoritesService,
-              private messageObserverService: MessageObserverService) { }
+              private messageObserverService: MessageObserverService) {
+    messageObserverService.message.subscribe({
+      next: message => {
+        this.messageReceived(message);
+      }
+    })
+  }
 
   ngOnInit(): void {
     this.getAll();
@@ -27,9 +35,6 @@ export class FavoritesComponent implements OnInit {
         },
         error: err => {
           console.log(err);
-        },
-        complete: () => {
-          this.messageObserverService.decrementAndNext();
         }
       })
   }
@@ -54,7 +59,7 @@ export class FavoritesComponent implements OnInit {
             console.log(err);
           }
         });
-    };
+    }
   }
 
   productDeleted($event: ProductDto) {
@@ -63,5 +68,16 @@ export class FavoritesComponent implements OnInit {
         this.products.splice(index, 1);
       }
     });
+  }
+
+  private messageReceived(message: Message) {
+    let productUpdate = message.object as ProductUpdate;
+    for(let i = 0; i < this.products.length; i++) {
+      if(this.products[i].id === productUpdate.oldProductDto.id) {
+        this.products[i].shopName = productUpdate.newProductDto.shopName;
+        this.products[i].name = productUpdate.newProductDto.name;
+        this.products[i].price = productUpdate.newProductDto.price;
+      }
+    }
   }
 }

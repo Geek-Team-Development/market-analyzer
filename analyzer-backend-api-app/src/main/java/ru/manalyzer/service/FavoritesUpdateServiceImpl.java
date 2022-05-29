@@ -38,16 +38,19 @@ public class FavoritesUpdateServiceImpl implements FavoritesUpdateService {
         this.notifyMessageService = notifyMessageService;
         this.userNotifyMessageRepository = userNotifyMessageRepository;
         this.rabbitTemplate = rabbitTemplate;
+        this.favoritesService.addProductUpdateListener(this, this::handleProductUpdated);
     }
 
     @Override
     @Scheduled(fixedRateString = "${update.service.delayBetweenUpdate}",
             initialDelayString = "${update.service.initialDelay}",
             timeUnit = TimeUnit.HOURS)
+//    @Scheduled(fixedRateString = "40",
+//            initialDelayString = "0",
+//            timeUnit = TimeUnit.SECONDS)
     public void updateFavorites() {
         logger.info("Запустилось обновление продуктов из избранного");
-        favoritesService.update()
-                .subscribe(this::handleProductUpdated);
+        favoritesService.update();
         logger.info("Закончилось обновление продуктов из избранного");
     }
 

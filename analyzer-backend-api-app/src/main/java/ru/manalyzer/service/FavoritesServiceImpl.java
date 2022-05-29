@@ -7,18 +7,18 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.manalyzer.Parser;
 import ru.manalyzer.dto.ProductDto;
-import ru.manalyzer.dto.UserDto;
 import ru.manalyzer.mapper.Mapper;
 import ru.manalyzer.mapper.PriceMapper;
 import ru.manalyzer.persist.Favorite;
 import ru.manalyzer.persist.Product;
 import ru.manalyzer.persist.ProductPrice;
-import ru.manalyzer.persist.User;
 import ru.manalyzer.repository.FavoriteRepository;
 import ru.manalyzer.repository.ProductPriceRepository;
 import ru.manalyzer.repository.ReactiveFavoriteRepository;
 import ru.manalyzer.service.dto.ProductUpdateDto;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,6 +45,8 @@ public class FavoritesServiceImpl implements FavoritesService {
 
     private final Map<String, Parser> activeParserMap;
 
+    private final Map<Object, ProductUpdateListener> productUpdateListeners = new HashMap<>();
+
     @Autowired
     public FavoritesServiceImpl(FavoriteRepository favoriteRepository,
                                 ReactiveFavoriteRepository reactiveFavoriteRepository,
@@ -64,6 +66,16 @@ public class FavoritesServiceImpl implements FavoritesService {
         this.productMapper = productMapper;
         this.productDtoToProductPriceMapper = productDtoToProductPriceMapper;
         this.activeParserMap = activeParserMap;
+    }
+
+    @Override
+    public void addProductUpdateListener(Object object, ProductUpdateListener listener) {
+        productUpdateListeners.put(object, listener);
+    }
+
+    @Override
+    public void removeProductUpdateListener(Object object) {
+        productUpdateListeners.remove(object);
     }
 
     @Override
@@ -136,6 +148,49 @@ public class FavoritesServiceImpl implements FavoritesService {
 
         productPriceRepository.save(productPrice);
     }
+  
+    @Override
+    public void update() {
+        reactiveFavoriteRepository.findAll()
+                .flatMap(favorite -> Flux.fromIterable(favorite.getProducts()))
+                .map(productMapper::toDto)
+                .distinct()
+                .subscribe(productDto ->
+                        this.updateOneProduct(productDto).subscribe()
+                );
+    }
+
+    private Mono<ProductDto> updateOneProduct(ProductDto productDto) {
+//        ProductDto updated = productMapper.toDto(productMapper.toEntity(productDto));
+//        updated.setPrice(new BigDecimal(productDto.getPrice()).add(new BigDecimal(2000)).toString());
+//        return Mono.just(updated)
+//                .mapNotNull(updatedDto -> {
+//                    if (!productDto.equals(updatedDto)) {
+//                        saveProductPrice(saveOrUpdateProduct(updatedDto));
+//                        System.out.println("New product price " + updatedDto.getPrice());
+//                        System.out.println("Old product price " + productDto.getPrice());
+//                        updatedDto.setOldPrice(productDto.getPrice());
+//                        notifyUser(updatedDto);
+//                        notifyFront(productDto, updatedDto);
+//                        return updatedDto;
+//                    }
+//                    return productDto;
+//                });
+        return activeParserMap.get(productDto.getShopName())
+                .parseOneProduct(productDto)
+                .mapNotNull(updatedDto -> {
+                    if (!productDto.equals(updatedDto)) {
+                        saveProductPrice(saveOrUpdateProduct(updatedDto));
+                        System.out.println("New product price " + updatedDto.getPrice());
+                        System.out.println("Old product price " + productDto.getPrice());
+                        updatedDto.setOldPrice(productDto.getPrice());
+                        notifyUser(updatedDto);
+                        notifyFront(productDto, updatedDto);
+                        return updatedDto;
+                    }
+                    return productDto;
+                });
+    }
 
     private void notifyUser(ProductDto dto) {
         Product product = storageProductService
@@ -156,36 +211,13 @@ public class FavoritesServiceImpl implements FavoritesService {
 //                .filter(chatId -> !chatId.isBlank())
 //                .subscribe(chatId -> telegramService.notifyUsersAboutChangePrice(chatId, dto));
     }
-  
-    @Override
-    public Flux<ProductUpdateDto> update() {
 
-        return reactiveFavoriteRepository.findAll()
-                .flatMap(favorite -> Flux.fromIterable(favorite.getProducts()))
-                .map(productMapper::toDto)
-                .distinct()
-                .flatMap(productDto ->
-                        updateOneProduct(productDto)
-                                .filter(updatedDto -> !productDto.equals(updatedDto))
-                                .map(updatedDto -> {
-                                    ProductUpdateDto productUpdateDto = new ProductUpdateDto();
-                                    productUpdateDto.setOldProductDto(productDto);
-                                    productUpdateDto.setNewProductDto(updatedDto);
-                                    return productUpdateDto;
-                        })
-                );
-    }
-
-    private Mono<ProductDto> updateOneProduct(ProductDto productDto) {
-        return activeParserMap.get(productDto.getShopName())
-                .parseOneProduct(productDto)
-                .mapNotNull(updatedDto -> {
-                    if (!productDto.equals(updatedDto)) {
-                        saveProductPrice(saveOrUpdateProduct(updatedDto));
-                        return updatedDto;
-                    }
-                    return productDto;
-                });
+    private void notifyFront(ProductDto oldProductDto, ProductDto updatedDto) {
+        ProductUpdateDto productUpdateDto = new ProductUpdateDto();
+        productUpdateDto.setOldProductDto(oldProductDto);
+        productUpdateDto.setNewProductDto(updatedDto);
+        productUpdateListeners.values()
+                .forEach(listener -> listener.update(productUpdateDto));
     }
 
     @Override
