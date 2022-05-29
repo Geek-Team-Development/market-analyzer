@@ -8,4 +8,6 @@ import ru.manalyzer.persist.Favorite;
 public interface ReactiveFavoriteRepository extends ReactiveMongoRepository<Favorite, String> {
 
     Flux<Favorite> findByUserId(Mono<String> userId);
+
+//    Mono<Favorite> findByUserId(String userId);
 }

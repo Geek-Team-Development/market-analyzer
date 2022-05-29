@@ -1,16 +1,16 @@
 version: '3'
 services:
-  analyzer-backend-api-app:
-    image: geekteam/analyzer-backend-api-app:latest
-    ports:
-      - 8080:8080
-
-  frontend:
-    image: geekteam/frontend
-    ports:
-      - 80:80
-    depends_on:
-      - analyzer-backend-api-app
+#  analyzer-backend-api-app:
+#    image: geekteam/analyzer-backend-api-app:latest
+#    ports:
+#      - 8080:8080
+#
+#  frontend:
+#    image: geekteam/frontend
+#    ports:
+#      - 80:80
+#    depends_on:
+#      - analyzer-backend-api-app
 
   db:
     image: mongo
@@ -20,29 +20,31 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     ports:
       - 27017:27017
-    volumes:
-      - mongodb-data:/var/lib/mongodb
+#    volumes:
+#      - mongodb-data:/var/lib/mongodb
 
   rabbitmq:
     image: 'rabbitmq:3-management'
     ports:
       - 5672:5672
       - 15672:15672
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
-
-  redis:
-    image: 'bitnami/redis:latest'
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    ports:
-      - 6379:6379
-
-  telegram-bot:
-    image: geekteam/telegram-bot
-    ports:
-      - 8090
-
-volumes:
-  mongodb-data:
-  rabbitmq-data:
+      - 61613:61613
+    command: sh -c "rabbitmq-plugins enable --offline rabbitmq_stomp && rabbitmq-server"
+#    volumes:
+#      - rabbitmq-data:/var/lib/rabbitmq
+#
+#  redis:
+#    image: 'bitnami/redis:latest'
+#    environment:
+#      - ALLOW_EMPTY_PASSWORD=yes
+#    ports:
+#      - 6379:6379
+#
+#  telegram-bot:
+#    image: geekteam/telegram-bot
+#    ports:
+#      - 8090
+#
+#volumes:
+#  mongodb-data:
+#  rabbitmq-data:
