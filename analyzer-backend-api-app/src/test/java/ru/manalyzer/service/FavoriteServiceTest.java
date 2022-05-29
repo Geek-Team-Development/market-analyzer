@@ -27,6 +27,7 @@ import ru.manalyzer.persist.ProductPrice;
 import ru.manalyzer.repository.FavoriteRepository;
 import ru.manalyzer.repository.ProductPriceRepository;
 import ru.manalyzer.repository.ReactiveFavoriteRepository;
+import ru.manalyzer.service.dto.ProductUpdateDto;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -159,12 +160,6 @@ public class FavoriteServiceTest {
                         Matchers.in(List.of("Macbook Pro", "Macbook Air", "Mac mini"))))
                 .assertNext(dto -> MatcherAssert.assertThat(dto.getName(),
                         Matchers.in(List.of("Macbook Pro", "Macbook Air", "Mac mini"))))
-                .assertNext(dto -> MatcherAssert.assertThat(dto.getName(),
-                        Matchers.in(List.of("Macbook Pro", "Macbook Air", "Mac mini"))))
-                .assertNext(dto -> MatcherAssert.assertThat(dto.getName(),
-                        Matchers.in(List.of("Macbook Pro", "Macbook Air", "Mac mini"))))
-                .assertNext(dto -> MatcherAssert.assertThat(dto.getName(),
-                        Matchers.in(List.of("Macbook Pro", "Macbook Air", "Mac mini"))))
                 .expectNoEvent(Duration.ofMillis(500))
                 .thenCancel()
                 .verify();
@@ -173,6 +168,8 @@ public class FavoriteServiceTest {
 
     @Test
     public void updateTest() {
+        ((ProductMapper)productMapper).initMapper();
+        ((ProductToProductPriceMapper)productDtoToProductPriceMapper).initMapper();
         ProductDto newMacbookProDto = new ProductDto();
         newMacbookProDto.setId(macbookPro.getId());
         newMacbookProDto.setShopName(macbookPro.getShopName());
@@ -185,19 +182,16 @@ public class FavoriteServiceTest {
         Product oldMacbookPro = productMapper.toEntity(macbookPro);
         Product oldMacBookProAir = productMapper.toEntity(macbookAir);
         Product oldMacMini = productMapper.toEntity(macMini);
-        ((ProductMapper)productMapper).mapSpecificFields(newMacbookProDto, newMacbookPro);
-        ((ProductMapper)productMapper).mapSpecificFields(macbookPro, oldMacbookPro);
-        ((ProductMapper)productMapper).mapSpecificFields(macbookAir, oldMacBookProAir);
-        ((ProductMapper)productMapper).mapSpecificFields(macMini, oldMacMini);
 
         ProductPrice expectedProductPrice = productDtoToProductPriceMapper.toProductPrice(newMacbookPro);
-        ((ProductToProductPriceMapper)productDtoToProductPriceMapper).mapSpecificFields(newMacbookPro, expectedProductPrice);
+
+        Set<Product> set = new HashSet<>();
+        set.add(oldMacbookPro);
+        set.add(oldMacBookProAir);
+        set.add(oldMacMini);
 
         when(reactiveFavoriteRepository.findAll())
-                .thenReturn(Flux.just(new Favorite(
-                        "test",
-                        Set.of(oldMacbookPro, oldMacBookProAir, oldMacMini)
-                )));
+                .thenReturn(Flux.just(new Favorite("test", set)));
         when(oldiParser.parseOneProduct(Mockito.argThat(dto -> dto.getShopName().equals(oldiShopName))))
                 .thenReturn(Mono.just(macbookAir));
         when(mvideoParser.parseOneProduct(Mockito.argThat(dto -> dto.getShopName().equals(mvideoShopName))))
@@ -209,10 +203,21 @@ public class FavoriteServiceTest {
 
         ArgumentCaptor<ProductPrice> captor = ArgumentCaptor.forClass(ProductPrice.class);
 
-        favoritesService.update();
+        Flux<ProductUpdateDto> productUpdateDtoFlux = favoritesService.update();
+
+        StepVerifier.create(productUpdateDtoFlux)
+                .expectSubscription()
+                .assertNext(productUpdateDto -> {
+                    assertEquals(macbookPro, productUpdateDto.getOldProductDto());
+                    assertEquals(newMacbookProDto, productUpdateDto.getNewProductDto());
+                })
+                .thenCancel()
+                .verify();;
+
         verify(productPriceRepository, times(1)).save(any());
         verify(productPriceRepository).save(captor.capture());
         ProductPrice resultProductPrice = captor.getValue();
         assertEquals(expectedProductPrice.getProductId(), resultProductPrice.getProductId());
+        assertEquals(expectedProductPrice.getPrice(), resultProductPrice.getPrice());
     }
 }

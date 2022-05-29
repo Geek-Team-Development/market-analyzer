@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.manalyzer.dto.UserDto;
 import ru.manalyzer.mapper.Mapper;
@@ -28,7 +30,10 @@ public class AuthenticationServiceTest {
         userRepository = Mockito.mock(UserRepository.class);
         Mapper<User, UserDto> userMapper = new UserMapper<>(new ModelMapper(), User.class, UserDto.class);
         PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
-        authenticationService = new AuthenticationServiceImpl(userRepository, userMapper, passwordEncoder);
+        DirectExchange directExchange = Mockito.mock(DirectExchange.class);
+        AmqpAdmin amqpAdmin = Mockito.mock(AmqpAdmin.class);
+        authenticationService = new AuthenticationServiceImpl(userRepository, userMapper, passwordEncoder,
+                directExchange, amqpAdmin);
     }
 
     @Test

@@ -6,6 +6,7 @@ import ru.manalyzer.persist.Product;
 import ru.manalyzer.persist.ProductPrice;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
@@ -26,6 +27,8 @@ public class ProductToProductPriceMapper<E extends ProductPrice, D extends Produ
     public void mapSpecificFields(D source, E destination) {
         destination.setProductId(source.getId());
         destination.setDate(new Date());
+        destination.setPrice(source.getCost());
+        destination.setProductId(source.getProductShopId());
     }
 
     @Override
