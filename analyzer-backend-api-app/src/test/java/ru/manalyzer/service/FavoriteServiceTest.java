@@ -89,6 +89,7 @@ public class FavoriteServiceTest {
                 reactiveFavoriteRepository,
                 productPriceRepository,
                 authenticationService,
+                null, null,
                 storageProductService,
                 productMapper,
                 productDtoToProductPriceMapper,

@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import ru.manalyzer.Parser;
 import ru.manalyzer.diginetica.dto.ConverterDto;
+import ru.manalyzer.diginetica.dto.DigineticaProductDto;
 import ru.manalyzer.diginetica.dto.DigineticaResponseDto;
 import ru.manalyzer.diginetica.property.DigineticaConnectionProperties;
 import ru.manalyzer.dto.ProductDto;
@@ -42,6 +43,7 @@ public class DigineticaParser implements Parser {
         return invokeRequest(searchName, sort, pageNumber)
                 .flatMapIterable(DigineticaResponseDto::getProducts)
 //                .filter(oldiProductDto -> oldiProductDto.getName().toLowerCase().contains(searchName.toLowerCase()))
+                .filter(oldiProductDto -> matchProduct(searchName, oldiProductDto))
                 .map(converterDigineticaDtoToDto::convertToDto);
     }
 
@@ -96,5 +98,17 @@ public class DigineticaParser implements Parser {
 
     private void exceptionHandle(Throwable throwable) {
         log.error(connectionProperties.getShopName() + " parser error");
+    }
+
+    private boolean matchProduct(String searchName, DigineticaProductDto digineticaProductDto) {
+        String[] searchWords = searchName.split(" ");
+        String productName = digineticaProductDto.getName().toLowerCase();
+        for (int i = 0; i < searchWords.length; i++) {
+            String searchWord = searchWords[i].toLowerCase();
+            if (!productName.contains(searchWord.substring(0, searchWord.length() - 1))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

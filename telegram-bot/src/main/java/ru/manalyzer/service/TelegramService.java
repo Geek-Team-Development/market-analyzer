@@ -2,6 +2,7 @@ package ru.manalyzer.service;
 
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import ru.manalyzer.dto.PriceNotificationDto;
 import ru.manalyzer.dto.UserDto;
 
 public interface TelegramService {
@@ -13,4 +14,6 @@ public interface TelegramService {
     void commandRequest(Message message);
 
     void authorizeRequest(UserDto userDto);
+
+    void priceNotificationRequest(PriceNotificationDto priceNotificationDto);
 }

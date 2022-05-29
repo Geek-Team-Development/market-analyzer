@@ -10,7 +10,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 public class ProductDto extends AbstractPersistentDto {
 
 //    private String id;
@@ -18,6 +18,8 @@ public class ProductDto extends AbstractPersistentDto {
     private String name;
 
     private String price;
+
+    private String oldPrice;
 
     private String productLink;
 

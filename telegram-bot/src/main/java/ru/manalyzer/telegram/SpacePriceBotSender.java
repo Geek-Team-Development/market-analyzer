@@ -1,6 +1,7 @@
 package ru.manalyzer.telegram;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -11,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.manalyzer.dto.ProductDto;
+import ru.manalyzer.telegram.notification.NotificationFormatter;
 import ru.manalyzer.telegram.slider.CardSliderFormatter;
 import ru.manalyzer.storage.entity.ProductCardSlider;
 import ru.manalyzer.telegram.keyboard.ChatKeyboard;
@@ -25,13 +27,18 @@ public class SpacePriceBotSender implements BotSender {
 
     private final CardSliderFormatter cardSliderCaptionFormatter;
 
+    private final NotificationFormatter notificationFormatter;
+
     private final ChatKeyboard chatKeyboard;
 
+    @Autowired
     public SpacePriceBotSender(SpacePriceBot spacePriceBot,
                                CardSliderFormatter cardSliderCaptionFormatter,
+                               NotificationFormatter notificationFormatter,
                                ChatKeyboard chatKeyboard) {
         this.spacePriceBot = spacePriceBot;
         this.cardSliderCaptionFormatter = cardSliderCaptionFormatter;
+        this.notificationFormatter = notificationFormatter;
         this.chatKeyboard = chatKeyboard;
     }
 
@@ -54,6 +61,18 @@ public class SpacePriceBotSender implements BotSender {
                 .build();
 
         sendMessage(sendMessage);
+    }
+
+    @Override
+    public void sendPriceNotification(String chatId, ProductDto productDto) {
+        sendPhoto(
+                SendPhoto.builder()
+                        .chatId(chatId)
+                        .photo(new InputFile(productDto.getImageLink()))
+                        .caption(notificationFormatter.format(productDto))
+                        .parseMode(ParseMode.HTML)
+                        .build()
+        );
     }
 
     private void updateProductCardSlider(ProductCardSlider productCardSlider) {

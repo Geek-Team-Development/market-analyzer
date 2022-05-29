@@ -45,6 +45,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<String> getTelegramChatIdByUserId(String userId) {
+        return userRepository.findById(userId)
+                .map(User::getTelegramChatId);
+    }
+
+    @Override
     public UserDto updateUser(UserDto userDto) {
         User user = userRepository.findById(userDto.getId()).orElseThrow(() -> new RuntimeException("User not found"));
         userDto.setPassword(user.getPassword());

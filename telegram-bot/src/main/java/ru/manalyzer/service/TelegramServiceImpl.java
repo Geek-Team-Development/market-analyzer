@@ -3,6 +3,7 @@ package ru.manalyzer.service;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import ru.manalyzer.dto.PriceNotificationDto;
 import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.dto.UserDto;
 import ru.manalyzer.property.MessageProperties;
@@ -137,6 +138,11 @@ public class TelegramServiceImpl implements TelegramService {
         botSender.sendInformationMessage(userDto.getTelegramChatId(), messageProperties.getAuthorizedOk());
         productCardSliderRepository.findById(userDto.getTelegramChatId())
                 .ifPresent(botSender::sendProductCardSlider);
+    }
+
+    @Override
+    public void priceNotificationRequest(PriceNotificationDto priceNotificationDto) {
+        botSender.sendPriceNotification(priceNotificationDto.getChatId(), priceNotificationDto.getProductDto());
     }
 
     private void sendAndSaveCardSlider(ProductCardSlider productCardSlider) {
