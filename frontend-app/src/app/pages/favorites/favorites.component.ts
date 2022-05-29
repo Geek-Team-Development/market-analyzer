@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ProductDto} from "../../dto/product-dto";
 import {FavoritesService} from "../../services/favorites.service";
+import {MessageObserverService} from "../../services/message-observer.service";
 
 @Component({
   selector: 'app-favorites',
@@ -11,7 +12,8 @@ export class FavoritesComponent implements OnInit {
 
   products: ProductDto[] = [];
 
-  constructor(private favoriteService: FavoritesService) { }
+  constructor(private favoriteService: FavoritesService,
+              private messageObserverService: MessageObserverService) { }
 
   ngOnInit(): void {
     this.getAll();
@@ -21,10 +23,13 @@ export class FavoritesComponent implements OnInit {
     this.favoriteService.getAll()
       .subscribe({
         next: response => {
-          this.pushProduct(response)
+          this.pushProduct(response);
         },
         error: err => {
           console.log(err);
+        },
+        complete: () => {
+          this.messageObserverService.decrementAndNext();
         }
       })
   }

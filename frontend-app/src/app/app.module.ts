@@ -25,6 +25,8 @@ import {NavBarAppNameComponent} from "./components/nav-bar/components/nav-bar-ap
 import {NavBarSmallMenuBtnComponent} from "./components/nav-bar/components/nav-bar-small-menu-btn.component";
 import {ErrorDialogComponent} from "./components/error-dialog/error-dialog.component";
 import {MatDialogModule} from "@angular/material/dialog";
+import {MatBadgeModule} from "@angular/material/badge";
+import { NotificationsComponent } from './pages/notifications/notifications.component';
 
 @NgModule({
   declarations: [
@@ -39,24 +41,26 @@ import {MatDialogModule} from "@angular/material/dialog";
     ProductCardComponent,
     UsersComponent,
     ProfileComponent,
-    ErrorDialogComponent
+    ErrorDialogComponent,
+    NotificationsComponent
   ],
 
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    MatProgressSpinnerModule,
-    MatButtonModule,
-    MatMenuModule,
-    MatDividerModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatDialogModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        BrowserAnimationsModule,
+        HttpClientModule,
+        MatProgressSpinnerModule,
+        MatButtonModule,
+        MatMenuModule,
+        MatDividerModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatDialogModule,
+        MatBadgeModule
+    ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: UnauthorizedInterceptor, multi: true }
   ],

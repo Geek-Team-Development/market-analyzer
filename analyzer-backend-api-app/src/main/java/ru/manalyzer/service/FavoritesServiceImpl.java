@@ -17,6 +17,7 @@ import ru.manalyzer.persist.User;
 import ru.manalyzer.repository.FavoriteRepository;
 import ru.manalyzer.repository.ProductPriceRepository;
 import ru.manalyzer.repository.ReactiveFavoriteRepository;
+import ru.manalyzer.service.dto.ProductUpdateDto;
 
 import java.util.Map;
 import java.util.Optional;
@@ -67,29 +68,12 @@ public class FavoritesServiceImpl implements FavoritesService {
 
     @Override
     public Flux<ProductDto> getFavoritesCartOfUser(String userLogin) {
-        return Flux.create(fluxSink -> reactiveFavoriteRepository.findByUserId(Mono.just(getUserId(userLogin)))
-                .subscribe(favorite -> favorite.getProducts().parallelStream().forEach(product -> {
-                            ProductDto productDto = productMapper.toDto(product);
-                            fluxSink.next(productDto);
-                            activeParserMap.get(productDto.getShopName())
-                                    .parseOneProduct(productDto)
-                                    .subscribe(dto -> {
-                                        if (!productDto.equals(dto)) {
-                                            fluxSink.next(dto);
-
-                                            // if change price then notify users
-                                            if (!productDto.getPrice().equals(dto.getPrice())) {
-                                                System.out.println("New product price " + dto.getPrice());
-                                                System.out.println("Old product price " + productDto.getPrice());
-                                                dto.setOldPrice(productDto.getPrice());
-                                                notifyUser(dto);
-                                            }
-                                            saveProductPrice(saveOrUpdateProduct(dto));
-                                        }
-                                    });
-                        }
-                )));
-
+        String userId = getUserId(userLogin);
+        return reactiveFavoriteRepository.findByUserId(Mono.just(getUserId(userLogin)))
+                .filter(favorite -> favorite.getUserId().equals(userId))
+                .flatMap(favorite -> Flux.fromIterable(favorite.getProducts()))
+                .map(productMapper::toDto)
+                .flatMap(this::updateOneProduct);
     }
 
     @Override
@@ -171,5 +155,45 @@ public class FavoritesServiceImpl implements FavoritesService {
 //                .map(opt -> opt.get().getTelegramChatId())
 //                .filter(chatId -> !chatId.isBlank())
 //                .subscribe(chatId -> telegramService.notifyUsersAboutChangePrice(chatId, dto));
+    }
+  
+    @Override
+    public Flux<ProductUpdateDto> update() {
+
+        return reactiveFavoriteRepository.findAll()
+                .flatMap(favorite -> Flux.fromIterable(favorite.getProducts()))
+                .map(productMapper::toDto)
+                .distinct()
+                .flatMap(productDto ->
+                        updateOneProduct(productDto)
+                                .filter(updatedDto -> !productDto.equals(updatedDto))
+                                .map(updatedDto -> {
+                                    ProductUpdateDto productUpdateDto = new ProductUpdateDto();
+                                    productUpdateDto.setOldProductDto(productDto);
+                                    productUpdateDto.setNewProductDto(updatedDto);
+                                    return productUpdateDto;
+                        })
+                );
+    }
+
+    private Mono<ProductDto> updateOneProduct(ProductDto productDto) {
+        return activeParserMap.get(productDto.getShopName())
+                .parseOneProduct(productDto)
+                .mapNotNull(updatedDto -> {
+                    if (!productDto.equals(updatedDto)) {
+                        saveProductPrice(saveOrUpdateProduct(updatedDto));
+                        return updatedDto;
+                    }
+                    return productDto;
+                });
+    }
+
+    @Override
+    public Flux<String> getUsersWithProduct(ProductDto productDto) {
+        return reactiveFavoriteRepository.findAll()
+                .filter(favorite -> favorite.getProducts()
+                        .stream()
+                        .anyMatch(product -> product.getProductShopId().equals(productDto.getId())))
+                .map(Favorite::getUserId);
     }
 }

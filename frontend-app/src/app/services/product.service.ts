@@ -3,7 +3,6 @@ import {EventSourceService} from "./event-source.service";
 import {ProductDto} from "../dto/product-dto";
 import {Observable} from "rxjs";
 import {Util} from "../utils/util";
-import {Sort} from "../dto/sort";
 
 @Injectable({
   providedIn: 'root'

@@ -11,4 +11,5 @@ public interface ReactiveFavoriteRepository extends ReactiveMongoRepository<Favo
     Flux<Favorite> findByUserId(Mono<String> userId);
 
     Flux<Favorite> findByProductsContains(Product product);
+
 }

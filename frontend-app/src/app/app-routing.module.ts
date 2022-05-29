@@ -9,6 +9,7 @@ import {UsersComponent} from "./pages/users/users.component";
 import {UsersAuthGuard} from "./utils/users-auth-guard";
 import {ProfileComponent} from "./pages/profile/profile.component";
 import {ProfileAuthGuard} from "./utils/profile-auth-guard";
+import {NotificationsComponent} from "./pages/notifications/notifications.component";
 
 const routes: Routes = [
   { path: "", pathMatch: "full", redirectTo: FrontUrls.MAIN },
@@ -17,7 +18,8 @@ const routes: Routes = [
   { path: FrontUrls.SIGN_IN, component: SignInComponent },
   { path: FrontUrls.FAVORITES, component: FavoritesComponent },
   { path: FrontUrls.USERS, component: UsersComponent, canActivate: [ UsersAuthGuard ] },
-  { path: FrontUrls.PROFILE, component: ProfileComponent, canActivate: [ ProfileAuthGuard ] }
+  { path: FrontUrls.PROFILE, component: ProfileComponent, canActivate: [ ProfileAuthGuard ] },
+  { path: FrontUrls.NOTIFICATIONS, component: NotificationsComponent }
 ];
 
 @NgModule({
