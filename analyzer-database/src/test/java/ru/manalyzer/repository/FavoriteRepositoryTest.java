@@ -1,14 +1,16 @@
 package ru.manalyzer.repository;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ru.manalyzer.dbmigrations.FavoriteCollectionInitializerChangeLog;
 import ru.manalyzer.persist.Favorite;
 import ru.manalyzer.persist.Product;
 import ru.manalyzer.persist.Role;
@@ -16,8 +18,8 @@ import ru.manalyzer.persist.User;
 
 import java.math.BigDecimal;
 
-@DataMongoTest(excludeAutoConfiguration = {EmbeddedMongoAutoConfiguration.class})
-@ExtendWith(SpringExtension.class)
+@DataMongoTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FavoriteRepositoryTest {
 
     @Autowired
@@ -29,6 +31,9 @@ public class FavoriteRepositoryTest {
     @Autowired
     private FavoriteRepository favoriteRepository;
 
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
     private static User testUser;
 
     private static Product testProductMacbook;
@@ -36,7 +41,12 @@ public class FavoriteRepositoryTest {
     private static Product testProductIPhone;
 
     @BeforeAll
-    public static void init() {
+    public void init() {
+        FavoriteCollectionInitializerChangeLog changeLog =
+                new FavoriteCollectionInitializerChangeLog();
+        changeLog.before(mongoTemplate);
+        changeLog.execution(mongoTemplate);
+
         testUser = new User();
         testUser.setEmail("test@mail.ru");
         testUser.setFirstName("Test");
@@ -60,6 +70,13 @@ public class FavoriteRepositoryTest {
         testProductIPhone.setCost(new BigDecimal(100000));
         testProductIPhone.setImageLink("");
         testProductIPhone.setProductLink("");
+    }
+
+    @AfterEach
+    public void afterEach() {
+        userRepository.deleteAll();
+        productRepository.deleteAll();
+        favoriteRepository.deleteAll();
     }
 
     @Test
