@@ -1,18 +1,17 @@
 package ru.manalyzer.repository;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.dao.DuplicateKeyException;
 import ru.manalyzer.persist.Role;
 import ru.manalyzer.persist.User;
-import org.springframework.dao.DuplicateKeyException;
 
-
-@DataMongoTest(excludeAutoConfiguration= {EmbeddedMongoAutoConfiguration.class})
-@ExtendWith(SpringExtension.class)
+@DataMongoTest
+@OverrideAutoConfiguration(enabled = true)
 public class UserRepositoryTest {
 
     @Autowired

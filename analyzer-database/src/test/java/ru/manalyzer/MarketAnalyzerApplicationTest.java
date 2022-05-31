@@ -1,14 +1,9 @@
 package ru.manalyzer;
 
-import org.junit.jupiter.api.Test;
+import io.mongock.runner.springboot.EnableMongock;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootApplication
+@EnableMongock
 public class MarketAnalyzerApplicationTest {
-
-    @Test
-    void contextLoads() {
-    }
-
 }
