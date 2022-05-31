@@ -2,19 +2,25 @@ package ru.manalyzer.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.rabbit.test.TestRabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.manalyzer.AnalyzerBackendApiAppApplication;
+import ru.manalyzer.config.WebSocketSecurityConfiguration;
 import ru.manalyzer.dto.ProductDto;
 
 import java.util.List;
@@ -29,12 +35,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SpringJUnitConfig
 public class FavoriteControllerTest {
 
     private MockMvc mockMvc;
 
     @Autowired
     WebTestClient client;
+
+    @MockBean
+    AmqpAdmin amqpAdmin;
 
     @Autowired
     private WebApplicationContext context;
@@ -65,6 +75,9 @@ public class FavoriteControllerTest {
                 .apply(springSecurity())
                 .build();
     }
+
+    @Autowired
+    ApplicationContext ctx;
 
     @Test
     @org.junit.jupiter.api.Order(1)
