@@ -13,10 +13,9 @@ import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.dto.Sort;
 import ru.manalyzer.parser.mvideo.config.properties.ParserProperties;
 import ru.manalyzer.parser.mvideo.dto.*;
-import ru.manalyzer.parser.mvideo.service.MVideoHeadersService;
+import ru.manalyzer.parser.mvideo.service.HeadersService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Парсер информации о продуктах с сервера MVideo
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class MVideoParser implements ru.manalyzer.Parser {
 
-    private final MVideoHeadersService mVideoHeadersService;
+    private final HeadersService headersService;
     private final WebClient webClient;
     private final ParserProperties properties;
 
@@ -32,10 +31,10 @@ public class MVideoParser implements ru.manalyzer.Parser {
 
     @Autowired
     public MVideoParser(WebClient webClient,
-                        MVideoHeadersService mVideoHeadersService,
+                        HeadersService headersService,
                         ParserProperties properties) {
         this.webClient = webClient;
-        this.mVideoHeadersService = mVideoHeadersService;
+        this.headersService = headersService;
         this.properties = properties;
     }
 
@@ -64,7 +63,7 @@ public class MVideoParser implements ru.manalyzer.Parser {
     }
 
     private Mono<List<String>> getProductIds(String searchName, Sort sort, int pageNumber) {
-        HttpHeaders productIdsRequestHeaders = mVideoHeadersService.getIdsHeaders();
+        HttpHeaders productIdsRequestHeaders = headersService.getIdsHeaders();
         return webClient
                 .get()
                 .uri(uriBuilder -> {
@@ -112,7 +111,7 @@ public class MVideoParser implements ru.manalyzer.Parser {
 
     private Mono<List<MaterialPrice>> getProductPrice(List<String> productIds) {
         String productIdsStr = String.join(",", productIds);
-        HttpHeaders productIdsRequestHeaders = mVideoHeadersService.getIdsHeaders();
+        HttpHeaders productIdsRequestHeaders = headersService.getIdsHeaders();
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -129,7 +128,7 @@ public class MVideoParser implements ru.manalyzer.Parser {
     private Mono<List<ProductDetail>> getProductDetails(List<String> productIds,
                                                         String searchName) {
         ProductListPostObject postObject = new ProductListPostObject(productIds);
-        HttpHeaders productDetailsRequestHeaders = mVideoHeadersService.getDetailsHeaders(searchName);
+        HttpHeaders productDetailsRequestHeaders = headersService.getDetailsHeaders(searchName);
         return webClient
                 .post()
                 .uri(properties.getProductDetailsUrl())
