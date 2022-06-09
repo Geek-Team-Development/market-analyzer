@@ -17,7 +17,6 @@ import ru.manalyzer.repository.ProductPriceRepository;
 import ru.manalyzer.repository.ReactiveFavoriteRepository;
 import ru.manalyzer.service.dto.ProductUpdateDto;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -161,21 +160,6 @@ public class FavoritesServiceImpl implements FavoritesService {
     }
 
     private Mono<ProductDto> updateOneProduct(ProductDto productDto) {
-//        ProductDto updated = productMapper.toDto(productMapper.toEntity(productDto));
-//        updated.setPrice(new BigDecimal(productDto.getPrice()).add(new BigDecimal(2000)).toString());
-//        return Mono.just(updated)
-//                .mapNotNull(updatedDto -> {
-//                    if (!productDto.equals(updatedDto)) {
-//                        saveProductPrice(saveOrUpdateProduct(updatedDto));
-//                        System.out.println("New product price " + updatedDto.getPrice());
-//                        System.out.println("Old product price " + productDto.getPrice());
-//                        updatedDto.setOldPrice(productDto.getPrice());
-//                        notifyUser(updatedDto);
-//                        notifyFront(productDto, updatedDto);
-//                        return updatedDto;
-//                    }
-//                    return productDto;
-//                });
         return activeParserMap.get(productDto.getShopName())
                 .parseOneProduct(productDto)
                 .mapNotNull(updatedDto -> {

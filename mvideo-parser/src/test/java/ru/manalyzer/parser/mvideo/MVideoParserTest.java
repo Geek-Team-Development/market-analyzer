@@ -227,7 +227,7 @@ public class MVideoParserTest {
 
     private List<String> getProductIds() {
         Random random = new Random();
-        return IntStream.rangeClosed(0, 10)
+        return IntStream.rangeClosed(0, 2)
                 .mapToObj(value -> Integer.toString(random.nextInt(Integer.MAX_VALUE)))
                 .collect(Collectors.toList());
     }

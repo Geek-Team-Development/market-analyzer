@@ -14,6 +14,7 @@ import reactor.test.StepVerifier;
 import ru.manalyzer.controller.param.ProductRequestParam;
 import ru.manalyzer.dto.ProductDto;
 import ru.manalyzer.dto.Sort;
+import ru.manalyzer.service.PaginationService;
 import ru.manalyzer.service.ProductService;
 import ru.manalyzer.service.ProductServiceImpl;
 
@@ -22,7 +23,7 @@ import java.util.Optional;
 
 public class ProductControllerTest {
 
-    private static ProductService productService;
+    private static PaginationService paginationService;
 
     private static ProductController productController;
 
@@ -33,14 +34,14 @@ public class ProductControllerTest {
 
     @BeforeAll
     public static void initAll() {
-        productService = Mockito.mock(ProductServiceImpl.class);
-//        productController = new ProductController(productService);
+        paginationService = Mockito.mock(PaginationService.class);
+        productController = new ProductController(paginationService);
 
         productDtoFlux = Flux.create(sink -> {
                         sink.next(new ProductDto(
                                 "1",
                                 "Macbook Pro",
-                                "200000",
+                                "140000",
                                 "https://www.oldi.ru/catalog/element/1",
                                 "https://img.oldi.ru/",
                                 "Oldi"
@@ -64,7 +65,7 @@ public class ProductControllerTest {
                         sink.next(new ProductDto(
                                 "2",
                                 "Macbook Air",
-                                "140000",
+                                "200000",
                                 "https://www.mvideo.ru/catalog/element/2",
                                 "https://img.mvideo.ru/",
                                 "M.Video"
@@ -79,7 +80,7 @@ public class ProductControllerTest {
         String searchName = "macbook";
         ProductRequestParam requestParam = new ProductRequestParam(searchName, 0, Sort.price_asc);
 
-        Mockito.when(productService.findProducts(requestParam))
+        Mockito.when(paginationService.findProducts(requestParam))
                 .thenReturn(productDtoFlux);
 
         WebTestClient

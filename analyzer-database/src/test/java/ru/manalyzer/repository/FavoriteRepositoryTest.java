@@ -3,12 +3,10 @@ package ru.manalyzer.repository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.manalyzer.persist.Favorite;
 import ru.manalyzer.persist.Product;
 import ru.manalyzer.persist.Role;
@@ -16,8 +14,8 @@ import ru.manalyzer.persist.User;
 
 import java.math.BigDecimal;
 
-@DataMongoTest(excludeAutoConfiguration = {EmbeddedMongoAutoConfiguration.class})
-@ExtendWith(SpringExtension.class)
+@DataMongoTest
+@OverrideAutoConfiguration(enabled = true)
 public class FavoriteRepositoryTest {
 
     @Autowired

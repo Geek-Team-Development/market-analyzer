@@ -59,6 +59,10 @@ public class FavoriteServiceTest {
 
     private final StorageProductService storageProductService = mock(StorageProductService.class);
 
+    private final UserService userService = mock(UserService.class);
+
+    private final TelegramService telegramService = mock(TelegramService.class);
+
     private ProductDto macbookPro;
 
     private ProductDto macbookAir;
@@ -89,7 +93,7 @@ public class FavoriteServiceTest {
                 reactiveFavoriteRepository,
                 productPriceRepository,
                 authenticationService,
-                null, null,
+                userService, telegramService,
                 storageProductService,
                 productMapper,
                 productDtoToProductPriceMapper,
@@ -123,27 +127,46 @@ public class FavoriteServiceTest {
 
     @Test
     public void getFavoritesCartOfUserTest() {
+        Product macBookAirEntity = productMapper.toEntity(macbookAir);
+        Product macBookProEntity = productMapper.toEntity(macbookPro);
+        Product macMiniEntity = productMapper.toEntity(macMini);
+        Set<Product> favoritesSet = Set.of(macBookProEntity, macBookAirEntity, macMiniEntity);
+        Favorite favorite = new Favorite("test", favoritesSet);
+        String telegramChatId = "1";
+
         when(reactiveFavoriteRepository.findByUserId(any()))
                 .thenAnswer(invocationOnMock -> {
                     Mono<String> userIdMono = invocationOnMock.getArgument(0);
                     String userId = userIdMono.block();
                     assertNotNull(userId);
                     if(userId.equals("test")) {
-                        return Flux.just(new Favorite(
-                                "test",
-                                Set.of(productMapper.toEntity(macbookPro), productMapper.toEntity(macbookAir),
-                                        productMapper.toEntity(macMini))
-                        ));
+                        return Flux.just(favorite);
                     }
                     return null;
                 });
-
         when(oldiParser.parseOneProduct(Mockito.argThat(dto -> dto.getShopName().equals(oldiShopName))))
                 .thenReturn(Mono.just(macbookAir));
         when(mvideoParser.parseOneProduct(Mockito.argThat(dto -> dto.getShopName().equals(mvideoShopName))))
                 .thenReturn(Mono.just(macbookPro));
         when(citilinkParser.parseOneProduct(Mockito.argThat(dto -> dto.getShopName().equals(citilinkShopName))))
                 .thenReturn(Mono.just(macMini));
+
+        when(storageProductService.findProductByShopIdAndShopName(macbookAir.getId(), macbookAir.getShopName()))
+                .thenReturn(Optional.of(macBookAirEntity));
+        when(storageProductService.findProductByShopIdAndShopName(macbookPro.getId(), macbookPro.getShopName()))
+                .thenReturn(Optional.of(macBookProEntity));
+        when(storageProductService.findProductByShopIdAndShopName(macMini.getId(), macMini.getShopName()))
+                .thenReturn(Optional.of(macMiniEntity));
+
+        when(reactiveFavoriteRepository.findByProductsContains(macBookAirEntity))
+                .thenReturn(Flux.just(favorite));
+        when(reactiveFavoriteRepository.findByProductsContains(macBookProEntity))
+                .thenReturn(Flux.just(favorite));
+        when(reactiveFavoriteRepository.findByProductsContains(macMiniEntity))
+                .thenReturn(Flux.just(favorite));
+
+        when(userService.getTelegramChatIdByUserId(favorite.getUserId()))
+                .thenReturn(Optional.of(telegramChatId));
 
         UserDto userDto = new UserDto();
         userDto.setId("test");
@@ -165,6 +188,9 @@ public class FavoriteServiceTest {
                 .thenCancel()
                 .verify();
 
+        verify(telegramService, times(1)).notifyUsersAboutChangePrice(telegramChatId, macbookAir);
+        verify(telegramService, times(1)).notifyUsersAboutChangePrice(telegramChatId, macbookPro);
+        verify(telegramService, times(1)).notifyUsersAboutChangePrice(telegramChatId, macMini);
     }
 
     @Test
