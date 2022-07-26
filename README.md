@@ -2,8 +2,15 @@
 
 <details open=""><summary><h2>Описание</h2></summary>
   <div>
-    <a href="http://80.78.244.225">Space Price</a> &ndash; современный сервис для получения актуальной информации о товарах
+    <a href="http://space-price.ru/">Space Price</a> &ndash; современный сервис для получения актуальной информации о товарах
         интернет магазинов.
+  </div>
+  <p></p>
+  <div>
+    Demo версия сайта: <a href="http://space-price.ru/">space-price.ru</a>
+  </div>
+  <div>
+    Demo версия Telegram-bot: <a href="https://t.me/SpacePriceBot">SpacePriceBot</a>
   </div>
   <p></p>
   <div align="center">
